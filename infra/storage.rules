@@ -28,7 +28,7 @@ service firebase.storage {
     }
 
     function isValidImageType() {
-      return request.resource.contentType.matches('image/(jpeg|jpg|png|webp|heic|heif)');
+      return request.resource.contentType.matches('image/.*');
     }
 
     function isValidMediaType() {
@@ -45,30 +45,34 @@ service firebase.storage {
       return request.resource.size < 5 * 1024 * 1024;
     }
 
+    function caseExists(caseId) {
+      return firestore.exists(/databases/(default)/documents/cases/$(caseId));
+    }
+
     function caseReporterUid(caseId) {
-      return get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid;
+      return firestore.get(/databases/(default)/documents/cases/$(caseId)).data.reporterUid;
     }
 
     function caseMuniCode(caseId) {
-      return get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode;
+      return firestore.get(/databases/(default)/documents/cases/$(caseId)).data.muniCode;
     }
 
     match /cases/{caseId}/media/{fileName} {
       allow create: if isAuthenticated() &&
         isValidMediaType() &&
         isUnderMaxSize() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         caseReporterUid(caseId) == request.auth.uid;
 
       allow read: if isAuthenticated() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         (
           caseReporterUid(caseId) == request.auth.uid ||
           (isOfficial() && canAccessMunicipality(caseMuniCode(caseId)))
         );
 
       allow update: if isAuthenticated() && isOfficial() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         canAccessMunicipality(caseMuniCode(caseId));
 
       allow delete: if isAuthenticated() && isAdmin();
@@ -109,20 +113,20 @@ service firebase.storage {
 
     match /cases/{caseId}/resolution/{fileName} {
       allow create: if isAuthenticated() && isOfficial() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         canAccessMunicipality(caseMuniCode(caseId)) &&
         isValidMediaType() &&
         isUnderMaxSize();
 
       allow read: if isAuthenticated() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         (
           caseReporterUid(caseId) == request.auth.uid ||
           (isOfficial() && canAccessMunicipality(caseMuniCode(caseId)))
         );
 
       allow update: if isAuthenticated() && isOfficial() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
+        caseExists(caseId) &&
         canAccessMunicipality(caseMuniCode(caseId));
 
       allow delete: if isAuthenticated() && isAdmin();

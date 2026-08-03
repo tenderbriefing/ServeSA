@@ -29,17 +29,18 @@
     "pilot:evidence": "ts-node tools/pilot/evidence_pack.ts --benchmark pilot_out/benchmark/summary.json --points pilot_out/pilot_points.geojson --out pilot_out/evidence"
   },
   "devDependencies": {
-    "turbo": "^1.10.0",
-    "typescript": "^5.2.0",
-    "@types/node": "^20.0.0",
-    "@types/node-fetch": "^2.6.0",
-    "prettier": "^3.0.0",
-    "eslint": "^8.0.0",
-    "playwright": "^1.40.0",
-    "ts-node": "^10.9.0",
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.5.0",
     "@turf/random": "^6.5.0",
-    "@turf/boolean-point-in-polygon": "^6.5.0"
+    "@types/node": "^20.0.0",
+    "@types/node-fetch": "^2.6.0",
+    "eslint": "^8.0.0",
+    "playwright": "^1.40.0",
+    "prettier": "^3.0.0",
+    "ts-node": "^10.9.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.2.0"
   },
   "engines": {
     "node": ">=20.0.0",
