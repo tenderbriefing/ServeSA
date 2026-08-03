@@ -1,3 +1,5 @@
+'use client'
+
 import { MunicipalityProfile } from '@/components/Municipality/MunicipalityProfile'
 
 export default function MunicipalityPage() {

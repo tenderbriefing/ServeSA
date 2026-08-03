@@ -1,183 +1,133 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
-    
+
     function hasRole(roles) {
-      return request.auth.token.roles != null && 
+      return request.auth.token.roles != null &&
              request.auth.token.roles.hasAny(roles);
     }
-    
+
     function isOfficial() {
       return hasRole(['official', 'moderator', 'admin']);
     }
-    
+
     function isAdmin() {
       return hasRole(['admin']);
     }
-    
+
+    function canAccessMunicipality(muniCode) {
+      return isAdmin() ||
+             (isOfficial() && request.auth.token.municipalityCode == muniCode);
+    }
+
     function isValidImageType() {
-      return request.resource.contentType.matches('image/.*');
+      return request.resource.contentType.matches('image/(jpeg|jpg|png|webp|heic|heif)');
     }
-    
-    function isValidVideoType() {
-      return request.resource.contentType.matches('video/.*');
-    }
-    
-    function isValidAudioType() {
-      return request.resource.contentType.matches('audio/.*');
-    }
-    
+
     function isValidMediaType() {
-      return isValidImageType() || isValidVideoType() || isValidAudioType();
+      return isValidImageType() ||
+             request.resource.contentType.matches('video/(mp4|quicktime)') ||
+             request.resource.contentType.matches('audio/.*');
     }
-    
+
     function isUnderMaxSize() {
-      return request.resource.size < 10 * 1024 * 1024; // 10MB limit
+      return request.resource.size < 10 * 1024 * 1024;
     }
-    
+
     function isUnderImageMaxSize() {
-      return request.resource.size < 5 * 1024 * 1024; // 5MB for images
+      return request.resource.size < 5 * 1024 * 1024;
     }
-    
-    function isUnderVideoMaxSize() {
-      return request.resource.size < 50 * 1024 * 1024; // 50MB for videos
+
+    function caseReporterUid(caseId) {
+      return get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid;
     }
-    
-    function isUnderAudioMaxSize() {
-      return request.resource.size < 10 * 1024 * 1024; // 10MB for audio
+
+    function caseMuniCode(caseId) {
+      return get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode;
     }
-    
-    // Case media files
+
     match /cases/{caseId}/media/{fileName} {
-      // Citizens can upload media for their own cases
-      allow create: if isAuthenticated() && 
-        isValidMediaType() && 
+      allow create: if isAuthenticated() &&
+        isValidMediaType() &&
         isUnderMaxSize() &&
-        // Verify case ownership through Firestore
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid;
-      
-      // Citizens can read their own case media
-      allow read: if isAuthenticated() && 
+        caseReporterUid(caseId) == request.auth.uid;
+
+      allow read: if isAuthenticated() &&
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid;
-      
-      // Officials can read case media in their jurisdiction
-      allow read: if isAuthenticated() && isOfficial() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        canAccessMunicipality(get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode);
-      
-      // Officials can update case media (replace with blurred versions)
+        (
+          caseReporterUid(caseId) == request.auth.uid ||
+          (isOfficial() && canAccessMunicipality(caseMuniCode(caseId)))
+        );
+
       allow update: if isAuthenticated() && isOfficial() &&
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        canAccessMunicipality(get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode);
-      
-      // Only admins can delete case media
+        canAccessMunicipality(caseMuniCode(caseId));
+
       allow delete: if isAuthenticated() && isAdmin();
     }
-    
-    // Case thumbnails (public access for blurred versions)
+
     match /cases/{caseId}/thumbnails/{fileName} {
-      // Public read access for blurred thumbnails
       allow read: if true;
-      
-      // Only system functions can create/update thumbnails
-      allow create, update: if isAuthenticated() && 
-        (isOfficial() || request.auth.token.aud == 'firebase-adminsdk');
-      
-      // Only admins can delete thumbnails
+      allow create, update: if false;
       allow delete: if isAuthenticated() && isAdmin();
     }
-    
-    // User avatars
+
     match /users/{userId}/avatar/{fileName} {
-      // Users can upload their own avatar
-      allow create: if isAuthenticated() && 
-        isOwner(userId) && 
-        isValidImageType() && 
+      allow create: if isAuthenticated() &&
+        isOwner(userId) &&
+        isValidImageType() &&
         isUnderImageMaxSize();
-      
-      // Users can read their own avatar
       allow read: if isAuthenticated() && isOwner(userId);
-      
-      // Users can update their own avatar
-      allow update: if isAuthenticated() && 
-        isOwner(userId) && 
-        isValidImageType() && 
+      allow update: if isAuthenticated() &&
+        isOwner(userId) &&
+        isValidImageType() &&
         isUnderImageMaxSize();
-      
-      // Users can delete their own avatar
       allow delete: if isAuthenticated() && isOwner(userId);
     }
-    
-    // Public assets (logos, icons, etc.)
+
     match /public/{fileName} {
-      // Public read access
       allow read: if true;
-      
-      // Only admins can upload public assets
-      allow create, update: if isAuthenticated() && isAdmin();
-      
-      // Only admins can delete public assets
-      allow delete: if isAuthenticated() && isAdmin();
+      allow create, update, delete: if isAuthenticated() && isAdmin();
     }
-    
-    // Temporary uploads (for processing)
+
     match /temp/{userId}/{fileName} {
-      // Users can upload temporary files
-      allow create: if isAuthenticated() && 
-        isOwner(userId) && 
-        isValidMediaType() && 
+      allow create: if isAuthenticated() &&
+        isOwner(userId) &&
+        isValidMediaType() &&
         isUnderMaxSize();
-      
-      // Users can read their own temporary files
       allow read: if isAuthenticated() && isOwner(userId);
-      
-      // Users can delete their own temporary files
       allow delete: if isAuthenticated() && isOwner(userId);
-      
-      // System can clean up old temporary files
-      allow delete: if isAuthenticated() && 
-        (isAdmin() || request.auth.token.aud == 'firebase-adminsdk');
     }
-    
-    // Resolution media (evidence of completed work)
+
     match /cases/{caseId}/resolution/{fileName} {
-      // Officials can upload resolution media
       allow create: if isAuthenticated() && isOfficial() &&
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        canAccessMunicipality(get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode) &&
-        isValidMediaType() && 
+        canAccessMunicipality(caseMuniCode(caseId)) &&
+        isValidMediaType() &&
         isUnderMaxSize();
-      
-      // Citizens can read resolution media for their cases
-      allow read: if isAuthenticated() && 
+
+      allow read: if isAuthenticated() &&
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid;
-      
-      // Officials can read resolution media in their jurisdiction
-      allow read: if isAuthenticated() && isOfficial() &&
-        exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        canAccessMunicipality(get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode);
-      
-      // Officials can update resolution media
+        (
+          caseReporterUid(caseId) == request.auth.uid ||
+          (isOfficial() && canAccessMunicipality(caseMuniCode(caseId)))
+        );
+
       allow update: if isAuthenticated() && isOfficial() &&
         exists(/databases/$(database)/documents/cases/$(caseId)) &&
-        canAccessMunicipality(get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode);
-      
-      // Only admins can delete resolution media
+        canAccessMunicipality(caseMuniCode(caseId));
+
       allow delete: if isAuthenticated() && isAdmin();
     }
-    
-    // Deny all other access
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

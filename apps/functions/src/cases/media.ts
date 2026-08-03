@@ -1,334 +1,359 @@
-import * as admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
+/**
+ * Case media upload — only against an existing owned case.
+ * Paths: cases/{caseId}/media/{fileName}
+ */
 
-const db = getFirestore();
-const storage = getStorage();
+import * as admin from 'firebase-admin'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
+import { logCaseTelemetry } from '../telemetry/caseEvents'
+
+const db = getFirestore()
+const storage = getStorage()
+
+const ALLOWED_MIME = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+])
+
+const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'])
+const MAX_BYTES = 10 * 1024 * 1024
 
 interface MediaUploadData {
-  caseId: string;
+  caseId: string
   files: Array<{
-    name: string;
-    type: string;
-    size: number;
-    data: string; // Base64 encoded data
-  }>;
-  userId: string;
+    name: string
+    type: string
+    size: number
+    data: string
+    contentHash?: string
+  }>
+  userId?: string
 }
 
 interface MediaProcessingResult {
-  success: boolean;
-  mediaUrls: string[];
-  error?: string;
+  success: boolean
+  mediaUrls: string[]
+  failed: Array<{ name: string; reason: string }>
+  status: 'completed' | 'partial' | 'failed'
+  error?: string
 }
 
-/**
- * Process media upload for a case
- */
-export const processMediaUpload = async (data: MediaUploadData): Promise<MediaProcessingResult> => {
-  try {
-    const { caseId, files, userId } = data;
-
-    // Validate case exists
-    const caseDoc = await db.collection('cases').doc(caseId).get();
-    if (!caseDoc.exists) {
-      throw new Error('Case not found');
-    }
-
-    const mediaUrls: string[] = [];
-    const processedFiles: any[] = [];
-
-    // Process each file
-    for (const file of files) {
-      try {
-        const processedFile = await processFile(file, caseId, userId);
-        mediaUrls.push(processedFile.url);
-        processedFiles.push(processedFile);
-      } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error);
-        // Continue processing other files
-      }
-    }
-
-    if (mediaUrls.length === 0) {
-      throw new Error('No files were successfully processed');
-    }
-
-    // Update case with media URLs
-    await db.collection('cases').doc(caseId).update({
-      mediaUrls: admin.firestore.FieldValue.arrayUnion(...mediaUrls),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedBy: userId
-    });
-
-    // Create media upload event
-    await db.collection('case_events').add({
-      caseId,
-      eventType: 'media_uploaded',
-      description: `${mediaUrls.length} media file(s) uploaded`,
-      userId,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      metadata: {
-        fileCount: mediaUrls.length,
-        fileTypes: processedFiles.map(f => f.type),
-        totalSize: processedFiles.reduce((sum, f) => sum + f.size, 0)
-      }
-    });
-
-    return {
-      success: true,
-      mediaUrls
-    };
-
-  } catch (error) {
-    console.error('Error processing media upload:', error);
-    return {
-      success: false,
-      mediaUrls: [],
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-};
-
-/**
- * Process individual file
- */
-async function processFile(file: any, caseId: string, userId: string): Promise<any> {
-  try {
-    // Validate file
-    validateFile(file);
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const fileExtension = getFileExtension(file.name);
-    const fileName = `${caseId}/${timestamp}_${sanitizeFileName(file.name)}`;
-    
-    // Convert base64 to buffer
-    const fileBuffer = Buffer.from(file.data, 'base64');
-
-    // Upload to Firebase Storage
-    const bucket = storage.bucket();
-    const fileRef = bucket.file(fileName);
-
-    await fileRef.save(fileBuffer, {
-      metadata: {
-        contentType: file.type,
-        metadata: {
-          caseId,
-          userId,
-          originalName: file.name,
-          uploadedAt: new Date().toISOString()
-        }
-      }
-    });
-
-    // Make file publicly accessible
-    await fileRef.makePublic();
-
-    // Get public URL
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-
-    // Store file metadata in database
-    const fileMetadata = {
-      caseId,
-      fileName,
-      originalName: file.name,
-      type: file.type,
-      size: file.size,
-      url: publicUrl,
-      uploadedBy: userId,
-      uploadedAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-
-    await db.collection('case_media').add(fileMetadata);
-
-    return {
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      url: publicUrl
-    };
-
-  } catch (error) {
-    console.error('Error processing file:', error);
-    throw error;
-  }
+function getExt(fileName: string): string {
+  const i = fileName.lastIndexOf('.')
+  return i === -1 ? '' : fileName.slice(i + 1).toLowerCase()
 }
 
-/**
- * Validate file
- */
-function validateFile(file: any): void {
-  // Check file size (max 10MB)
-  const maxSize = 10 * 1024 * 1024; // 10MB
-  if (file.size > maxSize) {
-    throw new Error(`File ${file.name} is too large. Maximum size is 10MB.`);
-  }
-
-  // Check file type
-  const allowedTypes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'video/mp4',
-    'video/avi',
-    'video/mov',
-    'application/pdf',
-    'text/plain'
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error(`File type ${file.type} is not allowed.`);
-  }
-
-  // Check file name
-  if (!file.name || file.name.length === 0) {
-    throw new Error('File name is required.');
-  }
-}
-
-/**
- * Get file extension
- */
-function getFileExtension(fileName: string): string {
-  const lastDot = fileName.lastIndexOf('.');
-  return lastDot !== -1 ? fileName.substring(lastDot + 1) : '';
-}
-
-/**
- * Sanitize file name
- */
 function sanitizeFileName(fileName: string): string {
   return fileName
     .replace(/[^a-zA-Z0-9.-]/g, '_')
     .replace(/_+/g, '_')
-    .replace(/^_|_$/g, '');
+    .replace(/^_|_$/g, '')
+    .slice(0, 120)
+}
+
+function validateFile(file: {
+  name: string
+  type: string
+  size: number
+  data: string
+}): void {
+  if (!file.name) throw new Error('File name is required')
+  if (file.size > MAX_BYTES) throw new Error('File exceeds 10MB limit')
+  if (!ALLOWED_MIME.has(file.type)) {
+    throw new Error(`Unsupported file type: ${file.type}`)
+  }
+  const ext = getExt(file.name)
+  if (!ALLOWED_EXT.has(ext)) {
+    throw new Error(`Unsupported file extension: ${ext}`)
+  }
+  // Reject executable disguises
+  const lower = file.name.toLowerCase()
+  if (
+    lower.endsWith('.exe') ||
+    lower.endsWith('.js') ||
+    lower.endsWith('.html') ||
+    lower.endsWith('.sh')
+  ) {
+    throw new Error('Executable or script uploads are not allowed')
+  }
+}
+
+async function assertCaseOwnership(
+  caseId: string,
+  userId?: string
+): Promise<Record<string, any>> {
+  const caseDoc = await db.collection('cases').doc(caseId).get()
+  if (!caseDoc.exists) {
+    throw new Error('Case not found')
+  }
+  const data = caseDoc.data()!
+  if (userId && data.reporterUid && data.reporterUid !== userId) {
+    throw new Error('Not authorised to attach media to this case')
+  }
+  return data
 }
 
 /**
- * Delete media files for a case
+ * Callable media upload against a durable case ID.
  */
-export const deleteCaseMedia = async (caseId: string, userId: string): Promise<void> => {
+export const processMediaUpload = async (
+  data: MediaUploadData
+): Promise<MediaProcessingResult> => {
+  const failed: Array<{ name: string; reason: string }> = []
+  const mediaUrls: string[] = []
+
   try {
-    // Get all media files for the case
-    const mediaSnapshot = await db.collection('case_media')
-      .where('caseId', '==', caseId)
-      .get();
+    const { caseId, files, userId } = data
+    if (!caseId) throw new Error('caseId is required')
+    if (!files?.length) throw new Error('No files provided')
 
-    const bucket = storage.bucket();
+    await assertCaseOwnership(caseId, userId)
 
-    // Delete each file from storage
-    for (const mediaDoc of mediaSnapshot.docs) {
-      const mediaData = mediaDoc.data();
-      
+    logCaseTelemetry('media_upload_started', {
+      caseId,
+      fileCount: files.length,
+    })
+
+    await db.collection('cases').doc(caseId).update({
+      'media.status': 'processing',
+      updatedAt: FieldValue.serverTimestamp(),
+    })
+
+    for (const file of files) {
       try {
-        const fileRef = bucket.file(mediaData.fileName);
-        await fileRef.delete();
-      } catch (error) {
-        console.error(`Error deleting file ${mediaData.fileName}:`, error);
-      }
+        // Idempotency via content hash if provided
+        if (file.contentHash) {
+          const existing = await db
+            .collection('case_media')
+            .where('caseId', '==', caseId)
+            .where('contentHash', '==', file.contentHash)
+            .limit(1)
+            .get()
+          if (!existing.empty) {
+            const url = existing.docs[0].data().url
+            if (url) mediaUrls.push(url)
+            continue
+          }
+        }
 
-      // Delete metadata
-      await mediaDoc.ref.delete();
+        validateFile(file)
+        const processed = await processFile(file, caseId, userId || 'anonymous')
+        mediaUrls.push(processed.url)
+      } catch (error) {
+        failed.push({
+          name: file.name,
+          reason: error instanceof Error ? error.message : 'upload failed',
+        })
+      }
     }
 
-    // Create deletion event
-    await db.collection('case_events').add({
+    const status: MediaProcessingResult['status'] =
+      mediaUrls.length === 0
+        ? 'failed'
+        : failed.length > 0
+          ? 'partial'
+          : 'completed'
+
+    await db.collection('cases').doc(caseId).update({
+      mediaUrls: FieldValue.arrayUnion(...mediaUrls),
+      'media.status': status,
+      'media.count': FieldValue.increment(mediaUrls.length),
+      'media.paths': FieldValue.arrayUnion(
+        ...mediaUrls.map(() => `cases/${caseId}/media`)
+      ),
+      updatedAt: FieldValue.serverTimestamp(),
+      updatedBy: userId || 'anonymous',
+    })
+
+    if (mediaUrls.length > 0) {
+      await db.collection('cases').doc(caseId).collection('events').add({
+        caseId,
+        eventType: 'media_uploaded',
+        description: `${mediaUrls.length} media file(s) uploaded`,
+        actorUid: userId || null,
+        timestamp: FieldValue.serverTimestamp(),
+        metadata: {
+          fileCount: mediaUrls.length,
+          failedCount: failed.length,
+        },
+      })
+    }
+
+    logCaseTelemetry('media_upload_completed', {
       caseId,
-      eventType: 'media_deleted',
-      description: 'All media files deleted',
-      userId,
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
-    });
+      uploaded: mediaUrls.length,
+      failed: failed.length,
+      status,
+    })
 
+    return {
+      success: mediaUrls.length > 0,
+      mediaUrls,
+      failed,
+      status,
+      error: status === 'failed' ? 'No files were successfully processed' : undefined,
+    }
   } catch (error) {
-    console.error('Error deleting case media:', error);
-    throw error;
+    console.error('Error processing media upload:', error)
+    return {
+      success: false,
+      mediaUrls: [],
+      failed,
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
   }
-};
+}
+
+async function processFile(
+  file: { name: string; type: string; size: number; data: string; contentHash?: string },
+  caseId: string,
+  userId: string
+): Promise<{ name: string; type: string; size: number; url: string }> {
+  const timestamp = Date.now()
+  const fileName = `cases/${caseId}/media/${timestamp}_${sanitizeFileName(file.name)}`
+  const fileBuffer = Buffer.from(file.data, 'base64')
+  const bucket = storage.bucket()
+  const fileRef = bucket.file(fileName)
+
+  await fileRef.save(fileBuffer, {
+    metadata: {
+      contentType: file.type,
+      metadata: {
+        caseId,
+        userId,
+        originalName: file.name,
+        uploadedAt: new Date().toISOString(),
+      },
+    },
+  })
+
+  // Private by default — signed URLs for access; do not makePublic
+  const [signedUrl] = await fileRef.getSignedUrl({
+    action: 'read',
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+  })
+
+  await db.collection('case_media').add({
+    caseId,
+    fileName,
+    originalName: file.name,
+    type: file.type,
+    size: file.size,
+    url: signedUrl,
+    storagePath: fileName,
+    contentHash: file.contentHash || null,
+    processingStatus: 'stored',
+    uploadedBy: userId,
+    uploadedAt: FieldValue.serverTimestamp(),
+  })
+
+  return {
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    url: signedUrl,
+  }
+}
 
 /**
- * Get media files for a case
+ * Storage onFinalize processor — idempotent finalisation hook.
  */
+export const onMediaObjectFinalized = async (object: {
+  name?: string
+  contentType?: string
+  metadata?: Record<string, string>
+}): Promise<void> => {
+  const name = object.name
+  if (!name || !name.startsWith('cases/') || !name.includes('/media/')) {
+    return
+  }
+  const parts = name.split('/')
+  const caseId = parts[1]
+  if (!caseId) return
+
+  const existing = await db
+    .collection('case_media')
+    .where('storagePath', '==', name)
+    .limit(1)
+    .get()
+
+  if (!existing.empty) {
+    return // already recorded
+  }
+
+  await db.collection('case_media').add({
+    caseId,
+    fileName: name,
+    storagePath: name,
+    type: object.contentType || 'application/octet-stream',
+    processingStatus: 'stored',
+    uploadedBy: object.metadata?.userId || 'system',
+    uploadedAt: FieldValue.serverTimestamp(),
+  })
+}
+
+export const deleteCaseMedia = async (
+  caseId: string,
+  userId: string
+): Promise<void> => {
+  await assertCaseOwnership(caseId, userId)
+  const mediaSnapshot = await db
+    .collection('case_media')
+    .where('caseId', '==', caseId)
+    .get()
+  const bucket = storage.bucket()
+
+  for (const mediaDoc of mediaSnapshot.docs) {
+    const mediaData = mediaDoc.data()
+    try {
+      await bucket.file(mediaData.fileName || mediaData.storagePath).delete()
+    } catch (error) {
+      console.error(`Error deleting file ${mediaData.fileName}:`, error)
+    }
+    await mediaDoc.ref.delete()
+  }
+}
+
 export const getCaseMedia = async (caseId: string): Promise<any[]> => {
-  try {
-    const mediaSnapshot = await db.collection('case_media')
-      .where('caseId', '==', caseId)
-      .orderBy('uploadedAt', 'desc')
-      .get();
+  const mediaSnapshot = await db
+    .collection('case_media')
+    .where('caseId', '==', caseId)
+    .get()
+  return mediaSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+}
 
-    return mediaSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+export const generateSignedUrl = async (
+  fileName: string,
+  expiresIn: number = 3600
+): Promise<string> => {
+  const bucket = storage.bucket()
+  const [signedUrl] = await bucket.file(fileName).getSignedUrl({
+    action: 'read',
+    expires: Date.now() + expiresIn * 1000,
+  })
+  return signedUrl
+}
 
-  } catch (error) {
-    console.error('Error getting case media:', error);
-    return [];
-  }
-};
+export const compressImage = async (
+  fileBuffer: Buffer,
+  _quality: number = 80
+): Promise<Buffer> => fileBuffer
 
-/**
- * Generate signed URL for private file access
- */
-export const generateSignedUrl = async (fileName: string, expiresIn: number = 3600): Promise<string> => {
-  try {
-    const bucket = storage.bucket();
-    const fileRef = bucket.file(fileName);
+export const extractImageMetadata = async (
+  _fileBuffer: Buffer
+): Promise<any> => ({
+  width: 0,
+  height: 0,
+  format: 'unknown',
+  hasLocation: false,
+  location: null,
+})
 
-    const [signedUrl] = await fileRef.getSignedUrl({
-      action: 'read',
-      expires: Date.now() + expiresIn * 1000
-    });
-
-    return signedUrl;
-
-  } catch (error) {
-    console.error('Error generating signed URL:', error);
-    throw error;
-  }
-};
-
-/**
- * Compress image file
- */
-export const compressImage = async (fileBuffer: Buffer, quality: number = 80): Promise<Buffer> => {
-  try {
-    // For Phase-1, return original buffer
-    // In production, this would use Sharp or similar library for image compression
-    return fileBuffer;
-
-  } catch (error) {
-    console.error('Error compressing image:', error);
-    return fileBuffer;
-  }
-};
-
-/**
- * Extract metadata from image
- */
-export const extractImageMetadata = async (fileBuffer: Buffer): Promise<any> => {
-  try {
-    // For Phase-1, return basic metadata
-    // In production, this would use ExifReader or similar library
-    return {
-      width: 0,
-      height: 0,
-      format: 'unknown',
-      hasLocation: false,
-      location: null
-    };
-
-  } catch (error) {
-    console.error('Error extracting image metadata:', error);
-    return {
-      width: 0,
-      height: 0,
-      format: 'unknown',
-      hasLocation: false,
-      location: null
-    };
-  }
-};
+// Avoid unused import warning for admin namespace usage patterns
+void admin

@@ -17,7 +17,7 @@ export class GeoresolveAPI {
    */
   async resolveCoordinates(lat: number, lng: number) {
     try {
-      const georesolveFunction = httpsCallable(functions, 'routingLookup');
+      const georesolveFunction = httpsCallable(functions, 'georesolveFunction');
       const result = await georesolveFunction({ lat, lng });
       return result.data;
     } catch (error) {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -39,7 +39,7 @@ export default function DashboardPage() {
         // Load user's cases from Firestore
         const casesQuery = query(
           collection(db, 'cases'),
-          where('userId', '==', user?.uid),
+          where('reporterUid', '==', user?.uid),
           orderBy('createdAt', 'desc')
         )
 

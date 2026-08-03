@@ -11,7 +11,6 @@ import { CompleteProfileModalWrapper } from '@/components/Auth/CompleteProfileMo
 import { Toaster } from '@/components/ui/Toaster'
 import { Analytics } from '@/components/Analytics'
 import './globals.css'
-import '../i18n/config'
 
 const inter = Inter({ subsets: ['latin'] })
 

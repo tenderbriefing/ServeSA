@@ -1,316 +1,232 @@
-import * as admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
+/**
+ * Duplicate assessment — advisory only.
+ * Never auto-closes or merges citizen cases without an authorised workflow.
+ */
 
-const db = getFirestore();
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { logCaseTelemetry } from '../telemetry/caseEvents'
+
+const db = getFirestore()
 
 interface DedupeRequest {
-  caseId: string;
-  threshold?: number;
-  timeWindow?: number;
+  caseId: string
+  threshold?: number
+  timeWindow?: number
 }
 
-interface DedupeResult {
-  success: boolean;
-  caseId: string;
+export interface DedupeResult {
+  success: boolean
+  caseId: string
+  status: 'completed' | 'skipped' | 'failed'
   duplicates: Array<{
-    caseId: string;
-    similarity: number;
-    distance: number;
-    timeDiff: number;
-  }>;
-  merged?: boolean;
-  error?: string;
+    caseId: string
+    similarity: number
+    distance: number
+    timeDiffHours: number
+    signals: string[]
+  }>
+  linked: false
+  suggested: boolean
+  error?: string
 }
 
-/**
- * Find and handle duplicate cases
- */
+function toDate(value: any): Date {
+  if (!value) return new Date(0)
+  if (typeof value.toDate === 'function') return value.toDate()
+  if (value instanceof Date) return value
+  return new Date(value)
+}
+
+function haversineMeters(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
+function textSimilarity(a: string, b: string): number {
+  const ta = new Set(
+    (a || '')
+      .toLowerCase()
+      .split(/\W+/)
+      .filter(Boolean)
+  )
+  const tb = new Set(
+    (b || '')
+      .toLowerCase()
+      .split(/\W+/)
+      .filter(Boolean)
+  )
+  if (ta.size === 0 || tb.size === 0) return 0
+  let inter = 0
+  for (const t of ta) if (tb.has(t)) inter++
+  return inter / Math.max(ta.size, tb.size)
+}
+
 export const dedupeCase = async (data: DedupeRequest): Promise<DedupeResult> => {
   try {
-    const { caseId, threshold = 100, timeWindow = 24 } = data;
-
-    const caseDoc = await db.collection('cases').doc(caseId).get();
-    
+    const { caseId, threshold = 150, timeWindow = 48 } = data
+    const caseDoc = await db.collection('cases').doc(caseId).get()
     if (!caseDoc.exists) {
-      throw new Error('Case not found');
+      throw new Error('Case not found')
     }
 
-    const caseData = caseDoc.data();
-    const duplicates = await findPotentialDuplicates(caseData, threshold, timeWindow);
+    const caseData = caseDoc.data()!
+    const createdAt = toDate(caseData.createdAt)
+    const timeThreshold = new Date(
+      createdAt.getTime() - timeWindow * 60 * 60 * 1000
+    )
 
-    if (duplicates.length === 0) {
-      return {
-        success: true,
-        caseId,
-        duplicates: []
-      };
+    const lat = caseData.location?.lat
+    const lng = caseData.location?.lng
+
+    let query = db
+      .collection('cases')
+      .where('category', '==', caseData.category)
+      .where('status', 'in', ['submitted', 'acknowledged', 'in_progress', 'ACK', 'IN_PROGRESS'])
+      .where('createdAt', '>=', timeThreshold)
+      .limit(50)
+
+    // Prefer municipality scope when available
+    if (caseData.muniCode || caseData.location?.municipalityId) {
+      query = db
+        .collection('cases')
+        .where(
+          'muniCode',
+          '==',
+          caseData.muniCode || caseData.location?.municipalityId
+        )
+        .where('category', '==', caseData.category)
+        .where('createdAt', '>=', timeThreshold)
+        .limit(50)
     }
 
-    const shouldMerge = await shouldMergeDuplicates(caseData, duplicates);
+    const snapshot = await query.get()
+    const duplicates: DedupeResult['duplicates'] = []
 
-    if (shouldMerge) {
-      await mergeDuplicateCases(caseData, duplicates);
-      
-      return {
-        success: true,
-        caseId,
-        duplicates,
-        merged: true
-      };
+    for (const doc of snapshot.docs) {
+      if (doc.id === caseId) continue
+      const other = doc.data()
+      const otherLat = other.location?.lat
+      const otherLng = other.location?.lng
+      const signals: string[] = []
+
+      let distance = Number.POSITIVE_INFINITY
+      if (
+        typeof lat === 'number' &&
+        typeof lng === 'number' &&
+        typeof otherLat === 'number' &&
+        typeof otherLng === 'number'
+      ) {
+        distance = haversineMeters(lat, lng, otherLat, otherLng)
+        if (distance <= threshold) signals.push('geo_proximity')
+      }
+
+      if (
+        caseData.subcategory &&
+        other.subcategory &&
+        caseData.subcategory === other.subcategory
+      ) {
+        signals.push('subcategory_match')
+      }
+
+      const titleSim = textSimilarity(caseData.title || '', other.title || '')
+      if (titleSim >= 0.5) signals.push('title_similarity')
+
+      const openStatuses = [
+        'submitted',
+        'acknowledged',
+        'in_progress',
+        'ACK',
+        'IN_PROGRESS',
+      ]
+      if (openStatuses.includes(other.status)) signals.push('open_status')
+
+      const timeDiffHours =
+        Math.abs(createdAt.getTime() - toDate(other.createdAt).getTime()) /
+        (1000 * 60 * 60)
+
+      if (signals.length === 0) continue
+      if (distance !== Number.POSITIVE_INFINITY && distance > threshold * 3) {
+        continue
+      }
+
+      const similarity = Math.min(
+        1,
+        (signals.includes('geo_proximity') ? 0.45 : 0) +
+          (signals.includes('subcategory_match') ? 0.2 : 0) +
+          (signals.includes('title_similarity') ? 0.25 : 0) +
+          (signals.includes('open_status') ? 0.1 : 0)
+      )
+
+      if (similarity < 0.35) continue
+
+      duplicates.push({
+        caseId: doc.id,
+        similarity,
+        distance: Number.isFinite(distance) ? distance : -1,
+        timeDiffHours,
+        signals,
+      })
     }
 
-    await markAsPotentialDuplicates(caseData, duplicates);
+    duplicates.sort((a, b) => b.similarity - a.similarity)
+
+    const suggested = duplicates.some((d) => d.similarity >= 0.7)
+    const assessment = {
+      status: 'completed' as const,
+      candidateCaseIds: duplicates.map((d) => d.caseId),
+      confidence: duplicates[0]?.similarity ?? 0,
+      reasoning: duplicates[0]?.signals ?? [],
+      disposition: suggested ? 'suggested' : 'independent',
+      assessedAt: FieldValue.serverTimestamp(),
+    }
+
+    await db.collection('cases').doc(caseId).update({
+      duplicateAssessment: assessment,
+      updatedAt: FieldValue.serverTimestamp(),
+    })
+
+    logCaseTelemetry('duplicate_assessment_completed', {
+      caseId,
+      candidates: duplicates.length,
+      suggested,
+    })
 
     return {
       success: true,
       caseId,
+      status: 'completed',
       duplicates,
-      merged: false
-    };
-
+      linked: false,
+      suggested,
+    }
   } catch (error) {
-    console.error('Error in case deduplication:', error);
+    console.error('Error in case deduplication:', error)
     return {
       success: false,
       caseId: data.caseId,
+      status: 'failed',
       duplicates: [],
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-};
-
-async function findPotentialDuplicates(
-  caseData: any,
-  threshold: number,
-  timeWindow: number
-): Promise<Array<{
-  caseId: string;
-  similarity: number;
-  distance: number;
-  timeDiff: number;
-}>> {
-  try {
-    const timeWindowMs = timeWindow * 60 * 60 * 1000;
-    const timeThreshold = new Date(caseData.createdAt.toDate().getTime() - timeWindowMs);
-
-    const potentialDuplicatesSnapshot = await db.collection('cases')
-      .where('category', '==', caseData.category)
-      .where('status', 'in', ['submitted', 'acknowledged', 'in_progress'])
-      .where('createdAt', '>=', timeThreshold)
-      .where('createdAt', '<=', caseData.createdAt.toDate())
-      .get();
-
-    const duplicates: Array<{
-      caseId: string;
-      similarity: number;
-      distance: number;
-      timeDiff: number;
-    }> = [];
-
-    for (const doc of potentialDuplicatesSnapshot.docs) {
-      if (doc.id === caseData.caseId) continue;
-
-      const duplicateData = doc.data();
-      
-      const distance = calculateDistance(
-        caseData.location.lat,
-        caseData.location.lng,
-        duplicateData.location.lat,
-        duplicateData.location.lng
-      );
-
-      if (distance <= threshold) {
-        const similarity = calculateSimilarity(caseData, duplicateData);
-        
-        const timeDiff = Math.abs(
-          caseData.createdAt.toDate().getTime() - duplicateData.createdAt.toDate().getTime()
-        );
-
-        duplicates.push({
-          caseId: doc.id,
-          similarity,
-          distance,
-          timeDiff
-        });
-      }
+      linked: false,
+      suggested: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     }
-
-    return duplicates.sort((a, b) => b.similarity - a.similarity);
-
-  } catch (error) {
-    console.error('Error finding potential duplicates:', error);
-    return [];
   }
 }
 
-function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371e3;
-  const φ1 = lat1 * Math.PI / 180;
-  const φ2 = lat2 * Math.PI / 180;
-  const Δφ = (lat2 - lat1) * Math.PI / 180;
-  const Δλ = (lng2 - lng1) * Math.PI / 180;
-
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-          Math.cos(φ1) * Math.cos(φ2) *
-          Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c;
+export const getDuplicateCases = async (caseId: string) => {
+  const caseDoc = await db.collection('cases').doc(caseId).get()
+  if (!caseDoc.exists) return []
+  const assessment = caseDoc.data()?.duplicateAssessment
+  return assessment?.candidateCaseIds || []
 }
-
-function calculateSimilarity(case1: any, case2: any): number {
-  let score = 0;
-  let factors = 0;
-
-  const titleSimilarity = calculateTextSimilarity(case1.title, case2.title);
-  score += titleSimilarity * 30;
-  factors += 30;
-
-  const descSimilarity = calculateTextSimilarity(case1.description, case2.description);
-  score += descSimilarity * 25;
-  factors += 25;
-
-  if (case1.category === case2.category) {
-    score += 20;
-  }
-  factors += 20;
-
-  if (case1.priority === case2.priority) {
-    score += 10;
-  }
-  factors += 10;
-
-  const distance = calculateDistance(
-    case1.location.lat, case1.location.lng,
-    case2.location.lat, case2.location.lng
-  );
-  const locationScore = Math.max(0, 15 - (distance / 10));
-  score += locationScore;
-  factors += 15;
-
-  return factors > 0 ? score / factors : 0;
-}
-
-function calculateTextSimilarity(text1: string, text2: string): number {
-  if (!text1 || !text2) return 0;
-
-  const words1 = text1.toLowerCase().split(/\s+/);
-  const words2 = text2.toLowerCase().split(/\s+/);
-
-  const set1 = new Set(words1);
-  const set2 = new Set(words2);
-
-  const intersection = new Set([...set1].filter(x => set2.has(x)));
-  const union = new Set([...set1, ...set2]);
-
-  return union.size > 0 ? intersection.size / union.size : 0;
-}
-
-async function shouldMergeDuplicates(caseData: any, duplicates: any[]): Promise<boolean> {
-  const highSimilarityDuplicates = duplicates.filter(d => 
-    d.similarity > 0.9 && d.distance < 10
-  );
-
-  return highSimilarityDuplicates.length > 0;
-}
-
-async function mergeDuplicateCases(primaryCase: any, duplicates: any[]): Promise<void> {
-  try {
-    const batch = db.batch();
-
-    const primaryRef = db.collection('cases').doc(primaryCase.caseId);
-    
-    const allMediaUrls = [primaryCase.mediaUrls || []];
-
-    for (const duplicate of duplicates) {
-      const duplicateDoc = await db.collection('cases').doc(duplicate.caseId).get();
-      if (duplicateDoc.exists) {
-        const duplicateData = duplicateDoc.data();
-        allMediaUrls.push(duplicateData.mediaUrls || []);
-      }
-    }
-
-    const mergedMediaUrls = [...new Set(allMediaUrls.flat())];
-
-    batch.update(primaryRef, {
-      mediaUrls: mergedMediaUrls,
-      mergedFrom: duplicates.map(d => d.caseId),
-      mergedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    for (const duplicate of duplicates) {
-      const duplicateRef = db.collection('cases').doc(duplicate.caseId);
-      batch.update(duplicateRef, {
-        status: 'merged',
-        mergedInto: primaryCase.caseId,
-        mergedAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    await batch.commit();
-
-  } catch (error) {
-    console.error('Error merging duplicate cases:', error);
-    throw error;
-  }
-}
-
-async function markAsPotentialDuplicates(primaryCase: any, duplicates: any[]): Promise<void> {
-  try {
-    const batch = db.batch();
-
-    const primaryRef = db.collection('cases').doc(primaryCase.caseId);
-    batch.update(primaryRef, {
-      potentialDuplicates: duplicates.map(d => d.caseId),
-      duplicateCheckAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    for (const duplicate of duplicates) {
-      const duplicateRef = db.collection('cases').doc(duplicate.caseId);
-      batch.update(duplicateRef, {
-        potentialDuplicateOf: primaryCase.caseId,
-        duplicateCheckAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    await batch.commit();
-
-  } catch (error) {
-    console.error('Error marking potential duplicates:', error);
-    throw error;
-  }
-}
-
-export const getDuplicateCases = async (caseId: string): Promise<any[]> => {
-  try {
-    const caseDoc = await db.collection('cases').doc(caseId).get();
-    
-    if (!caseDoc.exists) {
-      throw new Error('Case not found');
-    }
-
-    const caseData = caseDoc.data();
-    const duplicateIds = caseData.potentialDuplicates || [];
-
-    if (duplicateIds.length === 0) {
-      return [];
-    }
-
-    const duplicatesSnapshot = await db.collection('cases')
-      .where(admin.firestore.FieldPath.documentId(), 'in', duplicateIds)
-      .get();
-
-    return duplicatesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-
-  } catch (error) {
-    console.error('Error getting duplicate cases:', error);
-    return [];
-  }
-};

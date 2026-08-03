@@ -100,18 +100,33 @@ export const signUpWithEmail = async (
     await sendEmailVerification(user)
     
     // Create user profile in Firestore
-    await createUserProfile(user.uid, {
-      email: user.email!,
+    const newUser: User = {
+      uid: user.uid,
+      email: user.email || undefined,
       displayName: userData.displayName,
-      municipalityCode: userData.municipalityCode,
       phone: userData.phone,
-      emailVerified: false,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-      loginMethod: 'email'
+      municipalityCode: userData.municipalityCode,
+      roles: ['citizen'],
+      contactPreferences: ['email'],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastActiveAt: new Date(),
+      consent: {
+        dataCollection: false,
+        notifications: false,
+        location: false,
+        media: false,
+      },
+    }
+
+    await setDoc(doc(db, collections.users, user.uid), {
+      ...newUser,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastActiveAt: serverTimestamp(),
     })
-    
-    return user
+
+    return newUser
   } catch (error: any) {
     console.error('Error signing up with email:', error)
     
@@ -139,11 +154,28 @@ export const signInWithEmail = async (email: string, password: string): Promise<
     
     // Update user profile in Firestore
     await updateUserProfile(user.uid, {
-      lastLoginAt: new Date().toISOString(),
-      loginMethod: 'email'
+      lastActiveAt: new Date(),
     })
-    
-    return user
+
+    const profile = await getUserProfile(user.uid)
+    if (profile) return profile
+
+    return {
+      uid: user.uid,
+      email: user.email || undefined,
+      displayName: user.displayName || undefined,
+      photoURL: user.photoURL || undefined,
+      roles: ['citizen'],
+      contactPreferences: ['email'],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      consent: {
+        dataCollection: false,
+        notifications: false,
+        location: false,
+        media: false,
+      },
+    }
   } catch (error: any) {
     console.error('Error signing in with email:', error)
     
@@ -222,7 +254,6 @@ export const updateUserEmail = async (newEmail: string): Promise<void> => {
     // Update Firestore profile
     await updateUserProfile(user.uid, {
       email: newEmail,
-      emailVerified: false
     })
   } catch (error: any) {
     console.error('Error updating email:', error)

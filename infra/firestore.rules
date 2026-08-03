@@ -1,170 +1,142 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
-    
+
     function hasRole(roles) {
-      return request.auth.token.roles != null && 
+      return request.auth.token.roles != null &&
              request.auth.token.roles.hasAny(roles);
     }
-    
+
     function isOfficial() {
       return hasRole(['official', 'moderator', 'admin']);
     }
-    
+
     function isAdmin() {
       return hasRole(['admin']);
     }
-    
+
     function canAccessMunicipality(muniCode) {
-      return isAdmin() || 
+      return isAdmin() ||
              (isOfficial() && request.auth.token.municipalityCode == muniCode);
     }
-    
+
     function canAccessWard(wardId) {
-      return isAdmin() || 
+      return isAdmin() ||
              (isOfficial() && request.auth.token.wardId == wardId);
     }
-    
-    function isWithinRetentionPeriod(timestamp) {
-      return timestamp > timestamp.date(2023, 1, 1); // Example retention policy
+
+    function isCaseOwner() {
+      return isAuthenticated() && resource.data.reporterUid == request.auth.uid;
     }
-    
-    // Users collection
+
+    function publicCaseFieldsOnly() {
+      // Client reads of another user's case are denied; share views go via Cloud Functions.
+      return false;
+    }
+
     match /users/{userId} {
       allow read: if isAuthenticated() && (isOwner(userId) || isOfficial());
       allow create: if isAuthenticated() && isOwner(userId);
       allow update: if isAuthenticated() && isOwner(userId);
       allow delete: if isAuthenticated() && isAdmin();
     }
-    
-    // Cases collection
+
     match /cases/{caseId} {
-      // Citizens can read their own cases
-      allow read: if isAuthenticated() && 
-        (resource.data.reporterUid == request.auth.uid || isOfficial());
-      
-      // Citizens can create cases
-      allow create: if isAuthenticated() && 
-        request.resource.data.reporterUid == request.auth.uid;
-      
-      // Officials can update cases in their jurisdiction
-      allow update: if isAuthenticated() && isOfficial() && 
+      // Citizens read own cases; officials read within municipality
+      allow read: if isAuthenticated() && (
+        resource.data.reporterUid == request.auth.uid ||
+        (isOfficial() && canAccessMunicipality(resource.data.muniCode))
+      );
+
+      // Case creation is performed by Admin SDK (Cloud Functions).
+      // Citizens must not write reporter contact fields directly from the client.
+      allow create: if false;
+
+      allow update: if isAuthenticated() && isOfficial() &&
         canAccessMunicipality(resource.data.muniCode);
-      
-      // Only admins can delete cases
+
       allow delete: if isAuthenticated() && isAdmin();
-      
-      // Case events subcollection
+
       match /events/{eventId} {
-        allow read: if isAuthenticated() && 
-          (get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid || isOfficial());
-        allow create: if isAuthenticated() && isOfficial();
-        allow update: if isAuthenticated() && isAdmin();
-        allow delete: if isAuthenticated() && isAdmin();
+        allow read: if isAuthenticated() && (
+          get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid ||
+          (isOfficial() && canAccessMunicipality(
+            get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode
+          ))
+        );
+        allow create, update, delete: if false;
       }
     }
-    
-    // Municipalities collection
+
     match /municipalities/{muniCode} {
-      // Public read access for basic info
       allow read: if true;
-      
-      // Officials can update their municipality
       allow update: if isAuthenticated() && canAccessMunicipality(muniCode);
-      
-      // Only admins can create/delete municipalities
       allow create, delete: if isAuthenticated() && isAdmin();
     }
-    
-    // Wards collection
+
     match /wards/{wardId} {
-      // Public read access for basic info
       allow read: if true;
-      
-      // Officials can update their ward
       allow update: if isAuthenticated() && canAccessWard(wardId);
-      
-      // Only admins can create/delete wards
       allow create, delete: if isAuthenticated() && isAdmin();
     }
-    
-    // CAP Alerts collection
+
     match /cap_alerts/{alertId} {
-      // Public read access for alerts
       allow read: if true;
-      
-      // Only system functions can create/update alerts
-      allow create, update: if isAuthenticated() && 
-        (isAdmin() || request.auth.token.aud == 'firebase-adminsdk');
-      
-      // Only admins can delete alerts
-      allow delete: if isAuthenticated() && isAdmin();
+      allow create, update, delete: if false;
     }
-    
-    // Notifications collection
+
     match /notifications/{notificationId} {
-      // Users can read their own notifications
-      allow read: if isAuthenticated() && 
-        resource.data.userId == request.auth.uid;
-      
-      // System can create notifications
-      allow create: if isAuthenticated() && 
-        (isOfficial() || request.auth.token.aud == 'firebase-adminsdk');
-      
-      // Users can update their own notifications (mark as read)
-      allow update: if isAuthenticated() && 
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if false;
+      allow update: if isAuthenticated() &&
         resource.data.userId == request.auth.uid &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
-      
-      // System can delete old notifications
-      allow delete: if isAuthenticated() && 
-        (isAdmin() || request.auth.token.aud == 'firebase-adminsdk');
+      allow delete: if false;
     }
-    
-    // Analytics collection (aggregated data)
+
     match /analytics/{docId} {
-      // Public read access for aggregated analytics
       allow read: if true;
-      
-      // Only system functions can write analytics
-      allow write: if isAuthenticated() && 
-        (isAdmin() || request.auth.token.aud == 'firebase-adminsdk');
+      allow write: if false;
     }
-    
-    // Service categories collection
+
     match /service_categories/{categoryId} {
-      // Public read access
       allow read: if true;
-      
-      // Officials can update categories in their municipality
-      allow update: if isAuthenticated() && isOfficial();
-      
-      // Only admins can create/delete categories
-      allow create, delete: if isAuthenticated() && isAdmin();
+      allow write: if isAuthenticated() && isAdmin();
     }
-    
-    // Audit logs collection
+
     match /audit_logs/{logId} {
-      // Only system functions can create audit logs
-      allow create: if isAuthenticated() && 
-        request.auth.token.aud == 'firebase-adminsdk';
-      
-      // Officials can read audit logs
+      allow create: if false;
       allow read: if isAuthenticated() && isOfficial();
-      
-      // No updates or deletes allowed
       allow update, delete: if false;
     }
-    
-    // Deny all other access
+
+    // Idempotency, media metadata, ledger — Admin SDK only
+    match /case_idempotency/{id} {
+      allow read, write: if false;
+    }
+    match /case_media/{id} {
+      allow read, write: if false;
+    }
+    match /case_events/{id} {
+      allow read, write: if false;
+    }
+    match /notification_ledger/{id} {
+      allow read, write: if false;
+    }
+    match /georesolve_cache/{id} {
+      allow read, write: if false;
+    }
+    match /email_logs/{id} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

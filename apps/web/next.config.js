@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
+    // appDir is default in Next 15; keep empty experimental for forward-compat
   },
+  transpilePackages: ['@servesa/case-contract'],
   images: {
     domains: ['firebasestorage.googleapis.com'],
   },
@@ -25,7 +26,7 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(self), microphone=(), geolocation=(self)',
           },
         ],
       },

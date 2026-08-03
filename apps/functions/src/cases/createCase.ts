@@ -1,447 +1,358 @@
 /**
- * ServeSA Phase-1: Case Creation Function
- * This function handles case creation with validation, georesolve, and notifications
+ * ServeSA: Production case creation
+ * Canonical contract: @servesa/case-contract
  */
 
-import { getFirestore } from 'firebase-admin/firestore'
+import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore'
 import { getAuth } from 'firebase-admin/auth'
-import { z } from 'zod'
-import { georesolve } from '../routing/georesolve'
-import { sendNotification } from '../notifications/notifications'
-import { calculateSLA } from '../utils/slaCalculator'
+import { ZodError } from 'zod'
+import {
+  CreateCaseInputSchema,
+  calculateSlaFields,
+  CASE_CONTRACT_VERSION,
+  CONSENT_POLICY_VERSION,
+  type CreateCaseInput,
+  type CreateCaseResponse,
+  type GeoresolutionStatus,
+} from '@servesa/case-contract'
+import { georesolveSafe } from '../routing/georesolve'
+import { caseCreationLimiter } from '../utils/rateLimit'
+import { logCaseTelemetry } from '../telemetry/caseEvents'
 
 const db = getFirestore()
 const auth = getAuth()
 
+const WEB_APP_URL = process.env.WEB_APP_URL || 'https://servesa-aad53.web.app'
 
-// Case creation schema
-const CreateCaseSchema = z.object({
-  title: z.string().min(5).max(200),
-  description: z.string().min(10).max(2000),
-  category: z.enum(['water', 'electricity', 'roads', 'waste', 'internet', 'emergency']),
-  subcategory: z.string().optional(),
-  priority: z.enum(['low', 'medium', 'high', 'emergency']),
-  location: z.object({
-    lat: z.number().min(-35).max(-22),
-    lng: z.number().min(16).max(33),
-    address: z.string().optional()
-  }),
-  contactInfo: z.object({
-    phone: z.string().optional(),
-    email: z.string().email().optional()
-  }).optional(),
-  images: z.array(z.string()).optional(),
-  consent: z.boolean().refine(val => val === true, 'Consent is required'),
-  userId: z.string().optional() // Optional for anonymous reports
-})
-
-interface CreateCaseRequest {
-  title: string
-  description: string
-  category: string
-  subcategory?: string
-  priority: string
-  location: {
-    lat: number
-    lng: number
-    address?: string
+export class CaseCreationError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly status: number = 400
+  ) {
+    super(message)
+    this.name = 'CaseCreationError'
   }
-  contactInfo?: {
-    phone?: string
-    email?: string
-  }
-  images?: string[]
-  consent: boolean
-  userId?: string
 }
 
-interface CaseDocument {
-  caseId: string
-  title: string
-  description: string
-  category: string
-  subcategory?: string
-  priority: string
-  status: string
-  location: {
-    lat: number
-    lng: number
-    address?: string
-    wardId: string
-    wardName: string
-    municipalityId: string
-    municipalityName: string
-    province: string
+function generateCaseId(): string {
+  const timestamp = Date.now().toString(36).toUpperCase()
+  const random = Math.random().toString(36).slice(2, 8).toUpperCase()
+  return `CASE-${timestamp}-${random}`
+}
+
+function publicErrorMessage(error: unknown): { message: string; code: string; status: number } {
+  if (error instanceof CaseCreationError) {
+    return { message: error.message, code: error.code, status: error.status }
   }
-  contactInfo?: {
-    phone?: string
-    email?: string
+  if (error instanceof ZodError) {
+    const first = error.issues[0]
+    return {
+      message: first?.message || 'Validation failed',
+      code: 'validation_failed',
+      status: 400,
+    }
   }
-  images?: string[]
-  userId?: string
-  userProfile?: {
-    displayName?: string
-    email?: string
-    phone?: string
+  return {
+    message: 'Unable to create case. Please try again.',
+    code: 'internal_error',
+    status: 500,
   }
-  slaTarget: Date
-  slaBreach: boolean
-  createdAt: Date
-  updatedAt: Date
-  createdBy: string
-  updatedBy: string
 }
 
 /**
- * Create a new case
+ * Create a case with idempotency, georesolution, SLA, and atomic event write.
+ * Notifications are owned by onCaseCreated (not duplicated here).
  */
-export async function createCase(data: CreateCaseRequest, authToken?: string): Promise<{ caseId: string; shareUrl: string }> {
+export async function createCase(
+  rawData: unknown,
+  options: {
+    authUid?: string
+    authTokenValid?: boolean
+    anonymousSessionId?: string
+  } = {}
+): Promise<CreateCaseResponse> {
+  const started = Date.now()
+  let clientRequestId: string | undefined
+
   try {
-    // Validate input
-    const validatedData = CreateCaseSchema.parse(data)
-    
-    // Authenticate user if token provided
-    let user = null
-    if (authToken) {
-      try {
-        const decodedToken = await auth.verifyIdToken(authToken)
-        user = decodedToken
-      } catch (error) {
-        console.warn('Invalid auth token, proceeding as anonymous')
+    const parsed = CreateCaseInputSchema.parse(rawData) as CreateCaseInput
+    clientRequestId = parsed.clientRequestId
+
+    const rateKey =
+      options.authUid ||
+      options.anonymousSessionId ||
+      parsed.reporter.email ||
+      parsed.reporter.phone ||
+      parsed.clientRequestId
+
+    const rate = await caseCreationLimiter.checkRateLimit(`create:${rateKey}`)
+    if (!rate.allowed) {
+      throw new CaseCreationError(
+        'Too many reports submitted. Please wait a moment and try again.',
+        'rate_limited',
+        429
+      )
+    }
+
+    // Idempotency: return existing case for same clientRequestId + identity
+    const identityKey = options.authUid || `anon:${options.anonymousSessionId || parsed.reporter.email || parsed.reporter.phone || 'unknown'}`
+    const idempotencyDocId = `${parsed.clientRequestId}_${identityKey}`.replace(/[/\\]/g, '_')
+    const idempotencyRef = db.collection('case_idempotency').doc(idempotencyDocId)
+    const existingIdempotency = await idempotencyRef.get()
+
+    if (existingIdempotency.exists) {
+      const existing = existingIdempotency.data()
+      if (existing?.response) {
+        logCaseTelemetry('case_create_idempotent_hit', {
+          caseId: existing.response.caseId,
+          clientRequestId: parsed.clientRequestId,
+        })
+        return existing.response as CreateCaseResponse
       }
     }
 
-    // Georesolve location
-    const georesolveResult = await georesolve(validatedData.location.lat, validatedData.location.lng)
-    
-    // Get municipality SLA configuration
-    const municipalityDoc = await db.collection('municipalities').doc(georesolveResult.municipalityId).get()
-    const municipality = municipalityDoc.exists ? municipalityDoc.data() : null
-    
-    // Calculate SLA target
-    const slaTarget = calculateSLA(validatedData.category, validatedData.priority, municipality?.slaConfig)
-    
-    // Create case document
-    const caseId = generateCaseId()
-    const now = new Date()
-    
-    const caseDoc: CaseDocument = {
-      caseId,
-      title: validatedData.title,
-      description: validatedData.description,
-      category: validatedData.category,
-      subcategory: validatedData.subcategory,
-      priority: validatedData.priority,
-      status: 'submitted',
-      location: {
-        lat: validatedData.location.lat,
-        lng: validatedData.location.lng,
-        address: validatedData.location.address,
-        wardId: georesolveResult.wardId,
-        wardName: georesolveResult.wardName,
-        municipalityId: georesolveResult.municipalityId,
-        municipalityName: georesolveResult.municipalityName,
-        province: georesolveResult.province
-      },
-      contactInfo: validatedData.contactInfo,
-      images: validatedData.images,
-      userId: user?.uid || validatedData.userId,
-      userProfile: user ? {
-        displayName: user.name,
-        email: user.email,
-        phone: user.phone_number
-      } : undefined,
-      slaTarget,
-      slaBreach: false,
-      createdAt: now,
-      updatedAt: now,
-      createdBy: user?.uid || 'anonymous',
-      updatedBy: user?.uid || 'anonymous'
+    const geo = await georesolveSafe(parsed.latitude, parsed.longitude)
+
+    let municipalitySla: any = null
+    if (geo.municipalityId) {
+      const muniDoc = await db.collection('municipalities').doc(geo.municipalityId).get()
+      municipalitySla = muniDoc.exists ? muniDoc.data()?.slaConfig : null
     }
 
-    // Write to Firestore
-    await db.collection('cases').doc(caseId).set(caseDoc)
+    const slaStartedAt = new Date()
+    const sla = calculateSlaFields(
+      parsed.category,
+      parsed.priority,
+      municipalitySla,
+      slaStartedAt
+    )
 
-    // Create case event
-    const caseEvent = {
+    const caseId = generateCaseId()
+    const reference = caseId
+    const shareUrl = `${WEB_APP_URL}/case/${caseId}`
+    const mediaUploadPath = `cases/${caseId}/media`
+    const routingPending = geo.status === 'unresolved'
+    const status = 'submitted' as const
+
+    const reporterUid = options.authUid || null
+    const isAnonymous = !options.authUid
+
+    const caseDoc = {
+      caseId,
+      reference,
+      title: parsed.title,
+      description: parsed.description,
+      category: parsed.category,
+      subcategory: parsed.subcategory || null,
+      priority: parsed.priority,
+      status,
+      // Align with security rules
+      reporterUid: reporterUid,
+      anonymousSessionId: isAnonymous
+        ? options.anonymousSessionId || parsed.clientRequestId
+        : null,
+      reporter: {
+        name: parsed.reporter.name,
+        // Contact fields are private — never mirrored to analytics/events
+        email: parsed.reporter.email || null,
+        phone: parsed.reporter.phone || null,
+      },
+      location: {
+        lat: parsed.latitude,
+        lng: parsed.longitude,
+        address: parsed.address || null,
+        source: parsed.locationSource,
+        wardId: geo.wardId || null,
+        wardName: geo.wardName || null,
+        municipalityId: geo.municipalityId || null,
+        municipalityName: geo.municipalityName || null,
+        province: geo.province || null,
+        // Rules also check muniCode
+        muniCode: geo.municipalityId || null,
+      },
+      muniCode: geo.municipalityId || null,
+      wardId: geo.wardId || null,
+      georesolution: {
+        status: geo.status as GeoresolutionStatus,
+        confidence: geo.confidence,
+        method: geo.method,
+        cached: geo.cached,
+      },
+      sla: {
+        targetHours: sla.targetHours,
+        slaStartedAt: Timestamp.fromDate(sla.slaStartedAt),
+        slaTarget: Timestamp.fromDate(sla.slaTarget),
+        slaBreach: false,
+        policyVersion: sla.policyVersion,
+      },
+      // Flat fields for legacy readers / SLA engine compatibility
+      slaTarget: Timestamp.fromDate(sla.slaTarget),
+      slaBreach: false,
+      targetHours: sla.targetHours,
+      slaStartedAt: Timestamp.fromDate(sla.slaStartedAt),
+      slaPolicyVersion: sla.policyVersion,
+      clientRequestId: parsed.clientRequestId,
+      contractVersion: CASE_CONTRACT_VERSION,
+      consent: {
+        dataProcessing: true,
+        communications: parsed.consent.communications === true,
+        policyVersion: CONSENT_POLICY_VERSION,
+        consentedAt: FieldValue.serverTimestamp(),
+      },
+      media: {
+        status: 'none',
+        count: 0,
+        paths: [],
+      },
+      duplicateAssessment: {
+        status: 'pending',
+        candidateCaseIds: [],
+        confidence: null,
+        reasoning: null,
+      },
+      notifications: {
+        citizenAck: 'pending',
+        officialAlert: 'pending',
+      },
+      routingPending,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+      createdBy: reporterUid || 'anonymous',
+      updatedBy: reporterUid || 'anonymous',
+    }
+
+    const eventDoc = {
       caseId,
       eventType: 'case_created',
       description: 'Case submitted',
-      userId: user?.uid || 'anonymous',
-      userDisplayName: user?.name || 'Anonymous User',
-      timestamp: now,
+      // No PII in events
+      actorType: isAnonymous ? 'anonymous' : 'citizen',
+      actorUid: reporterUid,
+      timestamp: FieldValue.serverTimestamp(),
       metadata: {
-        category: validatedData.category,
-        priority: validatedData.priority,
-        wardId: georesolveResult.wardId,
-        municipalityId: georesolveResult.municipalityId
-      }
+        category: parsed.category,
+        subcategory: parsed.subcategory || null,
+        priority: parsed.priority,
+        wardId: geo.wardId || null,
+        municipalityId: geo.municipalityId || null,
+        georesolutionStatus: geo.status,
+        locationSource: parsed.locationSource,
+        routingPending,
+      },
     }
 
-    await db.collection('case_events').add(caseEvent)
-
-    // Send notifications
-    await sendCaseNotifications(caseDoc, user)
-
-    // Generate share URL
-    const shareUrl = `${process.env.WEB_APP_URL || 'https://servesa.co.za'}/case/${caseId}`
-
-    // Update analytics
-    await updateCaseAnalytics(caseDoc)
-
-    return {
+    const response: CreateCaseResponse = {
       caseId,
-      shareUrl
+      reference,
+      shareUrl,
+      status,
+      municipality: geo.municipalityId
+        ? { id: geo.municipalityId, name: geo.municipalityName || geo.municipalityId }
+        : undefined,
+      ward: geo.wardId
+        ? {
+            id: geo.wardId,
+            name: geo.wardName || undefined,
+            number: geo.wardId,
+          }
+        : undefined,
+      slaTarget: sla.slaTarget.toISOString(),
+      targetHours: sla.targetHours,
+      georesolutionStatus: geo.status,
+      mediaUploadPath,
+      routingPending,
+      duplicateAssessment: { status: 'pending' },
     }
 
-  } catch (error) {
-    console.error('Error creating case:', error)
-    throw new Error(`Case creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
-  }
-}
+    await db.runTransaction(async (tx) => {
+      const again = await tx.get(idempotencyRef)
+      if (again.exists && again.data()?.response) {
+        Object.assign(response, again.data()!.response)
+        return
+      }
 
-/**
- * Send notifications for new case
- */
-async function sendCaseNotifications(caseDoc: CaseDocument, user: any) {
-  try {
-    // Send acknowledgment to user
-    if (user?.uid) {
-      await sendNotification({
-        userId: user.uid,
-        title: 'Case Submitted Successfully',
-        body: `Your case "${caseDoc.title}" has been submitted and assigned case ID ${caseDoc.caseId}`,
-        type: 'case_acknowledgment',
-        data: {
-          caseId: caseDoc.caseId,
-          category: caseDoc.category,
-          priority: caseDoc.priority
-        }
+      const caseRef = db.collection('cases').doc(caseId)
+      const eventRef = caseRef.collection('events').doc()
+
+      tx.set(caseRef, caseDoc)
+      tx.set(eventRef, eventDoc)
+      // Also write top-level case_events for existing consumers (no PII)
+      const topLevelEventRef = db.collection('case_events').doc()
+      tx.set(topLevelEventRef, eventDoc)
+      tx.set(idempotencyRef, {
+        clientRequestId: parsed.clientRequestId,
+        identityKey,
+        caseId,
+        response,
+        createdAt: FieldValue.serverTimestamp(),
       })
-    }
-
-    // Send notification to municipality officials
-    const officialsSnapshot = await db.collection('users')
-      .where('role', 'in', ['official', 'admin'])
-      .where('municipalityId', '==', caseDoc.location.municipalityId)
-      .get()
-
-    for (const officialDoc of officialsSnapshot.docs) {
-      await sendNotification({
-        userId: officialDoc.id,
-        title: 'New Case Assigned',
-        body: `New ${caseDoc.priority} priority case in ${caseDoc.location.wardName}`,
-        type: 'new_case',
-        data: {
-          caseId: caseDoc.caseId,
-          category: caseDoc.category,
-          priority: caseDoc.priority,
-          wardId: caseDoc.location.wardId
-        }
-      })
-    }
-
-    // Send email notification if contact info provided
-    if (caseDoc.contactInfo?.email) {
-      await sendEmailNotification(caseDoc)
-    }
-
-  } catch (error) {
-    console.error('Error sending case notifications:', error)
-    // Don't throw - notification failure shouldn't break case creation
-  }
-}
-
-/**
- * Send email notification
- */
-async function sendEmailNotification(caseDoc: CaseDocument) {
-  try {
-    // This would integrate with Gmail API
-    // For Phase-1, log the email notification
-    console.log('Email notification would be sent to:', caseDoc.contactInfo?.email)
-    console.log('Case details:', {
-      caseId: caseDoc.caseId,
-      title: caseDoc.title,
-      category: caseDoc.category,
-      priority: caseDoc.priority
     })
+
+    logCaseTelemetry('case_created', {
+      caseId,
+      category: parsed.category,
+      priority: parsed.priority,
+      georesolutionStatus: geo.status,
+      routingPending,
+      latencyMs: Date.now() - started,
+      authenticated: Boolean(options.authUid),
+    })
+
+    return response
   } catch (error) {
-    console.error('Error sending email notification:', error)
+    const pub = publicErrorMessage(error)
+    logCaseTelemetry('case_creation_failed', {
+      code: pub.code,
+      clientRequestId,
+      latencyMs: Date.now() - started,
+    })
+    if (error instanceof CaseCreationError || error instanceof ZodError) {
+      throw new CaseCreationError(pub.message, pub.code, pub.status)
+    }
+    console.error('createCase unexpected error', error)
+    throw new CaseCreationError(pub.message, pub.code, pub.status)
   }
 }
 
 /**
- * Update case analytics
+ * Callable adapter — uses Firebase Auth context correctly (uid, not token object).
  */
-async function updateCaseAnalytics(caseDoc: CaseDocument) {
-  try {
-    const today = new Date().toISOString().split('T')[0]
-    const analyticsRef = db.collection('case_analytics').doc(today)
-    
-    await analyticsRef.set({
-      date: today,
-      municipalityId: caseDoc.location.municipalityId,
-      wardId: caseDoc.location.wardId,
-      category: caseDoc.category,
-      priority: caseDoc.priority,
-      status: caseDoc.status,
-      caseCount: 1,
-      totalCount: 1
-    }, { merge: true })
-
-  } catch (error) {
-    console.error('Error updating case analytics:', error)
-  }
+export async function createCaseCallable(
+  data: unknown,
+  authContext?: { uid: string; token?: unknown } | null
+): Promise<CreateCaseResponse> {
+  return createCase(data, {
+    authUid: authContext?.uid,
+    authTokenValid: Boolean(authContext?.uid),
+    anonymousSessionId:
+      data && typeof data === 'object' && 'anonymousSessionId' in (data as any)
+        ? String((data as any).anonymousSessionId)
+        : undefined,
+  })
 }
 
-/**
- * Generate unique case ID
- */
-function generateCaseId(): string {
-  const timestamp = Date.now().toString(36)
-  const random = Math.random().toString(36).substr(2, 5)
-  return `CASE-${timestamp}-${random}`.toUpperCase()
-}
-
-/**
- * HTTP callable function for case creation
- */
+/** HTTP helper kept for compatibility */
 export const createCaseHttp = async (req: any, res: any) => {
   try {
-    const authToken = req.headers.authorization?.replace('Bearer ', '')
-    const caseData = req.body
+    let authUid: string | undefined
+    const header = req.headers.authorization
+    if (header?.startsWith('Bearer ')) {
+      try {
+        const decoded = await auth.verifyIdToken(header.slice(7))
+        authUid = decoded.uid
+      } catch {
+        // proceed anonymous
+      }
+    }
 
-    const result = await createCase(caseData, authToken)
-
-    res.json({
-      success: true,
-      data: result
+    const result = await createCase(req.body, {
+      authUid,
+      anonymousSessionId: req.headers['x-anonymous-session'] as string | undefined,
     })
-
+    res.json({ success: true, data: result })
   } catch (error) {
-    console.error('Error in createCaseHttp:', error)
-    
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: error.errors
-      })
-    }
-
-    res.status(500).json({
-      error: 'Case creation failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    })
-  }
-}
-
-/**
- * Get case by ID
- */
-export async function getCase(caseId: string, userId?: string): Promise<CaseDocument | null> {
-  try {
-    const caseDoc = await db.collection('cases').doc(caseId).get()
-    
-    if (!caseDoc.exists) {
-      return null
-    }
-
-    const caseData = caseDoc.data() as CaseDocument
-
-    // Check access permissions
-    if (caseData.userId && caseData.userId !== userId) {
-      // Check if user is official/admin for this municipality
-      if (userId) {
-        const userDoc = await db.collection('users').doc(userId).get()
-        const userData = userDoc.data()
-        
-        if (userData?.role === 'official' || userData?.role === 'admin') {
-          if (userData.municipalityId === caseData.location.municipalityId) {
-            return caseData
-          }
-        }
-      }
-      
-      throw new Error('Access denied')
-    }
-
-    return caseData
-
-  } catch (error) {
-    console.error('Error getting case:', error)
-    throw error
-  }
-}
-
-/**
- * Update case status
- */
-export async function updateCaseStatus(caseId: string, status: string, userId: string, comment?: string): Promise<void> {
-  try {
-    const caseRef = db.collection('cases').doc(caseId)
-    const caseDoc = await caseRef.get()
-
-    if (!caseDoc.exists) {
-      throw new Error('Case not found')
-    }
-
-    const caseData = caseDoc.data() as CaseDocument
-
-    // Check permissions
-    if (caseData.userId !== userId) {
-      const userDoc = await db.collection('users').doc(userId).get()
-      const userData = userDoc.data()
-      
-      if (userData?.role !== 'official' && userData?.role !== 'admin') {
-        throw new Error('Access denied')
-      }
-      
-      if (userData.municipalityId !== caseData.location.municipalityId) {
-        throw new Error('Access denied')
-      }
-    }
-
-    // Update case
-    await caseRef.update({
-      status,
-      updatedAt: new Date(),
-      updatedBy: userId
-    })
-
-    // Create status update event
-    const caseEvent = {
-      caseId,
-      eventType: 'status_updated',
-      description: `Status updated to ${status}`,
-      userId,
-      timestamp: new Date(),
-      metadata: {
-        previousStatus: caseData.status,
-        newStatus: status,
-        comment
-      }
-    }
-
-    await db.collection('case_events').add(caseEvent)
-
-    // Send notification to case owner
-    if (caseData.userId && caseData.userId !== userId) {
-      await sendNotification({
-        userId: caseData.userId,
-        title: 'Case Status Updated',
-        body: `Your case "${caseData.title}" status has been updated to ${status}`,
-        type: 'status_update',
-        data: {
-          caseId,
-          status,
-          comment
-        }
-      })
-    }
-
-  } catch (error) {
-    console.error('Error updating case status:', error)
-    throw error
+    const pub = publicErrorMessage(error)
+    res.status(pub.status).json({ error: pub.message, code: pub.code })
   }
 }

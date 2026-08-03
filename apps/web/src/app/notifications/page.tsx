@@ -1,3 +1,5 @@
+'use client'
+
 import { NotificationCenter } from '@/components/Notifications/NotificationCenter'
 
 export default function NotificationsPage() {

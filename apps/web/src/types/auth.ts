@@ -1,4 +1,4 @@
-export interface User {
+export interface AuthUser {
   uid: string
   email: string | null
   displayName: string | null
@@ -20,7 +20,7 @@ export interface UserProfile {
 }
 
 export interface AuthState {
-  user: User | null
+  user: AuthUser | null
   userProfile: UserProfile | null
   loading: boolean
   isAuthenticated: boolean
