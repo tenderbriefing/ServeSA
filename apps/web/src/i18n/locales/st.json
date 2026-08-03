@@ -1,0 +1,298 @@
+{
+  "common": {
+    "loading": "E ntse e tsamaisa...",
+    "error": "Phoso",
+    "success": "Katleho",
+    "cancel": "Khansela",
+    "save": "Boloka",
+    "delete": "Hlakola",
+    "edit": "Fetola",
+    "view": "Sheba",
+    "submit": "Romela",
+    "back": "Morao",
+    "next": "E latelang",
+    "previous": "E fetileng",
+    "close": "Tswala",
+    "search": "Batla",
+    "filter": "Hlophisa",
+    "sort": "Hlophisa",
+    "refresh": "Hlohonolofatsa",
+    "download": "Tsamaisa tlase",
+    "upload": "Tsamaisa hodimo",
+    "yes": "Ee",
+    "no": "Che",
+    "ok": "OK",
+    "retry": "Leka hape",
+    "continue": "Tswela pele",
+    "skip": "Tlola"
+  },
+  "navigation": {
+    "home": "Lehae",
+    "report": "Bolella Bothata",
+    "dashboard": "Dashboard",
+    "explore": "Batlisisa",
+    "community": "Sechaba",
+    "messaging": "Melale",
+    "admin": "Molaoli",
+    "profile": "Profaele",
+    "settings": "Dipehelo",
+    "help": "Thuso",
+    "about": "Mabapi le"
+  },
+  "home": {
+    "hero": {
+      "title": "Bolella Dintlha tsa Masipala",
+      "subtitle": "Ka potlako",
+      "description": "ServeSA e kopanya baahi le mmuso wa selehae ho bolella le ho latela dintlha tsa tshebeletso. Fumana ditlhahiso tsa nako e nepahetseng mabapi le ditlaleho tsa hao 'me u bone tshusumetso sechabeng sa hao.",
+      "reportButton": "Bolella Bothata",
+      "exploreButton": "Batlisisa Diketsahalo"
+    },
+    "features": {
+      "title": "Hore na ServeSA e Sebetsa Joang",
+      "subtitle": "Mokgwa o bonolo, o potlakileng le o hlakileng wa ho bolella ditlaleho tsa tshebeletso ya masipala",
+      "step1": {
+        "title": "1. Bolella Bothata",
+        "description": "Nka setshwantsho 'me u hlalose bothata. AI ya rona e thusa ho arola le ho bea maemo ditlalehong tsa hao."
+      },
+      "step2": {
+        "title": "2. Latela Tswelopele",
+        "description": "Fumana ditlhahiso tsa nako e nepahetseng boemong ba ketsahalo la hao, nako e akanyetsweng ya tharollo, le ditlhahiso tsa tswelopele."
+      },
+      "step3": {
+        "title": "3. Bothata bo Rarollotsoe",
+        "description": "Fumana netefatso ha bothata ba hao bo rarollotsoe 'me u bone tshusumetso sechabeng sa hao."
+      }
+    },
+    "stats": {
+      "casesReported": "Diketsahalo tse Bolellweng",
+      "resolutionRate": "Sekhahla sa Tharollo",
+      "avgResponseTime": "Nako e Akanyetsweng ya Karabo",
+      "activeWards": "Diwadi tse Sebetsang"
+    },
+    "categories": {
+      "title": "Bolella Bothata Bofe kapa Bofe",
+      "subtitle": "Ho tloha ho ho tshoha ha metsi ho fihla ho ho senyeha ha tsela, re sebetsana le dinyehelo tsohle tsa tshebeletso ya masipala",
+      "waterSewage": "Metsi & Dikgopo",
+      "electricity": "Motlakase",
+      "roadsInfrastructure": "Ditsela & Ditshebeletso",
+      "wasteManagement": "Tsamaiso ya Litlhapiso",
+      "digitalServices": "Ditshebeletso tsa Digital",
+      "emergencyServices": "Ditshebeletso tsa Tshohanyetso"
+    },
+    "cta": {
+      "title": "O Loketse ho Etsa Phapang?",
+      "subtitle": "Kopana le dikete tsa baahi ba ntseng ba ntlafatsa mechaba ya bona ka ServeSA",
+      "button": "Qala ho Bolella Joale"
+    }
+  },
+  "report": {
+    "title": "Bolella Bothata",
+    "steps": {
+      "category": "Sehlopha",
+      "details": "Dintlha",
+      "location": "Sebaka",
+      "evidence": "Bopaki",
+      "review": "Hlahloba"
+    },
+    "categories": {
+      "waterSewage": "Metsi & Dikgopo",
+      "electricity": "Motlakase",
+      "roadsInfrastructure": "Ditsela & Ditshebeletso",
+      "wasteManagement": "Tsamaiso ya Litlhapiso",
+      "digitalServices": "Ditshebeletso tsa Digital",
+      "emergencyServices": "Ditshebeletso tsa Tshohanyetso"
+    },
+    "form": {
+      "title": "Sehlooho sa Bothata",
+      "titlePlaceholder": "Tlhaloso e khutshwane ya bothata",
+      "description": "Tlhaloso",
+      "descriptionPlaceholder": "Fana ka dintlha tse ngata mabapi le bothata",
+      "priority": "Maemo",
+      "priorityLow": "A Tlase",
+      "priorityMedium": "A Bohareng",
+      "priorityHigh": "A Hodimo",
+      "location": "Sebaka",
+      "locationPlaceholder": "Khetha sebaka mapeng kapa kenya aterese",
+      "photos": "Ditshwantsho",
+      "photosDescription": "Kenya ditshwantsho ho re thusa ho utlwisisa bothata hantle",
+      "anonymous": "Bolella ka Sebopeho",
+      "anonymousDescription": "Dintlha tsa hao tsa motho di ke ke tsa arolelwa le masipala",
+      "bulkReport": "Tlaleho e Kgolo",
+      "bulkReportDescription": "Bolella dintlha tse ngata tse amanang ka nako e le nngwe"
+    },
+    "evidence": {
+      "title": "Kenya Bopaki",
+      "photoVideo": "Setshwantsho/Vidio",
+      "voiceNote": "Noto ya Lentswe",
+      "document": "Tlaleho",
+      "aiDetection": "Ponahalo ya Bothata ka AI",
+      "aiDetectionDescription": "AI ya rona e tla fumana le ho arola dintlha ditshwantshong tsa hao ka boiketsetso"
+    },
+    "success": {
+      "title": "Tlaleho e Rometswe ka Katleho!",
+      "description": "Bothata ba hao bo bolellwe 'me bo nehetswe nomoro ya ketsahalo. O tla fumana ditlhahiso mabapi le tswelopele.",
+      "caseNumber": "Nomoro ya Ketsahalo",
+      "trackProgress": "Latela Tswelopele",
+      "reportAnother": "Bolella Bothata bo Mong"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard ya Ka",
+    "stats": {
+      "totalCases": "Diketsahalo Tsohle",
+      "activeCases": "Diketsahalo tse Sebetsang",
+      "resolvedCases": "Diketsahalo tse Rarollotsweng",
+      "avgResolutionTime": "Nako e Akanyetsweng ya Tharollo"
+    },
+    "filters": {
+      "all": "Tsohle",
+      "pending": "Di emetse",
+      "inProgress": "Di tswelopele",
+      "resolved": "Di rarollotsoe"
+    },
+    "case": {
+      "status": "Boemo",
+      "priority": "Maemo",
+      "created": "E entswe",
+      "updated": "E ntlafaditswe",
+      "estimatedResolution": "Tharollo e Akanyetsweng",
+      "viewDetails": "Sheba Dintlha"
+    }
+  },
+  "community": {
+    "title": "Sechaba",
+    "forums": {
+      "title": "Diforamo tsa Sechaba",
+      "description": "Bua ka dintlha tsa selehae le ditharollo le baahi ba hao",
+      "createTopic": "Etsa Sehlooho",
+      "recentTopics": "Dihlooho tsa Morao",
+      "popularTopics": "Dihlooho tse Tummeng"
+    },
+    "voting": {
+      "title": "Vota ka Dintlha",
+      "description": "Thusa ho bea maemo a dikarabo tsa masipala ka ho vota ka dintlha tse bolellweng",
+      "vote": "Vota",
+      "votes": "divoto",
+      "voted": "E votswe"
+    },
+    "solutions": {
+      "title": "Ditharollo tsa Sechaba",
+      "description": "Etsisa ditharollo 'me u vote ka ditharollo tsa dintlha tsa sechaba",
+      "suggestSolution": "Etsisa Tharollo",
+      "implemented": "E entswe",
+      "underReview": "E Hlahlobong"
+    }
+  },
+  "accessibility": {
+    "screenReader": "Tshehetso ya Mmadi wa Skrineng",
+    "highContrast": "Mokgwa wa Khontraste e Hodimo",
+    "largeText": "Mongolo o Mogolo",
+    "keyboardNavigation": "Tsela ya ho Tsamaisa ka Keyboard",
+    "voiceControl": "Taolo ya Lentswe",
+    "help": "Thuso ya ho Fihlella"
+  },
+  "offline": {
+    "title": "Mokgwa wa Offline",
+    "description": "O ha joale offline. Ditshebeletso tse ding tsa ka ba li lekanyetsoe.",
+    "syncWhenOnline": "Diphetoho di tla kopanya ha u boela online",
+    "offlineReports": "Ditlaleho tsa Offline",
+    "syncNow": "Kopanya Joale"
+  },
+  "notifications": {
+    "title": "Ditlhahiso",
+    "settings": "Dipehelo tsa Ditlhahiso",
+    "push": "Ditlhahiso tsa ho Tshwara",
+    "email": "Ditlhahiso tsa Email",
+    "sms": "Ditlhahiso tsa SMS",
+    "caseUpdates": "Ditlhahiso tsa Ketsahalo",
+    "communityUpdates": "Ditlhahiso tsa Sechaba",
+    "emergencyAlerts": "Ditlhahiso tsa Tshohanyetso"
+  },
+  "analytics": {
+    "title": "Dipalo tsa Tshebetso",
+    "municipalResponse": "Dikarabo tsa Masipala",
+    "resolutionRates": "Disekhahla tsa Tharollo",
+    "budgetTracking": "Ho Latela Budget",
+    "predictiveInsights": "Dintlha tse Akanyetsweng",
+    "trends": "Dikgato",
+    "comparison": "Papisano"
+  },
+  "help": {
+    "title": "Thuso & Ditutorial",
+    "digitalLiteracy": "Thuto ya ho Bala Digital",
+    "tutorials": "Ditutorial",
+    "faq": "Dipotso tse Botswang Hangata",
+    "contact": "Kopana le Tshehetso",
+    "feedback": "Karabo"
+  },
+  "language": {
+    "title": "Puo",
+    "english": "Senyesemane",
+    "zulu": "isiZulu",
+    "xhosa": "isiXhosa",
+    "afrikaans": "Seafrikaans",
+    "sesotho": "Sesotho"
+  },
+  "auth": {
+    "login": "Kena",
+    "signUp": "Ingodisa",
+    "signOut": "Tswa",
+    "loginDescription": "Rea u amohela hape! Ke kopa u kene akhaonto ya hao",
+    "signUpDescription": "Etsa akhaonto e mpsha ho qala ho bolella dintlha",
+    "email": "Email",
+    "emailPlaceholder": "Kenya email ya hao",
+    "password": "Lentsoe la ho Kena",
+    "passwordPlaceholder": "Kenya lentsoe la hao la ho kena",
+    "confirmPassword": "Netefatsa Lentsoe la ho Kena",
+    "confirmPasswordPlaceholder": "Netefatsa lentsoe la hao la ho kena",
+    "firstName": "Lebitso la Pele",
+    "firstNamePlaceholder": "Kenya lebitso la hao la pele",
+    "lastName": "Lehapu",
+    "lastNamePlaceholder": "Kenya lehapu la hao",
+    "phone": "Fono",
+    "phonePlaceholder": "Kenya nomoro ya hao ya fono",
+    "userType": "Mofuta wa Mosebedisi",
+    "citizen": "Moahi",
+    "department": "Karolo",
+    "admin": "Molaoli",
+    "loggingIn": "E kena...",
+    "creatingAccount": "E etsa akhaonto...",
+    "continueWithGoogle": "Tswela pele ka Google",
+    "or": "kapa",
+    "noAccount": "Ha u na akhaonto?",
+    "haveAccount": "O se o na le akhaonto?",
+    "passwordsDoNotMatch": "Mantswe a ho kena ha a tshwane",
+    "welcomeBack": "Rea u amohela hape ho ServeSA",
+    "joinUs": "Kopana le ServeSA kajeno",
+    "securePlatform": "Sebaka se sireletsehileng sa puisano ya baahi le mmuso"
+  },
+  "messaging": {
+    "title": "Setsi sa Melale",
+    "description": "Puisano e tobaneng le dikarolo le baetapele",
+    "loginRequired": "Ho Kena ho Hlokeha",
+    "loginRequiredDescription": "Ke kopa u kene ho fihlella setsi sa melale",
+    "conversations": "Dipuisano",
+    "departments": "Dikarolo",
+    "searchConversations": "Batla dipuisano...",
+    "searchDepartments": "Batla dikarolo...",
+    "all": "Tsohle",
+    "unread": "Tse sa Balweng",
+    "departments": "Dikarolo",
+    "selectConversation": "Khetha puisano ho qala ho romela melale",
+    "typeMessage": "Ngola lelate la hao...",
+    "departmentContacts": "Dikopano tsa Karolo",
+    "departmentContactsDescription": "Fumana 'me u kopane le dikarolo tsa masipala ka tobaneng",
+    "allCategories": "Dihlopha Tsohle",
+    "utilities": "Ditshebeletso",
+    "infrastructure": "Ditshebeletso tsa Sechaba",
+    "environment": "Tikoloho",
+    "community": "Sechaba",
+    "development": "Ntlafatso",
+    "online": "Online",
+    "offline": "Offline",
+    "startChat": "Qala ho Bua",
+    "staffCount": "{{count}} basebetsi",
+    "typicalResponseTime": "Nako e Tloaelehileng ya Karabo",
+    "noDepartmentsFound": "Ha ho a fumaneha dikarolo"
+  }
+}

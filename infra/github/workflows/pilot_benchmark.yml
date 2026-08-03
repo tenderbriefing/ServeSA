@@ -1,0 +1,104 @@
+name: Pilot Benchmark
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  push:
+    paths:
+      - 'apps/functions/src/routing/**'
+      - 'apps/functions/src/utils/georesolve.ts'
+      - 'infra/sql/**'
+      - 'tools/pilot/**'
+  pull_request:
+    paths:
+      - 'apps/functions/src/routing/**'
+      - 'apps/functions/src/utils/georesolve.ts'
+      - 'infra/sql/**'
+      - 'tools/pilot/**'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+          
+      - name: Create output directory
+        run: mkdir -p pilot_out
+        
+      - name: Generate pilot points
+        run: |
+          npm run pilot:points
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Run georesolve benchmark
+        run: |
+          npm run pilot:benchmark
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Generate evidence pack
+        run: |
+          npm run pilot:evidence
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-benchmark-${{ github.sha }}
+          path: |
+            pilot_out/
+            !pilot_out/node_modules/
+          retention-days: 30
+          
+      - name: Check accuracy threshold
+        run: |
+          if [ "$(jq -r '.threshold_met' pilot_out/benchmark/summary.json)" != "true" ]; then
+            echo "❌ Georesolve accuracy below threshold"
+            exit 1
+          fi
+          echo "✅ Georesolve accuracy meets threshold"
+          
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = JSON.parse(fs.readFileSync('pilot_out/benchmark/summary.json', 'utf8'));
+            
+            const comment = `## 🧪 Pilot Benchmark Results
+            
+            **Ward Accuracy:** ${(summary.ward_accuracy * 100).toFixed(2)}%
+            **Municipality Accuracy:** ${(summary.municipality_accuracy * 100).toFixed(2)}%
+            **Average Distance Error:** ${summary.avg_distance_m.toFixed(2)}m
+            **Threshold Met:** ${summary.threshold_met ? '✅ YES' : '❌ NO'}
+            
+            [Download full results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

@@ -1,0 +1,47 @@
+{
+  "name": "servesa-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "deploy:dev": "turbo run deploy:dev",
+    "deploy:prod": "turbo run deploy:prod",
+    "seed:wards": "cd tools/seed && npm run wards-to-bigquery",
+    "seed:municipalities": "cd tools/seed && npm run municipalities-seed",
+    "backfill:vectors": "cd tools/scripts && npm run backfill-case-vectors",
+    "typecheck": "turbo run type-check",
+    "verify:env": "bash ./infra/scripts/10_verify_env.sh",
+    "verify:geo": "bash ./infra/scripts/11_verify_geo.sh",
+    "smoke:e2e": "bash ./infra/scripts/12_smoke_e2e.sh",
+    "monitoring:alerts": "bash ./infra/scripts/13_monitoring_alerts.sh",
+    "headers:apply": "bash ./infra/scripts/14_hosting_headers.sh",
+    "pilot:points": "ts-node tools/pilot/generate_pilot_points.ts --muni JHB,CPT,TSH --perWard 20 --out pilot_out/pilot_points",
+    "pilot:benchmark": "ts-node tools/pilot/benchmark_georesolve.ts --points pilot_out/pilot_points.csv --out pilot_out/benchmark --threshold 0.95",
+    "pilot:evidence": "ts-node tools/pilot/evidence_pack.ts --benchmark pilot_out/benchmark/summary.json --points pilot_out/pilot_points.geojson --out pilot_out/evidence"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "typescript": "^5.2.0",
+    "@types/node": "^20.0.0",
+    "@types/node-fetch": "^2.6.0",
+    "prettier": "^3.0.0",
+    "eslint": "^8.0.0",
+    "playwright": "^1.40.0",
+    "ts-node": "^10.9.0",
+    "@turf/helpers": "^6.5.0",
+    "@turf/random": "^6.5.0",
+    "@turf/boolean-point-in-polygon": "^6.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

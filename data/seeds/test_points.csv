@@ -1,0 +1,21 @@
+lat,lng,expected_ward,expected_muni,expected_province,description
+-26.2041,28.0473,JHB001-001,City of Johannesburg,Gauteng,Johannesburg CBD
+-33.9249,18.4241,CPT001-001,City of Cape Town,Western Cape,Cape Town CBD
+-29.8587,31.0218,DBN001-001,eThekwini,KwaZulu-Natal,Durban CBD
+-25.7479,28.2293,PTA001-001,City of Tshwane,Gauteng,Pretoria CBD
+-26.1076,28.0567,JHB001-002,City of Johannesburg,Gauteng,Sandton
+-33.9715,18.6021,CPT001-002,City of Cape Town,Western Cape,Sea Point
+-29.8497,31.0342,DBN001-002,eThekwini,KwaZulu-Natal,Umhlanga
+-25.7313,28.2184,PTA001-002,City of Tshwane,Gauteng,Centurion
+-26.1599,27.8917,JHB001-003,City of Johannesburg,Gauteng,Roodepoort
+-33.9139,18.4177,CPT001-003,City of Cape Town,Western Cape,Observatory
+-29.8167,31.0167,DBN001-003,eThekwini,KwaZulu-Natal,North Beach
+-25.7069,28.2294,PTA001-003,City of Tshwane,Gauteng,Hatfield
+-26.1083,28.0436,JHB001-004,City of Johannesburg,Gauteng,Rosebank
+-33.9244,18.4191,CPT001-004,City of Cape Town,Western Cape,Green Point
+-29.8500,31.0000,DBN001-004,eThekwini,KwaZulu-Natal,South Beach
+-25.7479,28.2293,PTA001-004,City of Tshwane,Gauteng,Arcadia
+-26.1459,28.0322,JHB001-005,City of Johannesburg,Gauteng,Braamfontein
+-33.9289,18.4172,CPT001-005,City of Cape Town,Western Cape,De Waterkant
+-29.8587,31.0218,DBN001-005,eThekwini,KwaZulu-Natal,Point Waterfront
+-25.7479,28.2293,PTA001-005,City of Tshwane,Gauteng,Brooklyn

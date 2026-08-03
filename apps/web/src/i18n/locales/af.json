@@ -1,0 +1,298 @@
+{
+  "common": {
+    "loading": "Laai...",
+    "error": "Fout",
+    "success": "Sukses",
+    "cancel": "Kanselleer",
+    "save": "Stoor",
+    "delete": "Verwyder",
+    "edit": "Redigeer",
+    "view": "Bekyk",
+    "submit": "Dien in",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "close": "Sluit",
+    "search": "Soek",
+    "filter": "Filter",
+    "sort": "Sorteer",
+    "refresh": "Verfris",
+    "download": "Aflaai",
+    "upload": "Oplaai",
+    "yes": "Ja",
+    "no": "Nee",
+    "ok": "OK",
+    "retry": "Probeer weer",
+    "continue": "Gaan voort",
+    "skip": "Slaan oor"
+  },
+  "navigation": {
+    "home": "Tuis",
+    "report": "Rapporteer Probleem",
+    "dashboard": "Dashboard",
+    "explore": "Verken",
+    "community": "Gemeenskap",
+    "messaging": "Boodskappe",
+    "admin": "Admin",
+    "profile": "Profiel",
+    "settings": "Instellings",
+    "help": "Hulp",
+    "about": "Aangaande"
+  },
+  "home": {
+    "hero": {
+      "title": "Rapporteer Munisipale Probleme",
+      "subtitle": "Onmiddellik",
+      "description": "ServeSA verbind burgers met plaaslike regering om diensleweringsprobleme te rapporteer en dop te hou. Kry intydse opdaterings oor jou verslae en sien die impak in jou gemeenskap.",
+      "reportButton": "Rapporteer 'n Probleem",
+      "exploreButton": "Verken Sake"
+    },
+    "features": {
+      "title": "Hoe ServeSA Werk",
+      "subtitle": "Eenvoudige, vinnige en deursigtige rapporteringstelsel vir munisipale dienslewering",
+      "step1": {
+        "title": "1. Rapporteer Probleem",
+        "description": "Neem 'n foto en beskryf die probleem. Ons AI help om jou verslag te kategoriseer en prioriteer."
+      },
+      "step2": {
+        "title": "2. Dop Vordering",
+        "description": "Kry intydse opdaterings oor jou saakstatus, geskatte oplossingstyd en vorderingskennisgewings."
+      },
+      "step3": {
+        "title": "3. Probleem Opgelos",
+        "description": "Ontvang bevestiging wanneer jou probleem opgelos is en sien die impak in jou gemeenskap."
+      }
+    },
+    "stats": {
+      "casesReported": "Sake Gerapporteer",
+      "resolutionRate": "Oplossingstempo",
+      "avgResponseTime": "Gem. Reaksietyd",
+      "activeWards": "Aktiewe Wyke"
+    },
+    "categories": {
+      "title": "Rapporteer Enige Probleem",
+      "subtitle": "Van waterlekkasies tot padskade, ons hanteer alle munisipale diensversoeke",
+      "waterSewage": "Water & Riool",
+      "electricity": "Elektrisiteit",
+      "roadsInfrastructure": "Paaie & Infrastruktuur",
+      "wasteManagement": "Afvalbestuur",
+      "digitalServices": "Digitale Dienste",
+      "emergencyServices": "Nooddienste"
+    },
+    "cta": {
+      "title": "Gereed om 'n Verskil te Maak?",
+      "subtitle": "Sluit aan by duisende burgers wat aktief hul gemeenskappe verbeter deur ServeSA",
+      "button": "Begin Nou Rapporteer"
+    }
+  },
+  "report": {
+    "title": "Rapporteer 'n Probleem",
+    "steps": {
+      "category": "Kategorie",
+      "details": "Besonderhede",
+      "location": "Ligging",
+      "evidence": "Bewys",
+      "review": "Hersien"
+    },
+    "categories": {
+      "waterSewage": "Water & Riool",
+      "electricity": "Elektrisiteit",
+      "roadsInfrastructure": "Paaie & Infrastruktuur",
+      "wasteManagement": "Afvalbestuur",
+      "digitalServices": "Digitale Dienste",
+      "emergencyServices": "Nooddienste"
+    },
+    "form": {
+      "title": "Probleem Titel",
+      "titlePlaceholder": "Kort beskrywing van die probleem",
+      "description": "Beskrywing",
+      "descriptionPlaceholder": "Verskaf gedetailleerde inligting oor die probleem",
+      "priority": "Prioriteit",
+      "priorityLow": "Laag",
+      "priorityMedium": "Medium",
+      "priorityHigh": "Hoog",
+      "location": "Ligging",
+      "locationPlaceholder": "Kies ligging op kaart of voer adres in",
+      "photos": "Foto's",
+      "photosDescription": "Voeg foto's by om ons te help om die probleem beter te verstaan",
+      "anonymous": "Rapporteer Anoniem",
+      "anonymousDescription": "Jou persoonlike inligting sal nie met die munisipaliteit gedeel word nie",
+      "bulkReport": "Grootmaat Verslag",
+      "bulkReportDescription": "Rapporteer verskeie verwante probleme gelyktydig"
+    },
+    "evidence": {
+      "title": "Voeg Bewys By",
+      "photoVideo": "Foto/Video",
+      "voiceNote": "Stemnota",
+      "document": "Dokument",
+      "aiDetection": "AI Probleem Opsporing",
+      "aiDetectionDescription": "Ons AI sal outomaties probleme in jou foto's opspoor en kategoriseer"
+    },
+    "success": {
+      "title": "Verslag Suksesvol Ingedien!",
+      "description": "Jou probleem is gerapporteer en 'n saaknommer toegeken. Jy sal opdaterings oor die vordering ontvang.",
+      "caseNumber": "Saaknommer",
+      "trackProgress": "Dop Vordering",
+      "reportAnother": "Rapporteer Nog 'n Probleem"
+    }
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "stats": {
+      "totalCases": "Totale Sake",
+      "activeCases": "Aktiewe Sake",
+      "resolvedCases": "Opgeloste Sake",
+      "avgResolutionTime": "Gem. Oplossingstyd"
+    },
+    "filters": {
+      "all": "Alles",
+      "pending": "Hangende",
+      "inProgress": "In Uitvoering",
+      "resolved": "Opgelos"
+    },
+    "case": {
+      "status": "Status",
+      "priority": "Prioriteit",
+      "created": "Geskep",
+      "updated": "Opgedateer",
+      "estimatedResolution": "Geskatte Oplossing",
+      "viewDetails": "Bekyk Besonderhede"
+    }
+  },
+  "community": {
+    "title": "Gemeenskap",
+    "forums": {
+      "title": "Gemeenskapsforums",
+      "description": "Bespreek plaaslike probleme en oplossings met jou bure",
+      "createTopic": "Skep Onderwerp",
+      "recentTopics": "Onlangse Onderwerpe",
+      "popularTopics": "Populêre Onderwerpe"
+    },
+    "voting": {
+      "title": "Stem oor Probleme",
+      "description": "Help om munisipale reaksies te prioriteer deur oor gerapporteerde probleme te stem",
+      "vote": "Stem",
+      "votes": "stemme",
+      "voted": "Gestem"
+    },
+    "solutions": {
+      "title": "Gemeenskapsoplossings",
+      "description": "Stel oplossings voor en stem oor gemeenskapsprobleme",
+      "suggestSolution": "Stel Oplossing Voor",
+      "implemented": "Geïmplementeer",
+      "underReview": "Onder Hersiening"
+    }
+  },
+  "accessibility": {
+    "screenReader": "Skermleser Ondersteuning",
+    "highContrast": "Hoë Kontras Modus",
+    "largeText": "Groot Teks",
+    "keyboardNavigation": "Sleutelbord Navigasie",
+    "voiceControl": "Stembeheer",
+    "help": "Toeganklikheid Hulp"
+  },
+  "offline": {
+    "title": "Afline Modus",
+    "description": "Jy is tans afline. Sommige funksies mag beperk wees.",
+    "syncWhenOnline": "Veranderinge sal sinkroniseer wanneer jy weer aanlyn is",
+    "offlineReports": "Afline Verslae",
+    "syncNow": "Sinkroniseer Nou"
+  },
+  "notifications": {
+    "title": "Kennisgewings",
+    "settings": "Kennisgewing Instellings",
+    "push": "Druk Kennisgewings",
+    "email": "E-pos Kennisgewings",
+    "sms": "SMS Kennisgewings",
+    "caseUpdates": "Saak Opdaterings",
+    "communityUpdates": "Gemeenskap Opdaterings",
+    "emergencyAlerts": "Noodwaarskuwings"
+  },
+  "analytics": {
+    "title": "Prestasie Metrieke",
+    "municipalResponse": "Munisipale Reaksietye",
+    "resolutionRates": "Oplossingstempo's",
+    "budgetTracking": "Begroting Dop",
+    "predictiveInsights": "Voorspellende Insigte",
+    "trends": "Tendense",
+    "comparison": "Vergelyking"
+  },
+  "help": {
+    "title": "Hulp & Tutorials",
+    "digitalLiteracy": "Digitale Geletterdheid Opleiding",
+    "tutorials": "Tutorials",
+    "faq": "Gereelde Vrae",
+    "contact": "Kontak Ondersteuning",
+    "feedback": "Terugvoer"
+  },
+  "language": {
+    "title": "Taal",
+    "english": "Engels",
+    "zulu": "isiZulu",
+    "xhosa": "isiXhosa",
+    "afrikaans": "Afrikaans",
+    "sesotho": "Sesotho"
+  },
+  "auth": {
+    "login": "Teken In",
+    "signUp": "Teken Op",
+    "signOut": "Teken Uit",
+    "loginDescription": "Welkom terug! Teken asseblief in jou rekening",
+    "signUpDescription": "Skep 'n nuwe rekening om probleme te begin rapporteer",
+    "email": "E-pos",
+    "emailPlaceholder": "Voer jou e-pos in",
+    "password": "Wagwoord",
+    "passwordPlaceholder": "Voer jou wagwoord in",
+    "confirmPassword": "Bevestig Wagwoord",
+    "confirmPasswordPlaceholder": "Bevestig jou wagwoord",
+    "firstName": "Voornaam",
+    "firstNamePlaceholder": "Voer jou voornaam in",
+    "lastName": "Van",
+    "lastNamePlaceholder": "Voer jou van in",
+    "phone": "Telefoon",
+    "phonePlaceholder": "Voer jou telefoonnommer in",
+    "userType": "Gebruiker Tipe",
+    "citizen": "Burger",
+    "department": "Departement",
+    "admin": "Admin",
+    "loggingIn": "Teken in...",
+    "creatingAccount": "Skep rekening...",
+    "continueWithGoogle": "Gaan voort met Google",
+    "or": "of",
+    "noAccount": "Het jy nie 'n rekening nie?",
+    "haveAccount": "Het jy reeds 'n rekening?",
+    "passwordsDoNotMatch": "Wagwoorde stem nie ooreen nie",
+    "welcomeBack": "Welkom terug by ServeSA",
+    "joinUs": "Sluit aan by ServeSA vandag",
+    "securePlatform": "Veilige platform vir burger-regering kommunikasie"
+  },
+  "messaging": {
+    "title": "Boodskap Sentrum",
+    "description": "Direkte kommunikasie met departemente en amptenare",
+    "loginRequired": "Aanmelding Benodig",
+    "loginRequiredDescription": "Teken asseblief in om toegang tot die boodskap sentrum te kry",
+    "conversations": "Gesprekke",
+    "departments": "Departemente",
+    "searchConversations": "Soek gesprekke...",
+    "searchDepartments": "Soek departemente...",
+    "all": "Alles",
+    "unread": "Ongelees",
+    "departments": "Departemente",
+    "selectConversation": "Kies 'n gesprek om boodskappe te begin stuur",
+    "typeMessage": "Tik jou boodskap...",
+    "departmentContacts": "Departement Kontakte",
+    "departmentContactsDescription": "Vind en kontak munisipale departemente direk",
+    "allCategories": "Alle Kategorieë",
+    "utilities": "Nutsdienste",
+    "infrastructure": "Infrastruktuur",
+    "environment": "Omgewing",
+    "community": "Gemeenskap",
+    "development": "Ontwikkeling",
+    "online": "Aanlyn",
+    "offline": "Afline",
+    "startChat": "Begin Gesels",
+    "staffCount": "{{count}} personeel",
+    "typicalResponseTime": "Tipiese Reaksietyd",
+    "noDepartmentsFound": "Geen departemente gevind nie"
+  }
+}

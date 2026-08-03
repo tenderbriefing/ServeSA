@@ -1,0 +1,398 @@
+{
+  "categories": [
+    {
+      "id": "water",
+      "name": "Water & Sewage",
+      "description": "Water supply, sewage, and drainage issues",
+      "icon": "droplets",
+      "color": "blue",
+      "sla_hours": {
+        "emergency": 1,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "subcategories": [
+        {
+          "id": "water_leak",
+          "name": "Water Leak",
+          "description": "Burst pipes, leaking taps, or water main breaks"
+        },
+        {
+          "id": "sewage_blockage",
+          "name": "Sewage Blockage",
+          "description": "Blocked drains, overflowing manholes, or sewage backups"
+        },
+        {
+          "id": "water_quality",
+          "name": "Water Quality",
+          "description": "Discolored water, bad taste, or contamination concerns"
+        },
+        {
+          "id": "water_pressure",
+          "name": "Water Pressure",
+          "description": "Low water pressure or no water supply"
+        }
+      ]
+    },
+    {
+      "id": "electricity",
+      "name": "Electricity",
+      "description": "Power outages, street lights, and electrical infrastructure",
+      "icon": "zap",
+      "color": "yellow",
+      "sla_hours": {
+        "emergency": 1,
+        "high": 4,
+        "medium": 24,
+        "low": 72
+      },
+      "subcategories": [
+        {
+          "id": "power_outage",
+          "name": "Power Outage",
+          "description": "Complete loss of electricity in an area"
+        },
+        {
+          "id": "street_light",
+          "name": "Street Light",
+          "description": "Non-functioning or damaged street lights"
+        },
+        {
+          "id": "electrical_hazard",
+          "name": "Electrical Hazard",
+          "description": "Exposed wires, sparking, or dangerous electrical conditions"
+        },
+        {
+          "id": "transformer",
+          "name": "Transformer Issue",
+          "description": "Problems with electrical transformers or substations"
+        }
+      ]
+    },
+    {
+      "id": "roads",
+      "name": "Roads & Infrastructure",
+      "description": "Road damage, traffic signals, and transportation infrastructure",
+      "icon": "road",
+      "color": "gray",
+      "sla_hours": {
+        "emergency": 4,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "subcategories": [
+        {
+          "id": "pothole",
+          "name": "Pothole",
+          "description": "Road surface damage or holes in the road"
+        },
+        {
+          "id": "traffic_light",
+          "name": "Traffic Light",
+          "description": "Malfunctioning traffic signals or pedestrian crossings"
+        },
+        {
+          "id": "road_flooding",
+          "name": "Road Flooding",
+          "description": "Flooded roads or poor drainage causing water accumulation"
+        },
+        {
+          "id": "road_sign",
+          "name": "Road Sign",
+          "description": "Missing, damaged, or obscured road signs"
+        }
+      ]
+    },
+    {
+      "id": "waste",
+      "name": "Waste Management",
+      "description": "Garbage collection, illegal dumping, and recycling services",
+      "icon": "trash2",
+      "color": "green",
+      "sla_hours": {
+        "emergency": 24,
+        "high": 48,
+        "medium": 72,
+        "low": 168
+      },
+      "subcategories": [
+        {
+          "id": "garbage_collection",
+          "name": "Garbage Collection",
+          "description": "Missed garbage collection or overflowing bins"
+        },
+        {
+          "id": "illegal_dumping",
+          "name": "Illegal Dumping",
+          "description": "Unauthorized waste disposal or littering"
+        },
+        {
+          "id": "recycling",
+          "name": "Recycling",
+          "description": "Recycling collection or processing issues"
+        },
+        {
+          "id": "hazardous_waste",
+          "name": "Hazardous Waste",
+          "description": "Dangerous materials or chemical waste disposal"
+        }
+      ]
+    },
+    {
+      "id": "internet",
+      "name": "Digital Services",
+      "description": "WiFi hotspots, digital kiosks, and connectivity services",
+      "icon": "wifi",
+      "color": "purple",
+      "sla_hours": {
+        "emergency": 24,
+        "high": 72,
+        "medium": 168,
+        "low": 336
+      },
+      "subcategories": [
+        {
+          "id": "wifi_hotspot",
+          "name": "WiFi Hotspot",
+          "description": "Public WiFi connectivity issues"
+        },
+        {
+          "id": "digital_kiosk",
+          "name": "Digital Kiosk",
+          "description": "Problems with public information kiosks"
+        },
+        {
+          "id": "connectivity",
+          "name": "Connectivity",
+          "description": "General internet or network connectivity issues"
+        },
+        {
+          "id": "digital_services",
+          "name": "Digital Services",
+          "description": "Online government services or applications"
+        }
+      ]
+    },
+    {
+      "id": "emergency",
+      "name": "Emergency Services",
+      "description": "Urgent safety issues and emergency response",
+      "icon": "alert-triangle",
+      "color": "red",
+      "sla_hours": {
+        "emergency": 1,
+        "high": 2,
+        "medium": 4,
+        "low": 8
+      },
+      "subcategories": [
+        {
+          "id": "fire_hazard",
+          "name": "Fire Hazard",
+          "description": "Fire risks, smoke, or fire-related emergencies"
+        },
+        {
+          "id": "structural_damage",
+          "name": "Structural Damage",
+          "description": "Building damage or collapse risks"
+        },
+        {
+          "id": "flooding",
+          "name": "Flooding",
+          "description": "Severe flooding or water damage"
+        },
+        {
+          "id": "safety_hazard",
+          "name": "Safety Hazard",
+          "description": "General safety concerns or dangerous conditions"
+        }
+      ]
+    }
+  ],
+  "municipality_slas": {
+    "JHB001": {
+      "water": {
+        "emergency": 1,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "electricity": {
+        "emergency": 1,
+        "high": 4,
+        "medium": 24,
+        "low": 72
+      },
+      "roads": {
+        "emergency": 4,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "waste": {
+        "emergency": 24,
+        "high": 48,
+        "medium": 72,
+        "low": 168
+      },
+      "internet": {
+        "emergency": 24,
+        "high": 72,
+        "medium": 168,
+        "low": 336
+      },
+      "emergency": {
+        "emergency": 1,
+        "high": 2,
+        "medium": 4,
+        "low": 8
+      }
+    },
+    "CPT001": {
+      "water": {
+        "emergency": 1,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "electricity": {
+        "emergency": 1,
+        "high": 4,
+        "medium": 24,
+        "low": 72
+      },
+      "roads": {
+        "emergency": 4,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "waste": {
+        "emergency": 24,
+        "high": 48,
+        "medium": 72,
+        "low": 168
+      },
+      "internet": {
+        "emergency": 24,
+        "high": 72,
+        "medium": 168,
+        "low": 336
+      },
+      "emergency": {
+        "emergency": 1,
+        "high": 2,
+        "medium": 4,
+        "low": 8
+      }
+    },
+    "DBN001": {
+      "water": {
+        "emergency": 1,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "electricity": {
+        "emergency": 1,
+        "high": 4,
+        "medium": 24,
+        "low": 72
+      },
+      "roads": {
+        "emergency": 4,
+        "high": 24,
+        "medium": 72,
+        "low": 168
+      },
+      "waste": {
+        "emergency": 24,
+        "high": 48,
+        "medium": 72,
+        "low": 168
+      },
+      "internet": {
+        "emergency": 24,
+        "high": 72,
+        "medium": 168,
+        "low": 336
+      },
+      "emergency": {
+        "emergency": 1,
+        "high": 2,
+        "medium": 4,
+        "low": 8
+      }
+    }
+  },
+  "priority_levels": [
+    {
+      "id": "emergency",
+      "name": "Emergency",
+      "description": "Immediate response required - life or property at risk",
+      "color": "red",
+      "response_time_hours": 1
+    },
+    {
+      "id": "high",
+      "name": "High",
+      "description": "Urgent issue affecting many people or critical infrastructure",
+      "color": "orange",
+      "response_time_hours": 24
+    },
+    {
+      "id": "medium",
+      "name": "Medium",
+      "description": "Standard issue requiring normal response time",
+      "color": "yellow",
+      "response_time_hours": 72
+    },
+    {
+      "id": "low",
+      "name": "Low",
+      "description": "Minor issue that can be addressed during regular maintenance",
+      "color": "green",
+      "response_time_hours": 168
+    }
+  ],
+  "status_workflow": [
+    {
+      "id": "submitted",
+      "name": "Submitted",
+      "description": "Case has been submitted and is awaiting review",
+      "color": "gray"
+    },
+    {
+      "id": "acknowledged",
+      "name": "Acknowledged",
+      "description": "Case has been received and is being processed",
+      "color": "blue"
+    },
+    {
+      "id": "assigned",
+      "name": "Assigned",
+      "description": "Case has been assigned to a department or official",
+      "color": "yellow"
+    },
+    {
+      "id": "in_progress",
+      "name": "In Progress",
+      "description": "Work has begun on resolving the issue",
+      "color": "orange"
+    },
+    {
+      "id": "resolved",
+      "name": "Resolved",
+      "description": "Issue has been resolved and case is closed",
+      "color": "green"
+    },
+    {
+      "id": "reopened",
+      "name": "Reopened",
+      "description": "Case has been reopened due to new issues",
+      "color": "red"
+    }
+  ]
+}

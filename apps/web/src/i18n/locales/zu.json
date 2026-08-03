@@ -1,0 +1,298 @@
+{
+  "common": {
+    "loading": "Iyayilayisha...",
+    "error": "Iphutha",
+    "success": "Impumelelo",
+    "cancel": "Khansela",
+    "save": "Londoloza",
+    "delete": "Susa",
+    "edit": "Hlela",
+    "view": "Buka",
+    "submit": "Thumela",
+    "back": "Emuva",
+    "next": "Olandelayo",
+    "previous": "Ongaphambilini",
+    "close": "Vala",
+    "search": "Sesha",
+    "filter": "Hluza",
+    "sort": "Hlunga",
+    "refresh": "Vuselela",
+    "download": "Landa",
+    "upload": "Layisha phezulu",
+    "yes": "Yebo",
+    "no": "Cha",
+    "ok": "Kulungile",
+    "retry": "Zama futhi",
+    "continue": "Qhubeka",
+    "skip": "Yehlisa"
+  },
+  "navigation": {
+    "home": "Ikhaya",
+    "report": "Bika Inkinga",
+    "dashboard": "Ideshibhodi",
+    "explore": "Hlola",
+    "community": "Umphakathi",
+    "messaging": "Imilayezo",
+    "admin": "Umphathi",
+    "profile": "Iphrofayili",
+    "settings": "Izilungiselelo",
+    "help": "Usizo",
+    "about": "Mayelana"
+  },
+  "home": {
+    "hero": {
+      "title": "Bika Izinkinga Zomasipala",
+      "subtitle": "Ngokushesha",
+      "description": "I-ServeSA ixhuma izakhamizi nohulumeni wasekhaya ukubika nokulandelela izinkinga zokulethwa kwezinsizakalo. Thola izibuyekezo zangempela kumabiko akho ubone umthelela emphakathini wakho.",
+      "reportButton": "Bika Inkinga",
+      "exploreButton": "Hlola Amacala"
+    },
+    "features": {
+      "title": "I-ServeSA Isebenza Kanjani",
+      "subtitle": "Uhlelo olulula, olusheshayo nolucacile lokubika izinsizakalo zomasipala",
+      "step1": {
+        "title": "1. Bika Inkinga",
+        "description": "Thatha isithombe bese uchaza inkinga. I-AI yethu iyasiza ukuhlukanisa nokubeka izinhloso kumbiko wakho."
+      },
+      "step2": {
+        "title": "2. Landelela Intuthuko",
+        "description": "Thola izibuyekezo zangempela esimweni secala lakho, isikhathi sokuxazululwa esilinganiselwe, nezaziso zentuthuko."
+      },
+      "step3": {
+        "title": "3. Inkinga Ixazululwe",
+        "description": "Thola ukuqinisekiswa lapho inkinga yakho ixazululwa ubone umthelela emphakathini wakho."
+      }
+    },
+    "stats": {
+      "casesReported": "Amacala Abikiwe",
+      "resolutionRate": "Izinga Lokuxazulula",
+      "avgResponseTime": "Isikhathi Sokuphendula Esilinganiselwe",
+      "activeWards": "AmaWadi Asebenzayo"
+    },
+    "categories": {
+      "title": "Bika Noma Iyiphi Inkinga",
+      "subtitle": "Kusuka ekuchithekeni kwamanzi kuya ekulimaleni komgwaqo, sibhekelela zonke izicelo zezinsizakalo zomasipala",
+      "waterSewage": "Amanzi & Indle",
+      "electricity": "Ugesi",
+      "roadsInfrastructure": "Imigwaqo & Ingqalasizinda",
+      "wasteManagement": "Ukuphatha Imfucuza",
+      "digitalServices": "Izinsizakalo Zedijithali",
+      "emergencyServices": "Izinsizakalo Zokuthutha"
+    },
+    "cta": {
+      "title": "Ulungile Ukwenza Umehluko?",
+      "subtitle": "Joyina izinkulungwane zezakhamizi ezithuthukisa imiphakathi yazo ngokusebenzisa i-ServeSA",
+      "button": "Qala Ukubika Manje"
+    }
+  },
+  "report": {
+    "title": "Bika Inkinga",
+    "steps": {
+      "category": "Isigaba",
+      "details": "Imininingwane",
+      "location": "Indawo",
+      "evidence": "Ubufakazi",
+      "review": "Buyekeza"
+    },
+    "categories": {
+      "waterSewage": "Amanzi & Indle",
+      "electricity": "Ugesi",
+      "roadsInfrastructure": "Imigwaqo & Ingqalasizinda",
+      "wasteManagement": "Ukuphatha Imfucuza",
+      "digitalServices": "Izinsizakalo Zedijithali",
+      "emergencyServices": "Izinsizakalo Zokuthutha"
+    },
+    "form": {
+      "title": "Isihloko Senkinga",
+      "titlePlaceholder": "Incazelo emfushane yenkinga",
+      "description": "Incazelo",
+      "descriptionPlaceholder": "Nikeza imininingwane enemininingwane mayelana nenkinga",
+      "priority": "Inhloso",
+      "priorityLow": "Ephansi",
+      "priorityMedium": "Emaphakathi",
+      "priorityHigh": "Ephakeme",
+      "location": "Indawo",
+      "locationPlaceholder": "Khetha indawo emapheni noma faka ikheli",
+      "photos": "Izithombe",
+      "photosDescription": "Engeza izithombe ukusisiza siqonde inkinga kangcono",
+      "anonymous": "Bika Ngokungaziwa",
+      "anonymousDescription": "Imininingwane yakho yomuntu ngeke yabelwane nomasipala",
+      "bulkReport": "Bika Okuningi",
+      "bulkReportDescription": "Bika izinkinga eziningi ezihlobene ngesikhathi esisodwa"
+    },
+    "evidence": {
+      "title": "Engeza Ubufakazi",
+      "photoVideo": "Isithombe/IVidiyo",
+      "voiceNote": "Inothi Yezwi",
+      "document": "Ushicilelo",
+      "aiDetection": "Ukutholwa Kwenkinga Nge-AI",
+      "aiDetectionDescription": "I-AI yethu izothola nokuhlukanisa izinkinga ezithombeni zakho ngokuzenzakalela"
+    },
+    "success": {
+      "title": "Umbiko Uthunyelwe Ngempumelelo!",
+      "description": "Inkinga yakho ibikiwe futhi inikezwe inombolo yecala. Uzothola izibuyekezo entuthukweni.",
+      "caseNumber": "Inombolo Yecala",
+      "trackProgress": "Landelela Intuthuko",
+      "reportAnother": "Bika Enye Inkinga"
+    }
+  },
+  "dashboard": {
+    "title": "Ideshibhodi Yami",
+    "stats": {
+      "totalCases": "Amacala Wonke",
+      "activeCases": "Amacala Asebenzayo",
+      "resolvedCases": "Amacala Axazululwe",
+      "avgResolutionTime": "Isikhathi Sokuxazulula Esilinganiselwe"
+    },
+    "filters": {
+      "all": "Konke",
+      "pending": "Kulindile",
+      "inProgress": "Kuyathuthuka",
+      "resolved": "Kuxazululwe"
+    },
+    "case": {
+      "status": "Isimo",
+      "priority": "Inhloso",
+      "created": "Kwenziwe",
+      "updated": "Kubuyekezwe",
+      "estimatedResolution": "Ukuxazululwa Okulinganiselwe",
+      "viewDetails": "Buka Imininingwane"
+    }
+  },
+  "community": {
+    "title": "Umphakathi",
+    "forums": {
+      "title": "AmaForamu Omphakathi",
+      "description": "Xoxa ngezinkinga zasendaweni nezixazululo nabamakhelwane bakho",
+      "createTopic": "Dala Isihloko",
+      "recentTopics": "Izihloko Zamuva",
+      "popularTopics": "Izihloko Ezidumile"
+    },
+    "voting": {
+      "title": "Vota Ngezinkinga",
+      "description": "Siza ukubeka izinhloso zokuphendula kwamasipala ngokuvota ngezinkinga ezibikiwe",
+      "vote": "Vota",
+      "votes": "amavoti",
+      "voted": "Kuvotiwe"
+    },
+    "solutions": {
+      "title": "Izixazululo Zomphakathi",
+      "description": "Phakamisa futhi vote ngezixazululo zezinkinga zomphakathi",
+      "suggestSolution": "Phakamisa Isixazululo",
+      "implemented": "Kwenziwe",
+      "underReview": "Kubuyekezwa"
+    }
+  },
+  "accessibility": {
+    "screenReader": "Ukusekelwa Komfundi Wesikrini",
+    "highContrast": "Imodi Yokuhlukana Okuphezulu",
+    "largeText": "Umbhalo Omkhulu",
+    "keyboardNavigation": "Ukuzulazula Ngekhibhodi",
+    "voiceControl": "Ukulawula Ngezwi",
+    "help": "Usizo Lokufinyeleleka"
+  },
+  "offline": {
+    "title": "Imodi Engaxhunyiwe",
+    "description": "Awukaxhumi manje. Ezinye izici zingase zilinganiselwe.",
+    "syncWhenOnline": "Izinguquko zizohlanganiswa lapho ubuyela online",
+    "offlineReports": "Imibiko Engaxhunyiwe",
+    "syncNow": "Hlanganisa Manje"
+  },
+  "notifications": {
+    "title": "Izaziso",
+    "settings": "Izilungiselelo Zezaziso",
+    "push": "Izaziso Zokucindezela",
+    "email": "Izaziso Ze-imeyili",
+    "sms": "Izaziso Ze-SMS",
+    "caseUpdates": "Izibuyekezo Zamacala",
+    "communityUpdates": "Izibuyekezo Zomphakathi",
+    "emergencyAlerts": "Izaziso Zokuthutha"
+  },
+  "analytics": {
+    "title": "Izilinganiso Zokusebenza",
+    "municipalResponse": "Izikhathi Zokuphendula Kwamasipala",
+    "resolutionRates": "AmaReyithi Okuxazulula",
+    "budgetTracking": "Ukulandelela Inzuzo",
+    "predictiveInsights": "Ukuqonda Okubikezelayo",
+    "trends": "Imikhuba",
+    "comparison": "Ukuqhathanisa"
+  },
+  "help": {
+    "title": "Usizo & AmaTutorial",
+    "digitalLiteracy": "Ukuqeqeshwa Kokufunda Okwedijithali",
+    "tutorials": "AmaTutorial",
+    "faq": "Imibuzo Evame Ukubuzwa",
+    "contact": "Xhumana Nokusekelwa",
+    "feedback": "Impendulo"
+  },
+  "language": {
+    "title": "Ulimi",
+    "english": "IsiNgisi",
+    "zulu": "isiZulu",
+    "xhosa": "isiXhosa",
+    "afrikaans": "IsiBhunu",
+    "sesotho": "Sesotho"
+  },
+  "auth": {
+    "login": "Ngena",
+    "signUp": "Bhalisa",
+    "signOut": "Phuma",
+    "loginDescription": "Wamukelekile futhi! Sicela ungene kwi-akhawunti yakho",
+    "signUpDescription": "Dala i-akhawunti entsha ukuze uqale ukubika izinkinga",
+    "email": "I-imeyili",
+    "emailPlaceholder": "Faka i-imeyili yakho",
+    "password": "Iphasiwedi",
+    "passwordPlaceholder": "Faka iphasiwedi yakho",
+    "confirmPassword": "Qinisekisa Iphasiwedi",
+    "confirmPasswordPlaceholder": "Qinisekisa iphasiwedi yakho",
+    "firstName": "Igama Lokuqala",
+    "firstNamePlaceholder": "Faka igama lakho lokuqala",
+    "lastName": "Isibongo",
+    "lastNamePlaceholder": "Faka isibongo sakho",
+    "phone": "Ucingo",
+    "phonePlaceholder": "Faka inombolo yakho yocingo",
+    "userType": "Uhlobo Lwomsebenzisi",
+    "citizen": "Isakhamuzi",
+    "department": "Umnyango",
+    "admin": "Umphathi",
+    "loggingIn": "Iyangenisa...",
+    "creatingAccount": "Iyadala i-akhawunti...",
+    "continueWithGoogle": "Qhubeka ngeGoogle",
+    "or": "noma",
+    "noAccount": "Awunawo i-akhawunti?",
+    "haveAccount": "Usenayo i-akhawunti?",
+    "passwordsDoNotMatch": "Amaphasiwedi awafani",
+    "welcomeBack": "Wamukelekile futhi ku-ServeSA",
+    "joinUs": "Joyina i-ServeSA namuhla",
+    "securePlatform": "Indawo yokuphepha yokuxhumana kwezakhamizi nohulumeni"
+  },
+  "messaging": {
+    "title": "Isikhungo Semilayezo",
+    "description": "Ukuxhumana okuqondile neminyango nabaphathi",
+    "loginRequired": "Kudingeka Ungene",
+    "loginRequiredDescription": "Sicela ungene ukuze ufinyelele isikhungo semilayezo",
+    "conversations": "Izingxoxo",
+    "departments": "Iminyango",
+    "searchConversations": "Sesha izingxoxo...",
+    "searchDepartments": "Sesha iminyango...",
+    "all": "Konke",
+    "unread": "Okungafundwanga",
+    "departments": "Iminyango",
+    "selectConversation": "Khetha ingxoxo ukuze uqale ukuthumela imilayezo",
+    "typeMessage": "Bhala umlayezo wakho...",
+    "departmentContacts": "Izithintelo Zeminyango",
+    "departmentContactsDescription": "Thola futhi uxhumane neminyango yomasipala ngokuqondile",
+    "allCategories": "Zonke Izigaba",
+    "utilities": "Izinsizakalo",
+    "infrastructure": "Ingqalasizinda",
+    "environment": "Imvelo",
+    "community": "Umphakathi",
+    "development": "Intuthuko",
+    "online": "Online",
+    "offline": "Engaxhunyiwe",
+    "startChat": "Qala Ukuxoxa",
+    "staffCount": "{{count}} abasebenzi",
+    "typicalResponseTime": "Isikhathi Sokuphendula Esivamile",
+    "noDepartmentsFound": "Ayikho iminyango etholakele"
+  }
+}

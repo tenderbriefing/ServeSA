@@ -1,0 +1,17 @@
+municipality_id,municipality_name,municipality_type,province,contact_email,contact_phone,website,population,area_km2
+JHB001,City of Johannesburg,Metropolitan,Gauteng,info@joburg.org.za,+27 11 375 5555,https://www.joburg.org.za,5634800,1645
+CPT001,City of Cape Town,Metropolitan,Western Cape,info@capetown.gov.za,+27 21 400 1111,https://www.capetown.gov.za,4336886,2461
+DBN001,eThekwini Municipality,Metropolitan,KwaZulu-Natal,info@durban.gov.za,+27 31 311 1111,https://www.durban.gov.za,3745021,2292
+PTA001,City of Tshwane,Metropolitan,Gauteng,info@tshwane.gov.za,+27 12 358 9999,https://www.tshwane.gov.za,3210000,6298
+PE001,Nelson Mandela Bay,Metropolitan,Eastern Cape,info@mandelametro.gov.za,+27 41 501 9111,https://www.mandelametro.gov.za,1152115,1959
+BUF001,Buffalo City,Metropolitan,Eastern Cape,info@buffalocity.gov.za,+27 43 705 2000,https://www.buffalocity.gov.za,834997,2528
+MNG001,Mangaung,Metropolitan,Free State,info@mangaung.co.za,+27 51 405 8911,https://www.mangaung.co.za,787803,6284
+EKU001,Ekurhuleni,Metropolitan,Gauteng,info@ekurhuleni.gov.za,+27 11 999 0000,https://www.ekurhuleni.gov.za,3820000,1975
+JHB002,City of Johannesburg District,District,Gauteng,district@joburg.org.za,+27 11 375 5556,https://www.joburg.org.za/district,1200000,8500
+CPT002,City of Cape Town District,District,Western Cape,district@capetown.gov.za,+27 21 400 1112,https://www.capetown.gov.za/district,800000,5000
+DBN002,eThekwini District,District,KwaZulu-Natal,district@durban.gov.za,+27 31 311 1112,https://www.durban.gov.za/district,900000,6000
+PTA002,City of Tshwane District,District,Gauteng,district@tshwane.gov.za,+27 12 358 9998,https://www.tshwane.gov.za/district,700000,4500
+PE002,Nelson Mandela Bay District,District,Eastern Cape,district@mandelametro.gov.za,+27 41 501 9112,https://www.mandelametro.gov.za/district,500000,3000
+BUF002,Buffalo City District,District,Eastern Cape,district@buffalocity.gov.za,+27 43 705 2001,https://www.buffalocity.gov.za/district,300000,2000
+MNG002,Mangaung District,District,Free State,district@mangaung.co.za,+27 51 405 8912,https://www.mangaung.co.za/district,400000,2500
+EKU002,Ekurhuleni District,District,Gauteng,district@ekurhuleni.gov.za,+27 11 999 0001,https://www.ekurhuleni.gov.za/district,600000,3500
