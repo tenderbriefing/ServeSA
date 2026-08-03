@@ -28,7 +28,7 @@ Per release rules, FAIL is mandatory for: runtime/source mismatch, failed produc
 
 ## 4. Final SHA
 
-_Recorded at commit time (local tip after this certification commit)._
+`204ab27f14edcb0e681564e582d2868cb421b4c4`
 
 ## 5. Branch
 
