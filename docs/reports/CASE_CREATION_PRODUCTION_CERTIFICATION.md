@@ -26,11 +26,11 @@ Production platform enablement unblocked the prior FAIL. Blaze billing is linked
 
 ## 3. Final local SHA
 
-
+`24970a228841ceb47ab1d751a09890ae5d88281d`
 
 ## 4. Deployed SHA
 
- (Functions/Hosting deployed from this tip; CI verified SERVICE_ACCOUNT against servesa-aad53).
+`24970a228841ceb47ab1d751a09890ae5d88281d` (Functions/Hosting deployed from this tip; CI verified SERVICE_ACCOUNT against servesa-aad53).
 
 ## 5. Billing verification
 
