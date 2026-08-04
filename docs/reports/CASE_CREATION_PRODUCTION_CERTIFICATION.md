@@ -26,11 +26,11 @@ Production platform enablement unblocked the prior FAIL. Blaze billing is linked
 
 ## 3. Final local SHA
 
-Recorded at document stamp time after enablement commits (see git tip on `main`).
+
 
 ## 4. Deployed SHA
 
-Same tip as local `main` pushed to `tenderbriefing/ServeSA` for CI verification; runtime Functions/Hosting deployed from that tree via authenticated Firebase CLI (`smartprocure.ai@gmail.com`) after quality gates.
+ (Functions/Hosting deployed from this tip; CI verified SERVICE_ACCOUNT against servesa-aad53).
 
 ## 5. Billing verification
 
