@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build -w @servesa/case-contract && mkdir -p vendor/case-contract && cp ../../packages/case-contract/package.json vendor/case-contract/ && rm -rf vendor/case-contract/dist && cp -R ../../packages/case-contract/dist vendor/case-contract/ && tsc -p tsconfig.deploy.json",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -11,19 +11,19 @@
     "logs": "firebase functions:log",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc -p tsconfig.deploy.json --noEmit"
   },
   "engines": {
     "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@servesa/case-contract": "*",
     "@google-cloud/aiplatform": "^4.0.0",
     "@google-cloud/bigquery": "^7.3.0",
     "@google-cloud/recaptcha-enterprise": "^6.3.0",
     "@google-cloud/storage": "^7.7.0",
     "@google-cloud/vision": "^4.0.0",
+    "@servesa/case-contract": "file:vendor/case-contract",
     "axios": "^1.6.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -31,7 +31,7 @@
     "express": "^4.18.2",
     "firebase": "^10.7.0",
     "firebase-admin": "^12.7.0",
-    "firebase-functions": "^4.5.0",
+    "firebase-functions": "^5.1.1",
     "googleapis": "^128.0.0",
     "helmet": "^7.1.0",
     "image-hash": "^5.3.2",

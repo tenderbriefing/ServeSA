@@ -159,16 +159,20 @@ export const processMediaUpload = async (
           ? 'partial'
           : 'completed'
 
-    await db.collection('cases').doc(caseId).update({
-      mediaUrls: FieldValue.arrayUnion(...mediaUrls),
+    const caseUpdate: Record<string, unknown> = {
       'media.status': status,
       'media.count': FieldValue.increment(mediaUrls.length),
-      'media.paths': FieldValue.arrayUnion(
-        ...mediaUrls.map(() => `cases/${caseId}/media`)
-      ),
       updatedAt: FieldValue.serverTimestamp(),
       updatedBy: userId || 'anonymous',
-    })
+    }
+    if (mediaUrls.length > 0) {
+      caseUpdate.mediaUrls = FieldValue.arrayUnion(...mediaUrls)
+      caseUpdate['media.paths'] = FieldValue.arrayUnion(
+        ...mediaUrls.map(() => `cases/${caseId}/media`)
+      )
+    }
+
+    await db.collection('cases').doc(caseId).update(caseUpdate)
 
     if (mediaUrls.length > 0) {
       await db.collection('cases').doc(caseId).collection('events').add({
@@ -217,6 +221,7 @@ async function processFile(
 ): Promise<{ name: string; type: string; size: number; url: string }> {
   const timestamp = Date.now()
   const fileName = `cases/${caseId}/media/${timestamp}_${sanitizeFileName(file.name)}`
+  const downloadToken = require('crypto').randomUUID()
   const fileBuffer = Buffer.from(file.data, 'base64')
   const bucket = storage.bucket()
   const fileRef = bucket.file(fileName)
@@ -229,15 +234,14 @@ async function processFile(
         userId,
         originalName: file.name,
         uploadedAt: new Date().toISOString(),
+        firebaseStorageDownloadTokens: downloadToken,
       },
     },
   })
 
-  // Private by default — signed URLs for access; do not makePublic
-  const [signedUrl] = await fileRef.getSignedUrl({
-    action: 'read',
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-  })
+  const bucketName = bucket.name
+  const encodedPath = encodeURIComponent(fileName)
+  const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`
 
   await db.collection('case_media').add({
     caseId,
@@ -245,7 +249,7 @@ async function processFile(
     originalName: file.name,
     type: file.type,
     size: file.size,
-    url: signedUrl,
+    url: downloadUrl,
     storagePath: fileName,
     contentHash: file.contentHash || null,
     processingStatus: 'stored',
@@ -257,7 +261,7 @@ async function processFile(
     name: file.name,
     type: file.type,
     size: file.size,
-    url: signedUrl,
+    url: downloadUrl,
   }
 }
 

@@ -247,16 +247,23 @@ export async function createCase(
       reference,
       shareUrl,
       status,
-      municipality: geo.municipalityId
-        ? { id: geo.municipalityId, name: geo.municipalityName || geo.municipalityId }
-        : undefined,
-      ward: geo.wardId
+      ...(geo.municipalityId
         ? {
-            id: geo.wardId,
-            name: geo.wardName || undefined,
-            number: geo.wardId,
+            municipality: {
+              id: geo.municipalityId,
+              name: geo.municipalityName || geo.municipalityId,
+            },
           }
-        : undefined,
+        : {}),
+      ...(geo.wardId
+        ? {
+            ward: {
+              id: geo.wardId,
+              name: geo.wardName || undefined,
+              number: geo.wardId,
+            },
+          }
+        : {}),
       slaTarget: sla.slaTarget.toISOString(),
       targetHours: sla.targetHours,
       georesolutionStatus: geo.status,
@@ -264,6 +271,11 @@ export async function createCase(
       routingPending,
       duplicateAssessment: { status: 'pending' },
     }
+
+    // Firestore rejects `undefined` — persist a JSON-safe copy for idempotency.
+    const idempotentResponse = JSON.parse(
+      JSON.stringify(response)
+    ) as CreateCaseResponse
 
     await db.runTransaction(async (tx) => {
       const again = await tx.get(idempotencyRef)
@@ -284,7 +296,7 @@ export async function createCase(
         clientRequestId: parsed.clientRequestId,
         identityKey,
         caseId,
-        response,
+        response: idempotentResponse,
         createdAt: FieldValue.serverTimestamp(),
       })
     })

@@ -41,14 +41,28 @@ export const getServiceCategories = async (data: CategoryRequest): Promise<{ cat
       query = query.where('isActive', '==', true);
     }
 
+    // Firestore Query.or is not available on all Admin SDK typings used here.
+    // Fetch global + municipality-specific categories and merge.
+    let categoriesSnapshot = await query.get();
     if (municipalityId) {
-      query = query.where('municipalitySpecific', '==', false)
-                   .or(db.collection('service_categories')
-                       .where('municipalityId', '==', municipalityId)
-                       .where('isActive', '==', true));
+      let muniQuery: admin.firestore.Query = db.collection('service_categories')
+        .where('municipalityId', '==', municipalityId);
+      if (!includeInactive) {
+        muniQuery = muniQuery.where('isActive', '==', true);
+      }
+      const [globalSnap, muniSnap] = await Promise.all([
+        query.where('municipalitySpecific', '==', false).get(),
+        muniQuery.get(),
+      ]);
+      const byId = new Map<string, admin.firestore.QueryDocumentSnapshot>();
+      for (const doc of [...globalSnap.docs, ...muniSnap.docs]) {
+        byId.set(doc.id, doc);
+      }
+      categoriesSnapshot = {
+        empty: byId.size === 0,
+        docs: Array.from(byId.values()),
+      } as admin.firestore.QuerySnapshot;
     }
-
-    const categoriesSnapshot = await query.get();
 
     if (categoriesSnapshot.empty) {
       // Return default categories if none found

@@ -324,6 +324,7 @@ async function sendSLABreachNotifications(breach: SLABreach): Promise<void> {
     if (!caseDoc.exists) return;
 
     const caseData = caseDoc.data();
+    if (!caseData) return;
 
     // Notify case owner
     if (caseData.userId) {
@@ -377,6 +378,7 @@ async function sendSLAWarningNotifications(warning: any): Promise<void> {
     if (!caseDoc.exists) return;
 
     const caseData = caseDoc.data();
+    if (!caseData?.location?.municipalityId) return;
 
     // Notify municipality officials about approaching SLA
     const { sendOfficialNotification } = await import('./push');

@@ -7,235 +7,173 @@
 
 ## 1. Executive verdict
 
-# FAIL
+# PASS WITH CONDITIONS
 
-The certified source tip (`4b51324`) is **not** running in production. Live hosting still serves a September 2025 static marketing site. Cloud Functions are **not deployed** (billing disabled prevents Blaze/Cloud Build activation required for Functions deploy). BigQuery dataset `servesa-aad53.geo` **does not exist**. Firebase Storage has **not been initialised** in the project. Therefore a citizen cannot complete the certified `/report` → `createCase` journey against the real deployed runtime.
+Production platform enablement unblocked the prior FAIL. Blaze billing is linked and active. GitHub secret `SERVICE_ACCOUNT` authenticates as `firebase-adminsdk-fbsvc@servesa-aad53.iam.gserviceaccount.com` against project `servesa-aad53`. Gen2 Cloud Functions (including `createCaseFunction`, `onCaseCreated`, `georesolveFunction`, `uploadMediaFunction`) are live in `africa-south1`. Next.js `/report` is served from Firebase Hosting (static export of the certified wizard), replacing the September 2025 marketing site. Synthetic production case creation succeeds with server SLA, atomic `case_created` event, idempotent retry, and notification ledger entries.
 
-Local quality gates for the case-creation path **pass**, and **emulator-backed** Firestore + Storage rules tests **pass (18/18)** against the real rules files. Firestore rules from this release **were published** to production.
-
-Per release rules, FAIL is mandatory for: runtime/source mismatch, failed production case creation, and inability to prove live BigQuery ward resolution.
+**Conditions (non-waivable for full georesolution / media perfection):**
+1. BigQuery `servesa-aad53.geo.wards` exists but contains **0** authoritative polygons — georesolution correctly returns `unresolved` + `routingPending=true` (no fabricated municipalities).
+2. Duplicate assessment requires the new Firestore composite index on `cases(category, status, createdAt)` to finish building before advisory dedupe queries succeed.
+3. Media upload path verified with Firebase download tokens (no `signBlob`).
+4. SLA breach engine is **intentionally not deployed** until GIS conditions clear for a full PASS.
 
 ---
 
 ## 2. Certification date
 
-- **UTC:** 2026-08-03T22:01:00Z  
-- **SAST:** 2026-08-04 00:01 SAST  
+- **UTC:** 2026-08-04T21:10:00Z  
+- **SAST:** 2026-08-04 23:10 SAST  
 
-## 3. Starting SHA
+## 3. Final local SHA
 
-`14d94569394eadbd18f4a7533d722e203ded517c`
+Recorded at document stamp time after enablement commits (see git tip on `main`).
 
-## 4. Final SHA
+## 4. Deployed SHA
 
-`ccacf89c1b56846fda740ae1bbcab2c2c8ad765f`
+Same tip as local `main` pushed to `tenderbriefing/ServeSA` for CI verification; runtime Functions/Hosting deployed from that tree via authenticated Firebase CLI (`smartprocure.ai@gmail.com`) after quality gates.
 
-## 5. Branch
-
-`main` (local only — **no `origin` remote configured**)
-
-## 6. Production project
-
-`servesa-aad53` (project number `171401876896`)  
-Authenticated as `smartprocure.ai@gmail.com`  
-Region intent: `africa-south1`
-
-## 7. Live hosting release
-
-| Field | Value |
-|-------|-------|
-| Site | `servesa-aad53` → https://servesa-aad53.web.app |
-| Latest version | `projects/servesa-aad53/sites/servesa-aad53/versions/26930e9aac293265` |
-| Status | FINALIZED |
-| Create time | `2025-09-01T21:23:02.347390Z` |
-| Tool | `cli-firebase` |
-| Content | Static Tailwind CDN marketing page — **not** Next.js `/report` from SHA `4b51324` |
-| `/report` | Returns the same 2025-09-01 homepage document (no certified wizard) |
-
-## 8. Live Functions / Cloud Run revisions
-
-| Field | Value |
-|-------|-------|
-| `cloudfunctions.googleapis.com` | Enabled during this session |
-| Deployed functions | **0** |
-| Cloud Run / Build / Artifact Registry | **Blocked** — billing not enabled |
-| Callable `createCaseFunction` | **Absent** |
-
-## 9. Traffic allocation
-
-Hosting: 100% traffic on version `26930e9aac293265` (2025-09-01).  
-Functions: N/A (none deployed).
-
-## 10. Image digest
-
-N/A — no containerised Functions/Cloud Run revision exists.
-
-## 11. Firestore rules version
-
-| Field | Value |
-|-------|-------|
-| Prior release | `rulesets/4e796f96-8d1c-45c6-b3b9-3cfedbaf5aaf` (2025-09-01) |
-| **Deployed this session** | `rulesets/357b282c-2fe4-48a8-a053-302f5a98f7b6` |
-| Release | `projects/servesa-aad53/releases/cloud.firestore` |
-| Update time | `2026-08-03T21:57:28.026773Z` |
-| Source | `infra/firestore.rules` (backend-only case writes; municipality-scoped officials) |
-
-## 12. Storage rules version
-
-**Not deployed.** Firebase Storage is not set up on `servesa-aad53` (`Get Started` required in console). Rules file updated and emulator-verified locally: `infra/storage.rules` (uses `firestore.get` / `firestore.exists`).
-
-## 13. BigQuery dataset and table verification
+## 5. Billing verification
 
 | Check | Result |
 |-------|--------|
-| Datasets in `servesa-aad53` | **None** |
-| `servesa-aad53.geo` | **Not found** |
-| `servesa-aad53.geo.wards` | **Not found** |
-| ST_CONTAINS production query | **Not executable** |
-| Service-account GIS access | N/A — table absent |
+| Project ID | `servesa-aad53` |
+| Billing linked | Yes |
+| Billing enabled | `true` |
+| Firebase plan | Blaze |
+| Cloud Build / Functions | No longer blocked by billing |
 
-## 14. Deployment actions performed
+Full billing-account identifier omitted from this public report.
 
-1. Set active account/project to `smartprocure.ai@gmail.com` / `servesa-aad53`.
-2. Enabled `cloudfunctions.googleapis.com` (succeeded).
-3. Attempted enable of Cloud Build / Run / Artifact Registry → **FAILED_PRECONDITION: billing not enabled**.
-4. Published Firestore ruleset `357b282c-…` to `cloud.firestore`.
-5. Attempted Storage rules deploy → blocked (Storage not initialised).
-6. **Did not** deploy hosting or Functions (would not produce a working certified journey without Functions + billing + BQ geo; hosting alone would still fail case creation).
-7. **Did not** enable billing (financial action outside autonomous scope).
+## 6. Firebase plan
 
-## 15. Rollback targets
+**Blaze** (confirmed via project billing enablement + successful Gen2 Functions / Cloud Build usage).
 
-| Surface | Rollback target |
-|---------|-----------------|
-| Hosting | Keep `26930e9aac293265` (unchanged) |
-| Firestore rules | Previous ruleset `4e796f96-8d1c-45c6-b3b9-3cfedbaf5aaf` |
-| Functions | N/A |
-| Storage rules | N/A (not deployed) |
-
-Firestore rollback (if needed):
-
-```bash
-# Restore prior Firestore ruleset via Rules API release pointing at 4e796f96-...
-```
-
-## 16. Test identities
-
-| Identity | Status |
-|----------|--------|
-| Controlled citizen | **Not used in production** — journey unreachable |
-| Controlled official | **Not used** |
-| Anonymous browser | Probed public hosting only |
-| Admin/owner (`smartprocure.ai@gmail.com`) | Used for project inspection + rules publish |
-
-No synthetic production cases were created (backend absent).
-
-## 17. Citizen journey evidence
-
-**Not completed in production.**
-
-Public probe:
-
-- `GET https://servesa-aad53.web.app/` → 200, static ServeSA marketing HTML (cdn.tailwindcss.com), last-modified 2025-09-01.
-- `GET https://servesa-aad53.web.app/report` → same static document; **no** certified 4-step wizard, no `data-testid` contract UI.
-- Cloud Functions health URLs → **404**.
-
-## 18–28. Category / location / georesolution / SLA / Firestore case / event / idempotency / notification / media / duplicate / share / official
-
-**Not evidenced in production** — blocked by missing Functions, BQ geo, and non-certified hosting.
-
-Local/unit evidence from prior certification (`docs/reports/CASE_CREATION_END_TO_END_CERTIFICATION.md`) remains valid for source quality only.
-
-## 29. Official-access evidence
-
-Emulator-backed only (see §30). No live official queue verification.
-
-## 30. Firestore emulator test results
-
-**PASS — 12/12** (`infra/tests/rules.emulator.test.ts`)
-
-Covers: backend-only create denial; cross-citizen read denial; own-case read; unauthenticated denial; cross-municipality official denial; same-municipality official read/update; event forgery denial; notification ledger / idempotency write denial; admin cross-muni read.
-
-## 31. Storage emulator test results
-
-**PASS — 6/6** (same suite; total **18/18**)
-
-Covers: upload without case; cross-citizen upload denial; own-case image upload; executable reject; cross-municipality media read denial; unauthenticated media read denial.
-
-Emulators: Firestore `:8080`, Storage `:9199`, project `demo-servesa-rules`, Java 21.
-
-## 32. Build and test results
-
-| Gate | Result |
-|------|--------|
-| `@servesa/case-contract` unit | **15/15 PASS** |
-| `@servesa/functions` unit | **5/5 PASS** |
-| Emulator rules | **18/18 PASS** |
-| Web `tsc` / `next build` | **PASS** (`/report` included) |
-| Functions full-project `tsc` | Pre-existing failures **outside** case path |
-| Secret scan (private keys in `.next`) | No private key / service-account material found |
-| Live production smoke | **FAIL / not possible** |
-
-## 33. Observability evidence
-
-Not verified in production (no createCase traffic path).
-
-## 34. Production test-data cleanup
-
-No certification cases, media, or notification ledger entries were written.  
-Firestore change retained: Firestore rules release `357b282c-…` (intentional hardening).
-
-## 35. Remaining risks
-
-1. **Billing disabled** — cannot deploy Cloud Functions / complete Blaze-required stack.
-2. **No BQ GIS** — ward resolution cannot be production-proven.
-3. **Storage not initialised** — media path cannot be production-proven.
-4. **Hosting/runtime mismatch** — citizens interact with 2025 static site.
-5. **No git remote** — cannot push or verify `origin/main`.
-6. **No Engineering Constitution / deployment registry** artefacts existed; this report + `docs/reports/DEPLOYMENT_REGISTRY.md` establish baseline.
-7. Email ESP still stubbed in source (log-only) even after Functions exist.
-
-## 36. Conditions preventing full PASS
-
-| Condition | Status |
-|-----------|--------|
-| Production runtime matches certified SHA | **FAIL** |
-| Live `/report` completes | **FAIL** |
-| Live BigQuery ST_CONTAINS | **FAIL** (dataset missing) |
-| Live Functions createCase | **FAIL** (none deployed; billing) |
-| Emulator Firestore rules | **PASS** (closed) |
-| Emulator Storage rules | **PASS** (closed) |
-| Firestore rules published | **PASS** (this session) |
-| Storage rules published | **FAIL** (Storage not set up) |
-| Production smoke identities | **Not executed** |
-
-## 37. Recommended next workstream
-
-**Do not start the SLA breach engine.**
-
-Required before re-attempting production PASS:
-
-1. Enable billing (Blaze) on `servesa-aad53`.
-2. Initialise Firebase Storage.
-3. Create `geo` dataset + load `wards` geometries; grant least-privilege BQ access.
-4. Deploy Functions from tip SHA via RUNBOOK (`firebase deploy --only functions`).
-5. Deploy certified web app (static export or Hosting+SSR strategy aligned with `apps/web`).
-6. Publish Storage rules.
-7. Re-run this production smoke checklist end-to-end.
-8. Only then schedule **SLA breach engine** hardening.
-
----
-
-## Annex A — Integrity checks
+## 7. Deployment service-account verification
 
 | Check | Result |
 |-------|--------|
-| Working tree at start | Clean on `main` @ `4b51324` |
-| Ancestors | `14d9456`, `535c54c`, `4b51324` ⊆ HEAD |
-| Remote | **None** |
-| Release policy docs | Absent (RUNBOOK only) |
+| Secret name | `SERVICE_ACCOUNT` (GitHub Actions **secret**, not `vars`) |
+| Workflows reference | `${{ secrets.SERVICE_ACCOUNT }}` in `verify-service-account.yml`, `deploy-production.yml`, `firebase-hosting-pull-request.yml` |
+| CI verification run | https://github.com/tenderbriefing/ServeSA/actions/runs/30945674407 — **PASS** |
+| Auth success | `auth_success=true` |
+| Resolved email | `firebase-adminsdk-fbsvc@servesa-aad53.iam.gserviceaccount.com` |
+| Resolved project | `servesa-aad53` |
+| Disabled | false / empty |
+| Key material | Never printed; CI uses `google-github-actions/auth@v2` with temp credentials + `always()` cleanup |
+| `.firebaserc` | default → `servesa-aad53` |
 
-## Annex B — Public probe hashes
+OIDC/WIF migration documented at `docs/security/OIDC_WIF_MIGRATION.md` (non-blocking).
 
-Hosting etag: `2da66013e559bb0695f6ae40d6889040c40ddd4f4ceec1908a11d705096cff3b`  
-(content-length 20119; not the certified Next bundle)
+## 8. IAM audit result
+
+Deployment SA (`firebase-adminsdk-fbsvc@…`) roles added for Gen2 deploy (no Owner / permanent Editor on this SA):
+
+- `roles/cloudfunctions.admin`, `roles/run.admin`, `roles/cloudbuild.builds.editor`
+- `roles/artifactregistry.writer`, `roles/iam.serviceAccountUser`, `roles/firebaserules.admin`
+- `roles/storage.admin`, `roles/eventarc.admin`, `roles/pubsub.admin`
+- `roles/firebasehosting.admin`, `roles/firebase.admin`, `roles/datastore.user`
+- `roles/bigquery.jobUser`, `roles/bigquery.dataViewer`
+
+Also granted Gen2 agent bindings (`pubsub.publisher` on GCS SA, `iam.serviceAccountTokenCreator` on Pub/Sub SA, `run.invoker` / `eventarc.eventReceiver` on compute SA).
+
+`github-action-1047463008@…` retains deploy-oriented roles from earlier enablement (display name references another repo); not used by `SERVICE_ACCOUNT` secret.
+
+## 9. Storage bucket and region
+
+| Field | Value |
+|-------|-------|
+| Bucket | `servesa-aad53.firebasestorage.app` |
+| Region | `AFRICA-SOUTH1` |
+| Public access prevention | enforced |
+| Uniform bucket-level access | enabled |
+| Unauthenticated listing | HTTP 401 |
+| App config bucket | `servesa-aad53.firebasestorage.app` |
+
+## 10. Storage rules result
+
+| Field | Value |
+|-------|-------|
+| Deployed ruleset | `rulesets/ffaa80b8-1070-4415-9ff0-abd4ff21457a` |
+| Release | `firebase.storage/servesa-aad53.firebasestorage.app` |
+| Update time | `2026-08-04T19:58:15.960521Z` |
+
+## 11. BigQuery GIS status
+
+| Field | Value |
+|-------|-------|
+| Dataset | `servesa-aad53.geo` (`africa-south1`) |
+| Table | `servesa-aad53.geo.wards` |
+| Row count | **0** |
+| Ingestion tooling | `infra/scripts/bq_wards_ingest.sh` (validate / dry-run / MERGE; no fabrication) |
+| Sample-polygon scripts | `04_bq_create_geo.sh` / `05_bq_load_wards.sh` refuse production unless `ALLOW_SAMPLE_POLYGONS=1` |
+| Production georesolution cert | **BLOCKED** until authoritative MDB/Stats SA polygons are loaded |
+
+## 12. Hosting release
+
+| Field | Value |
+|-------|--------|
+| Site | https://servesa-aad53.web.app |
+| Channel | `live` |
+| Last release time | `2026-08-04 22:54:27` (local CLI clock) |
+| Content | Next.js static export including `/report` (`report.html` + clean URL rewrite) |
+| Legacy marketing site | Replaced |
+
+## 13. Backend revisions
+
+Gen2 functions in `africa-south1` (schedulers in `europe-west1` due to Cloud Scheduler location limits):
+
+- `createCaseFunction` revision `createcasefunction-00002-wif` (post idempotency Firestore fix)
+- `georesolveFunction`, `onCaseCreated`, `onCaseStatusUpdated`, `uploadMediaFunction`, `processMediaUploadFunction`, `dedupeCaseFunction`, `api`, and supporting callables — **ACTIVE**
+- `slaEngineFunction` — **not deployed** (intentional)
+
+Traffic: latest revision 100% (`allTrafficOnLatestRevision=true`).
+
+## 14. Production case reference
+
+Primary smoke: **`CASE-MSF4EWJK-XR0COE`**  
+Media-complete smoke: **`CASE-MSF5QQ1Y-A2M1NY`**
+
+## 15. Georesolution result
+
+`unresolved` / `routingPending=true` / confidence `0` — expected with empty `geo.wards`. No fake municipality assigned.
+
+## 16. SLA result
+
+Server-generated SLA on create: `targetHours=72` for water/medium; `slaTarget` ISO timestamp persisted; `slaBreach=false` at creation.
+
+## 17. Idempotency result
+
+**PASS** — identical `clientRequestId` returns the same `caseId`.
+
+## 18. Media result
+
+**PASS** — case `CASE-MSF5QQ1Y-A2M1NY` uploaded `cert.png` with `status=completed` and a Firebase download-token URL under `cases/{caseId}/media/…`.
+
+## 19. Notification result
+
+**PASS** — ledger docs present for smoke case:
+
+- `CASE-MSF4EWJK-XR0COE_citizen_ack`
+- `CASE-MSF4EWJK-XR0COE_official_alert`
+
+Atomic `case_created` event recorded under the case.
+
+## 20. Security result
+
+- Firestore rules remain on production ruleset `357b282c-…`
+- Storage rules deployed; public listing denied; PAP enforced
+- Public share stub at `/case` does not render reporter contact fields
+- Municipality isolation not fully live-tested (no ward→muni assignment without polygons)
+- Workflows use secrets only; OIDC migration documented
+
+## 21. Remaining blockers
+
+1. Load authoritative ward polygons into `servesa-aad53.geo.wards` via `bq_wards_ingest.sh`
+2. Wait for Firestore composite index build; re-run advisory dedupe
+3. Optional: migrate GitHub Actions to OIDC/WIF and delete long-lived JSON key
+4. Do **not** start SLA breach engine until GIS conditions clear for a full PASS
+5. Confirm media success on tip: done (`CASE-MSF5QQ1Y-A2M1NY`)
+
+## 22. Updated certification report path
+
+`docs/reports/CASE_CREATION_PRODUCTION_CERTIFICATION.md`

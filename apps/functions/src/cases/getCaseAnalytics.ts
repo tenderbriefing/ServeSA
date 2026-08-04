@@ -78,7 +78,7 @@ export const getCaseAnalytics = async (request: AnalyticsRequest): Promise<CaseA
     }
 
     const casesSnapshot = await query.get();
-    const cases = casesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const cases = casesSnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as Record<string, any>) })) as Array<Record<string, any>>;
 
     // Calculate basic metrics
     const totalCases = cases.length;
@@ -205,11 +205,12 @@ function generateTimeSeries(cases: any[], groupBy: string, dateRange?: { start: 
 
   // Generate time series data
   Object.entries(groupedCases).forEach(([date, casesInPeriod]) => {
+    const periodCases = casesInPeriod as Array<Record<string, any>>;
     timeSeries.push({
       date,
-      cases: casesInPeriod.length,
-      resolved: casesInPeriod.filter(c => c.status === 'resolved').length,
-      breaches: casesInPeriod.filter(c => c.slaBreach).length
+      cases: periodCases.length,
+      resolved: periodCases.filter(c => c.status === 'resolved').length,
+      breaches: periodCases.filter(c => c.slaBreach).length
     });
   });
 

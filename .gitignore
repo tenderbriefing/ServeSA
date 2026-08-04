@@ -71,3 +71,4 @@ packages/*/dist/
 
 # Certification working artifacts
 *.cert.tmp
+apps/functions/lib/

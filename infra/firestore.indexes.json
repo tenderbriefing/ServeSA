@@ -1,1 +1,29 @@
-{"indexes":[],"fieldOverrides":[]}
+{
+  "indexes": [
+    {
+      "collectionGroup": "cases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "case_media",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "caseId", "order": "ASCENDING" },
+        { "fieldPath": "contentHash", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "case_media",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "storagePath", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

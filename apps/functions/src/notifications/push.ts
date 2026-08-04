@@ -7,7 +7,7 @@ interface PushNotificationData {
   userId: string;
   title: string;
   body: string;
-  type: 'case_acknowledgment' | 'status_update' | 'new_case' | 'sla_breach' | 'general';
+  type: 'case_acknowledgment' | 'status_update' | 'new_case' | 'sla_breach' | 'case_assignment' | 'sla_warning' | 'general';
   data?: Record<string, any>;
   imageUrl?: string;
   actionUrl?: string;
@@ -130,7 +130,7 @@ export const sendBulkPushNotification = async (
     );
 
     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    const failureCount = results.length - successCount;
+    void (results.length - successCount);
 
     return {
       success: successCount > 0,

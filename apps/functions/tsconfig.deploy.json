@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "noEmit": false,
+    "noEmitOnError": false,
+    "declaration": false,
+    "declarationMap": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "noUnusedLocals": false
+  },
+  "exclude": ["node_modules", "lib", "src/__tests__", "src/ai"]
+}

@@ -46,6 +46,9 @@ export const updateCaseStatus = async (data: UpdateCaseStatusData): Promise<Upda
     }
 
     const caseData = caseDoc.data();
+    if (!caseData) {
+      throw new Error('Case not found');
+    }
 
     // Validate user permissions
     await validateUserPermissions(caseData, userId);
