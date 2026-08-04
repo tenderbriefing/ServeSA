@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "servesa-aad53",
+    "prod": "servesa-aad53"
+  },
+  "targets": {},
+  "etags": {}
+}

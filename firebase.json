@@ -20,18 +20,15 @@
     }
   ],
   "hosting": {
-    "public": "apps/web/out",
+    "source": "apps/web",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "frameworksBackend": {
+      "region": "africa-south1"
+    }
   },
   "emulators": {
     "auth": { "port": 9099 },

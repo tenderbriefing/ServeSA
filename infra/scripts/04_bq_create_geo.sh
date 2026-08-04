@@ -2,6 +2,11 @@
 
 # ServeSA Phase-1: BigQuery GIS Dataset Creation
 # This script creates the BigQuery GIS dataset and tables for geospatial data
+#
+# WARNING: The sample INSERT polygons later in this script are NON-AUTHORITATIVE
+# fixtures for local demos only. Do NOT run those inserts against production.
+# Production path: create empty schema, then use infra/scripts/bq_wards_ingest.sh
+# with MDB/Stats SA GeoJSON. Fabricated polygons invalidate georesolution certification.
 
 set -e
 
@@ -9,8 +14,14 @@ PROJECT_ID="${PROJECT_ID:-servesa-aad53}"
 REGION="${REGION:-africa-south1}"
 DATASET_NAME="${DATASET_NAME:-geo}"
 
-echo "🗺️ Creating BigQuery GIS dataset for ServeSA..."
-echo "Project: $PROJECT_ID"
+if [[ "${ALLOW_SAMPLE_POLYGONS:-0}" != "1" && "${1:-}" != "--allow-sample-polygons" ]]; then
+  echo "Refusing to run: this script can insert fabricated sample polygons."
+  echo "For production: dataset/table already provisioned; load via bq_wards_ingest.sh"
+  echo "Override only for local demos: ALLOW_SAMPLE_POLYGONS=1 $0"
+  exit 2
+fi
+
+echo "🗺️ Creating BigQuery GIS dataset for ServeSA..."echo "Project: $PROJECT_ID"
 echo "Region: $REGION"
 echo "Dataset: $DATASET_NAME"
 

@@ -2,6 +2,10 @@
 
 # ServeSA Phase-1: BigQuery Ward Data Loader
 # This script loads real ward GeoJSON data into BigQuery
+#
+# DEPRECATED for production: use infra/scripts/bq_wards_ingest.sh instead.
+# This script fabricates sample GeoJSON when files are missing — that is forbidden
+# for production georesolution certification.
 
 set -e
 
@@ -10,8 +14,13 @@ REGION="${REGION:-africa-south1}"
 DATASET_NAME="${DATASET_NAME:-geo}"
 WARD_DATA_DIR="${WARD_DATA_DIR:-./data/wards}"
 
-echo "🗺️ Loading ward data into BigQuery for ServeSA..."
-echo "Project: $PROJECT_ID"
+if [[ "${ALLOW_SAMPLE_POLYGONS:-0}" != "1" && "${1:-}" != "--allow-sample-polygons" ]]; then
+  echo "Refusing to run: missing files would be replaced with fabricated polygons."
+  echo "Use: SOURCE_FILE=... ./infra/scripts/bq_wards_ingest.sh"
+  exit 2
+fi
+
+echo "🗺️ Loading ward data into BigQuery for ServeSA..."echo "Project: $PROJECT_ID"
 echo "Region: $REGION"
 echo "Dataset: $DATASET_NAME"
 echo "Data directory: $WARD_DATA_DIR"
