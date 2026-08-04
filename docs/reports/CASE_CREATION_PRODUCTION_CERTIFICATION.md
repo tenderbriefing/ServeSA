@@ -26,11 +26,11 @@ Production platform enablement unblocked the prior FAIL. Blaze billing is linked
 
 ## 3. Final local SHA
 
-`24970a228841ceb47ab1d751a09890ae5d88281d`
+`01f4bfc1c3af94725a63eca5ad64ad24e5482044`
 
 ## 4. Deployed SHA
 
-`24970a228841ceb47ab1d751a09890ae5d88281d` (Functions/Hosting deployed from this tip; CI verified SERVICE_ACCOUNT against servesa-aad53).
+`24970a228841ceb47ab1d751a09890ae5d88281d` (runtime Functions/Hosting from enablement commit; tip `01f4bfc` is docs SHA stamp only).
 
 ## 5. Billing verification
 
