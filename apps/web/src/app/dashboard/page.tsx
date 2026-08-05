@@ -1,359 +1,288 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { 
-  MapPin, 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle, 
-  Plus,
-  Filter,
-  Search,
-  BarChart3,
-  TrendingUp,
-  Calendar,
-  Building2
-} from 'lucide-react'
-import { MunicipalityProfile } from '@/components/Municipality/MunicipalityProfile'
-import { useAuth } from '@/hooks/useAuth'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { AuthGate } from '@/components/Auth/AuthGate'
+import { useAuth } from '@/hooks/useAuth'
+import { Calendar, MapPin, Plus, Search } from 'lucide-react'
+
+type CitizenCase = {
+  id: string
+  caseId?: string
+  title: string
+  description: string
+  status: string
+  priority?: string
+  location: string
+  createdAt: string
+  estimatedResolution?: string
+}
 
 export default function DashboardPage() {
-  const { user, userProfile } = useAuth()
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-
-  const [cases, setCases] = useState<any[]>([])
+  const [cases, setCases] = useState<CitizenCase[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  // Load cases from backend
   useEffect(() => {
-    const loadCases = async () => {
-      setLoading(true)
-      try {
-        // Load user's cases from Firestore
-        const casesQuery = query(
-          collection(db, 'cases'),
-          where('reporterUid', '==', user?.uid),
-          orderBy('createdAt', 'desc')
-        )
+    if (!user?.uid) return
 
-        const unsubscribe = onSnapshot(casesQuery, (snapshot) => {
-          const casesData: any[] = []
+    setLoading(true)
+    setLoadError(null)
 
-          snapshot.docs.forEach((docSnapshot) => {
+    try {
+      const casesQuery = query(
+        collection(db, 'cases'),
+        where('reporterUid', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      )
+
+      const unsubscribe = onSnapshot(
+        casesQuery,
+        (snapshot) => {
+          const casesData: CitizenCase[] = snapshot.docs.map((docSnapshot) => {
             const data = docSnapshot.data()
-            casesData.push({
+            return {
               id: docSnapshot.id,
               caseId: data.caseId,
-              title: data.title || data.description?.substring(0, 50) + '...',
-              description: data.description,
-              category: data.category,
-              status: data.status,
+              title:
+                data.title ||
+                (data.description
+                  ? `${String(data.description).slice(0, 50)}…`
+                  : 'Untitled case'),
+              description: data.description || '',
+              status: data.status || 'submitted',
               priority: data.priority || data.severity,
-              location: data.location?.address || data.address || 'Location not specified',
-              wardName: data.location?.wardName,
-              municipalityName: data.location?.municipalityName,
-              createdAt: data.createdAt?.toDate()?.toISOString() || new Date().toISOString(),
-              updatedAt: data.updatedAt?.toDate()?.toISOString() || new Date().toISOString(),
-              estimatedResolution: data.slaTarget?.toDate()?.toISOString(),
-              resolvedAt: data.resolvedAt?.toDate()?.toISOString(),
-              slaBreach: data.slaBreach || false,
-              mediaUrls: data.mediaUrls || []
-            })
+              location:
+                data.location?.address ||
+                data.address ||
+                [data.location?.wardName, data.location?.municipalityName]
+                  .filter(Boolean)
+                  .join(', ') ||
+                'Location captured',
+              createdAt:
+                data.createdAt?.toDate?.()?.toISOString?.() ||
+                new Date().toISOString(),
+              estimatedResolution: data.slaTarget?.toDate?.()?.toISOString?.(),
+            }
           })
-
           setCases(casesData)
-        })
+          setLoading(false)
+        },
+        (error) => {
+          console.error('Error loading cases:', error)
+          setLoadError(
+            'We could not load your cases right now. Check your connection and try again.'
+          )
+          setLoading(false)
+        }
+      )
 
-        return () => unsubscribe()
-      } catch (error) {
-        console.error('Error loading cases:', error)
-        // Fallback to default cases if Firestore fails
-        const defaultCases = [
-          {
-            id: 'CASE-2024-001',
-            caseId: 'CASE-2024-001',
-            title: 'Water Leak on Main Street',
-            description: 'Major water leak affecting traffic and nearby businesses',
-            category: 'Water & Sewage',
-            status: 'in_progress',
-            priority: 'high',
-            location: 'Johannesburg, Ward 58',
-            wardName: 'Ward 58',
-            municipalityName: 'City of Johannesburg',
-            createdAt: '2024-01-15T10:30:00Z',
-            updatedAt: '2024-01-16T14:20:00Z',
-            estimatedResolution: '2024-01-18T12:00:00Z',
-            slaBreach: false,
-            mediaUrls: []
-          },
-          {
-            id: 'CASE-2024-002',
-            caseId: 'CASE-2024-002',
-            title: 'Pothole on Oak Avenue',
-            description: 'Large pothole causing damage to vehicles',
-            category: 'Roads & Infrastructure',
-            status: 'acknowledged',
-            priority: 'medium',
-            location: 'Johannesburg, Ward 58',
-            wardName: 'Ward 58',
-            municipalityName: 'City of Johannesburg',
-            createdAt: '2024-01-14T16:45:00Z',
-            updatedAt: '2024-01-15T09:15:00Z',
-            estimatedResolution: '2024-01-20T12:00:00Z',
-            slaBreach: false,
-            mediaUrls: []
-          }
-        ]
-        setCases(defaultCases)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (user?.uid) {
-      loadCases()
+      return () => unsubscribe()
+    } catch (error) {
+      console.error('Error setting up cases listener:', error)
+      setLoadError(
+        'We could not load your cases right now. Check your connection and try again.'
+      )
+      setLoading(false)
     }
   }, [user?.uid])
 
   const stats = {
     total: cases.length,
-    active: cases.filter(c => !['resolved', 'closed'].includes(c.status)).length,
-    resolved: cases.filter(c => ['resolved', 'closed'].includes(c.status)).length,
-    avgResolutionTime: '2.3 days'
+    active: cases.filter((c) => !['resolved', 'closed'].includes(c.status))
+      .length,
+    resolved: cases.filter((c) =>
+      ['resolved', 'closed'].includes(c.status)
+    ).length,
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted': return 'bg-gray-100 text-gray-800'
-      case 'acknowledged': return 'bg-blue-100 text-blue-800'
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800'
-      case 'resolved': return 'bg-green-100 text-green-800'
-      case 'closed': return 'bg-green-100 text-green-800'
-      case 'rejected': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const filteredCases = cases.filter(case_ => {
+  const filteredCases = cases.filter((caseItem) => {
     let matchesTab = true
-    if (activeTab === 'acknowledged') {
-      matchesTab = case_.status === 'acknowledged'
-    } else if (activeTab === 'in_progress') {
-      matchesTab = case_.status === 'in_progress'
+    if (activeTab === 'active') {
+      matchesTab = !['resolved', 'closed'].includes(caseItem.status)
     } else if (activeTab === 'resolved') {
-      matchesTab = ['resolved', 'closed'].includes(case_.status)
+      matchesTab = ['resolved', 'closed'].includes(caseItem.status)
     }
-    
-    const matchesSearch = searchTerm === '' ||
-      case_.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      case_.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      case_.location.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const haystack = `${caseItem.title} ${caseItem.description} ${caseItem.location} ${caseItem.id}`.toLowerCase()
+    const matchesSearch =
+      searchTerm === '' || haystack.includes(searchTerm.toLowerCase())
     return matchesTab && matchesSearch
   })
 
   return (
-    <AuthGate>
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Track your reported issues and their progress</p>
-        </div>
-
-        {/* Municipality Profile Section */}
-        <div className="mb-8">
-          <MunicipalityProfile />
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Cases</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">
-                All time reports
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Cases</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.active}</div>
-              <p className="text-xs text-muted-foreground">
-                Currently being processed
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.resolved}</div>
-              <p className="text-xs text-muted-foreground">
-                Successfully completed
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Resolution</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.avgResolutionTime}</div>
-              <p className="text-xs text-muted-foreground">
-                Time to resolution
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <Button className="w-full sm:w-auto">
-            <Plus className="w-4 h-4 mr-2" />
-            Report New Issue
-          </Button>
-          
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search cases..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Tabs */}
-                 <div className="flex space-x-1 bg-white p-1 rounded-lg mb-6">
-                   {[
-                     { id: 'all', label: 'All Cases', count: cases.length },
-                     { id: 'acknowledged', label: 'Acknowledged', count: cases.filter(c => c.status === 'acknowledged').length },
-                     { id: 'in_progress', label: 'In Progress', count: cases.filter(c => c.status === 'in_progress').length },
-                     { id: 'resolved', label: 'Resolved', count: cases.filter(c => ['resolved', 'closed'].includes(c.status)).length }
-                   ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-primary-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {tab.label} ({tab.count})
-            </button>
-          ))}
-        </div>
-
-        {/* Cases List */}
-        <div className="space-y-4">
-          {filteredCases.map((case_) => (
-            <Card key={case_.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold">{case_.title}</h3>
-                      <Badge className={getStatusColor(case_.status)}>
-                        {case_.status.replace('_', ' ')}
-                      </Badge>
-                      <Badge className={getPriorityColor(case_.priority)}>
-                        {case_.priority}
-                      </Badge>
-                    </div>
-                    <p className="text-gray-600 mb-2">{case_.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {case_.location}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(case_.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
-                    <strong>Case ID:</strong> {case_.id}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                    {case_.status !== 'RESOLVED' && (
-                      <Button variant="outline" size="sm">
-                        Update
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                {case_.status !== 'RESOLVED' && case_.estimatedResolution && (
-                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-center gap-2 text-sm text-blue-800">
-                      <Clock className="w-4 h-4" />
-                      <span>
-                        Estimated resolution: {new Date(case_.estimatedResolution).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredCases.length === 0 && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="text-gray-500">
-                <BarChart3 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium mb-2">No cases found</h3>
-                <p className="mb-4">Try adjusting your search or filters</p>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Report Your First Issue
+    <AuthGate
+      next="/dashboard"
+      title="Sign in to view My Cases"
+      description="Cases linked to your account appear here. You can still track a case with a reference number without signing in."
+    >
+      <div className="bg-canvas">
+        <div className="container py-8">
+          <PageHeader
+            title="My Cases"
+            description="Track the reports linked to your account."
+            actions={
+              <Link href="/report">
+                <Button className="min-h-touch">
+                  <Plus className="mr-2 h-4 w-4" aria-hidden />
+                  Report an Issue
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </Link>
+            }
+          />
+
+          <div className="mb-8 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Total', value: stats.total },
+              { label: 'Open', value: stats.active },
+              { label: 'Resolved', value: stats.resolved },
+            ].map((stat) => (
+              <Card key={stat.label}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-ink-muted">
+                    {stat.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-ink">{stat.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+            <div className="relative flex-1">
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+                aria-hidden
+              />
+              <label htmlFor="case-search" className="sr-only">
+                Search cases
+              </label>
+              <input
+                id="case-search"
+                type="search"
+                placeholder="Search by title, place, or reference"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="min-h-touch w-full rounded-md border border-input bg-surface py-2 pl-10 pr-4 text-base"
+              />
+            </div>
+          </div>
+
+          <div
+            className="mb-6 flex gap-1 overflow-x-auto rounded-lg border border-border bg-surface p-1"
+            role="tablist"
+            aria-label="Case filters"
+          >
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'active', label: 'Open' },
+              { id: 'resolved', label: 'Resolved' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`min-h-touch flex-1 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-primary-700 text-white'
+                    : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {loading ? (
+            <Spinner label="Loading your cases…" />
+          ) : loadError ? (
+            <EmptyState title="Could not load cases" description={loadError} />
+          ) : filteredCases.length === 0 ? (
+            <EmptyState
+              title="No cases yet"
+              description="When you submit a report while signed in, it will appear here. You can also track any case with its reference number."
+              action={
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Link href="/report">
+                    <Button className="min-h-touch">Report an Issue</Button>
+                  </Link>
+                  <Link href="/case">
+                    <Button variant="outline" className="min-h-touch">
+                      Track a Case
+                    </Button>
+                  </Link>
+                </div>
+              }
+            />
+          ) : (
+            <ul className="space-y-4">
+              {filteredCases.map((caseItem) => (
+                <li key={caseItem.id}>
+                  <Card className="transition-shadow hover:shadow-md">
+                    <CardHeader>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <h2 className="text-lg font-semibold text-ink">
+                              {caseItem.title}
+                            </h2>
+                            <StatusBadge status={caseItem.status} />
+                          </div>
+                          <p className="text-sm text-ink-muted">
+                            {caseItem.description}
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-4 text-sm text-ink-subtle">
+                            <span className="inline-flex items-center gap-1">
+                              <MapPin className="h-4 w-4" aria-hidden />
+                              {caseItem.location}
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                              <Calendar className="h-4 w-4" aria-hidden />
+                              {new Date(caseItem.createdAt).toLocaleDateString(
+                                'en-ZA'
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                        <Link
+                          href={`/case?id=${encodeURIComponent(
+                            caseItem.caseId || caseItem.id
+                          )}`}
+                        >
+                          <Button variant="outline" className="min-h-touch">
+                            View case
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-ink-muted">
+                        <span className="font-medium text-ink">Reference:</span>{' '}
+                        <span className="font-mono">
+                          {caseItem.caseId || caseItem.id}
+                        </span>
+                      </p>
+                    </CardContent>
+                  </Card>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </AuthGate>

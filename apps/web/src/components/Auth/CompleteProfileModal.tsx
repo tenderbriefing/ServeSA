@@ -75,7 +75,8 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-bold">Complete Your Profile</CardTitle>
           <CardDescription>
-            Help us personalize your experience by providing your location information
+            Add optional contact and location details. You can skip this and
+            still report issues.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -95,21 +96,27 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
               )}
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Phone Number (Optional)</label>
+                <label className="text-sm font-medium">
+                  Mobile number <span className="text-ink-subtle">(optional)</span>
+                </label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="+27 11 123 4567"
-                    className="pl-10"
+                    placeholder="082 123 4567"
+                    className="pl-10 min-h-touch"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Province *</label>
+                <label className="text-sm font-medium">
+                  Province <span className="text-ink-subtle">(optional)</span>
+                </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Select value={formData.province} onValueChange={(value) => handleInputChange('province', value)}>
@@ -128,7 +135,9 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Municipality *</label>
+                <label className="text-sm font-medium">
+                  Municipality <span className="text-ink-subtle">(optional)</span>
+                </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Select 
@@ -163,9 +172,9 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
                 <Button
                   type="submit"
                   className="flex-1"
-                  disabled={isSubmitting || !formData.province || !formData.municipalityCode}
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Updating...' : 'Update Profile'}
+                  {isSubmitting ? 'Saving…' : 'Save profile'}
                 </Button>
               </div>
             </form>

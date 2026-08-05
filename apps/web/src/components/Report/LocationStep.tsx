@@ -20,10 +20,10 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
   const [gpsError, setGpsError] = useState<GpsErrorKind>(null)
   const [addressInput, setAddressInput] = useState(value.address || '')
   const [pinLat, setPinLat] = useState(
-    value.latitude != null ? String(value.latitude) : '-26.2041'
+    value.latitude != null ? String(value.latitude) : ''
   )
   const [pinLng, setPinLng] = useState(
-    value.longitude != null ? String(value.longitude) : '28.0473'
+    value.longitude != null ? String(value.longitude) : ''
   )
   const [pinError, setPinError] = useState<string | null>(null)
 
@@ -163,7 +163,9 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
       <div>
         <h3 className="text-lg font-semibold mb-2">Where is this issue?</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Choose one method. We only request GPS after you tap the button.
+          Choose one method: use your device location, enter an address with a
+          pin, or place a pin yourself. We only request GPS after you tap the
+          button. The map is optional — address and GPS are equally valid.
         </p>
       </div>
 
