@@ -12,7 +12,7 @@ The mandatory language-selector and US-flag removals are complete and covered by
 
 ## 3. Final SHA
 
-`2816d57c8de1efaff90233cc6ab5f2c0e1bfef17` — PR #6 head OID (`gh pr view 6 --json headRefOid`); authoritative for review. Product code landed at/before this tip.
+`b135ced284b795db5fcb92a12f4e02574d6ed758` — PR #6 head OID (`gh pr view 6 --json headRefOid`); authoritative for review. Product code landed at/before this tip.
 
 ## 4. Branch
 
