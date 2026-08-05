@@ -35,8 +35,9 @@ export const LocationSourceSchema = z.enum([
 ])
 
 export const GeoresolutionStatusSchema = z.enum([
-  'polygon_match',
-  'nearest_ward',
+  'polygon_match', // unique authoritative GIS match (resolved)
+  'ambiguous', // multiple conflicting polygons contain the point
+  'nearest_ward', // legacy / advisory only — never authoritative routing
   'municipality_only',
   'unresolved',
 ])

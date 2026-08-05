@@ -132,7 +132,8 @@ export async function createCase(
     const reference = caseId
     const shareUrl = `${WEB_APP_URL}/case/${caseId}`
     const mediaUploadPath = `cases/${caseId}/media`
-    const routingPending = geo.status === 'unresolved'
+    // Authoritative routing only on unique polygon_match; ambiguous/unresolved stay pending.
+    const routingPending = geo.status !== 'polygon_match'
     const status = 'submitted' as const
 
     const reporterUid = options.authUid || null
@@ -165,8 +166,11 @@ export async function createCase(
         source: parsed.locationSource,
         wardId: geo.wardId || null,
         wardName: geo.wardName || null,
+        wardNumber: geo.wardNumber || null,
         municipalityId: geo.municipalityId || null,
         municipalityName: geo.municipalityName || null,
+        districtCode: geo.districtCode || null,
+        districtName: geo.districtName || null,
         province: geo.province || null,
         // Rules also check muniCode
         muniCode: geo.municipalityId || null,
@@ -178,7 +182,14 @@ export async function createCase(
         confidence: geo.confidence,
         method: geo.method,
         cached: geo.cached,
+        datasetVersion: geo.datasetVersion || null,
+        boundaryCycle: geo.boundaryCycle || null,
+        resolvedAt: geo.resolvedAt || null,
+        routingSource: geo.routingSource || 'none',
+        candidateCount: geo.candidateCount || 0,
+        failureReason: geo.failureReason || null,
       },
+      routingManualOverride: false,
       sla: {
         targetHours: sla.targetHours,
         slaStartedAt: Timestamp.fromDate(sla.slaStartedAt),
@@ -239,6 +250,35 @@ export async function createCase(
         georesolutionStatus: geo.status,
         locationSource: parsed.locationSource,
         routingPending,
+        datasetVersion: geo.datasetVersion || null,
+        routingSource: geo.routingSource || 'none',
+      },
+    }
+
+    const routingEventDoc = {
+      caseId,
+      eventType: 'routing_resolution',
+      description:
+        geo.status === 'polygon_match'
+          ? 'Authoritative GIS ward resolution'
+          : geo.status === 'ambiguous'
+            ? 'Ambiguous GIS ward candidates'
+            : 'GIS ward resolution pending',
+      actorType: 'system',
+      actorUid: null,
+      timestamp: FieldValue.serverTimestamp(),
+      metadata: {
+        georesolutionStatus: geo.status,
+        method: geo.method,
+        wardId: geo.wardId || null,
+        municipalityId: geo.municipalityId || null,
+        province: geo.province || null,
+        datasetVersion: geo.datasetVersion || null,
+        boundaryCycle: geo.boundaryCycle || null,
+        routingSource: geo.routingSource || 'none',
+        candidateCount: geo.candidateCount || 0,
+        failureReason: geo.failureReason || null,
+        routingPending,
       },
     }
 
@@ -260,7 +300,7 @@ export async function createCase(
             ward: {
               id: geo.wardId,
               name: geo.wardName || undefined,
-              number: geo.wardId,
+              number: geo.wardNumber || geo.wardId,
             },
           }
         : {}),
@@ -286,12 +326,16 @@ export async function createCase(
 
       const caseRef = db.collection('cases').doc(caseId)
       const eventRef = caseRef.collection('events').doc()
+      const routingEventRef = caseRef.collection('events').doc()
 
       tx.set(caseRef, caseDoc)
       tx.set(eventRef, eventDoc)
+      tx.set(routingEventRef, routingEventDoc)
       // Also write top-level case_events for existing consumers (no PII)
       const topLevelEventRef = db.collection('case_events').doc()
       tx.set(topLevelEventRef, eventDoc)
+      const topLevelRoutingRef = db.collection('case_events').doc()
+      tx.set(topLevelRoutingRef, routingEventDoc)
       tx.set(idempotencyRef, {
         clientRequestId: parsed.clientRequestId,
         identityKey,

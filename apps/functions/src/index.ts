@@ -19,6 +19,7 @@ import {
 import { generateCasePDF } from './cases/pdf'
 
 import { georesolveSafe } from './routing/georesolve'
+import { reconcileUnresolvedCases } from './routing/reconcileUnresolved'
 import { getServiceCategories } from './routing/categories'
 
 import { sendEmailNotification } from './notifications/email'
@@ -114,6 +115,20 @@ export const generateCasePDFFunction = onCall(async (request) => {
 export const georesolveFunction = onCall(async (request) => {
   const { lat, lng } = request.data
   return await georesolveSafe(lat, lng)
+})
+
+/** Admin/ops only: bounded reconciliation of routingPending cases. Default dry-run. */
+export const reconcileUnresolvedRoutingFunction = onCall(async (request) => {
+  const token = request.auth?.token as Record<string, unknown> | undefined
+  const roles = (token?.roles as string[] | undefined) || []
+  if (!request.auth || !roles.some((r) => r === 'admin' || r === 'ops')) {
+    throw new HttpsError('permission-denied', 'Admin or ops role required')
+  }
+  return await reconcileUnresolvedCases({
+    limit: request.data?.limit,
+    dryRun: request.data?.dryRun !== false,
+    cursorCaseId: request.data?.cursorCaseId,
+  })
 })
 
 export const getServiceCategoriesFunction = onCall(async (request) => {
