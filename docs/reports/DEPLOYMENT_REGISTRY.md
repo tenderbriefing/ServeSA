@@ -2,24 +2,16 @@
 
 | Field | Value |
 |-------|-------|
-| Updated (UTC) | 2026-08-05T05:05:00Z |
-| Verdict | PASS WITH CONDITIONS (GIS routing certified; OIDC/WIF outstanding) |
+| Updated (UTC) | 2026-08-05T05:30:00Z |
+| Verdict | PASS WITH CONDITIONS (Ops MVP + GIS routing) |
 | Project | servesa-aad53 |
 | Branch | main |
-| Deployed SHA | `01b9e4c` (functions source `d709073` + index fix) |
-| Hosting | https://servesa-aad53.web.app (`/report` live) |
-| Functions region | africa-south1 (Gen2); schedulers europe-west1 |
-| createCase | ACTIVE `createcasefunction-00003-qem` |
-| georesolve | ACTIVE `georesolvefunction-00002-kuy` |
-| reconcileUnresolvedRouting | ACTIVE `reconcileunresolvedroutingfunction-00001-hit` |
-| Rollback createCase | `createcasefunction-00002-wif` |
-| Storage bucket | servesa-aad53.firebasestorage.app (AFRICA-SOUTH1) |
-| GIS raw bucket | gs://servesa-aad53-gis-sources (private) |
-| BQ dataset | servesa-aad53.geo |
-| BQ active wards | 4468 (`mdb-wards-2020-v1`, cycle 2020-LGE) |
-| BQ tables | wards, wards_staging, wards_next, wards_previous, ward_dataset_versions, ward_ingestion_audit |
-| Firestore indexes | READY (incl. routingPending+createdAt; dedupe composites) |
-| SERVICE_ACCOUNT CI | PASS (prior); OIDC/WIF deferred |
-| Smoke resolved | CASE-MSFMCCIU-JN1FTG |
-| Smoke unresolved | CASE-MSFMCXRF-1QNS4Z |
-| Cert reports | docs/reports/GEOSPATIAL_ROUTING_CERTIFICATION.md ; docs/reports/CASE_CREATION_PRODUCTION_CERTIFICATION.md |
+| Deployed SHA | `8b7088406357867973fd6429eb3c7be94c0ef6c8` |
+| Hosting | https://servesa-aad53.web.app (`/report`, `/ops`) |
+| Functions region | africa-south1 (Gen2) |
+| GIS dataset | mdb-wards-2020-v1 (4468 wards) |
+| Ops smoke case | CASE-MSFN98YW-0TQWX7 |
+| GIS resolved smoke | CASE-MSFMCCIU-JN1FTG |
+| Certs | docs/reports/MUNICIPALITY_OPERATIONS_CERTIFICATION.md ; docs/reports/GEOSPATIAL_ROUTING_CERTIFICATION.md |
+| Rollback GIS | geo.wards_previous |
+| Rollback createCase tip | createcasefunction-00003-qem (pre-ops) → redeploy from `062323d` if required |
