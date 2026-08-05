@@ -1,0 +1,15 @@
+{
+  "name": "@servesa/loadtest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local synthetic load benchmarks — does NOT write to production Firebase",
+  "scripts": {
+    "bench": "ts-node --transpile-only synthetic_load_bench.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.2.0"
+  },
+  "type": "commonjs"
+}

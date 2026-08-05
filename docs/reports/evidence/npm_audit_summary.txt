@@ -1,0 +1,5 @@
+npm_audit_generated_at=2026-08-05T14:55:37Z
+scope=omit-dev root + functions workspace
+summary=74 vulnerabilities reported (3 low, 33 moderate, 31 high, 7 critical) — predominantly transitive via uuid@8 / google-gax / websocket-driver / yaml
+action=tracked as C10; no force upgrade this sprint to avoid breaking GCP clients
+blocker_for_pilot=no (no known direct exploit path in citizen/ops callables from these advisories this window)

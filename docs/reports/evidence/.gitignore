@@ -1,0 +1,6 @@
+# Keep evidence artifacts in git for certification.
+# Only ignore local scratch and secrets.
+*.tmp
+uat_tokens.env
+*.env
+!*.env.example

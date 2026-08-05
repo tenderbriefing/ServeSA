@@ -57,6 +57,7 @@ Municipality Operations MVP is live at `/ops`. Privileged case mutations are ser
 - ADR: `docs/architecture/ADR_MUNICIPALITY_OPERATIONS.md`
 - Onboarding: `docs/runbooks/MUNICIPALITY_ONBOARDING.md`
 - User guide: `docs/runbooks/MUNICIPAL_USER_GUIDE.md`
+- Pilot guides: `docs/guides/MUNICIPAL_ADMIN_GUIDE.md`, `docs/guides/MUNICIPAL_OFFICIAL_GUIDE.md`, `docs/guides/SUPERVISOR_GUIDE.md`
 
 
 ## Addendum — Operational Intelligence (2026-08-05)
@@ -64,3 +65,24 @@ Municipality Operations MVP is live at `/ops`. Privileged case mutations are ser
 - `/ops` is now Smart Work Queue; supervisor board + map + field mode added.
 - Duplicate review + citizen_confirmed path exercised in OI smoke.
 - See `docs/reports/OPERATIONAL_INTELLIGENCE_CERTIFICATION.md`.
+
+---
+
+## Addendum — Pilot readiness hardening (2026-08-05)
+
+**Branch:** `cert/pilot-readiness-hardening`  
+**Starting tip:** `052161e` on main  
+**Prior OI tip / cert:** `e90fdc0` / `405839d`  
+**Sprint deploy SHA:** _to be filled at close_  
+**Master:** `docs/reports/PILOT_READINESS_CERTIFICATION.md`
+
+### Pilot posture for municipality ops
+
+- Single-municipality pilot using live surfaces only (`/ops`, `/ops/supervisor`, `/ops/map`, `/field`, case detail + duplicate review).
+- Lifecycle and municipal isolation rules from this cert remain the baseline; OI did not weaken GIS or cross-muni gates.
+- Configuration for the pilot municipality (departments, category maps, officials, feature flags) must follow `docs/pilot/PILOT_CONFIGURATION_TEMPLATE.md` before go-live.
+- Interactive browser UAT and controlled rollback drill remain **open conditions** (evidence TBD).
+
+### Invariants carried forward
+
+No GIS weaken · no image→municipality inference · no auto-merge · no citizen duplicate scores/notes · no cross-muni access · field workers unrelated-case isolation · intelligence fail-open · no face recognition · no speculative AI/SLA engine · deploy only from verified SHA.

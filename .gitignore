@@ -73,6 +73,15 @@ packages/*/dist/
 *.cert.tmp
 apps/functions/lib/
 
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# Local tool installs / generated fixture JPEGs (evidence JSON is committed)
+tools/*/node_modules/
+tools/image-similarity/fixtures/*.jpg
+
 # Authoritative GIS raw binaries (checksums + manifests are committed)
 data/gis/raw/
 data/gis/staging/

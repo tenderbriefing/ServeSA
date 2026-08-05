@@ -1,0 +1,19 @@
+
+> servesa-monorepo@1.0.0 test:image-similarity
+> npm run run -w @servesa/image-similarity
+
+
+> @servesa/image-similarity@1.0.0 run
+> npm run generate && npm run validate
+
+
+> @servesa/image-similarity@1.0.0 generate
+> ts-node --transpile-only generate-fixtures.ts
+
+Wrote 9 fixtures → /Users/billionaire/Desktop/ServeSA/tools/image-similarity/fixtures
+
+> @servesa/image-similarity@1.0.0 validate
+> ts-node --transpile-only validate-fixtures.ts
+
+Wrote /Users/billionaire/Desktop/ServeSA/docs/reports/evidence/image_similarity_fixture_results.json
+precision=1.000 recall=1.000 pairs=8 distantReject=true

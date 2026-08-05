@@ -80,3 +80,40 @@ Exact content hash used in smoke (synthetic 1×1 JPEG):
 - Functions: redeploy from SHA `2316f2d` tip for createCase/uploadMedia; delete new OI callables if required.
 - Do not roll back `georesolvefunction-00002-kuy` unless GIS incident.
 - See `docs/runbooks/IMAGE_INTELLIGENCE_ROLLBACK.md`.
+
+---
+
+## Addendum — Pilot readiness hardening (2026-08-05)
+
+**Branch:** `cert/pilot-readiness-hardening`  
+**Starting tip (main):** `052161e` (nav fix)  
+**Prior OI tip / cert:** `e90fdc0` / `405839d`  
+**This sprint deploy SHA:** _to be filled at close_  
+**Master cert:** `docs/reports/PILOT_READINESS_CERTIFICATION.md` (verdict template: **PASS WITH CONDITIONS**)
+
+### Scope of addendum
+
+Documentation, runbooks, pilot configuration, UAT scripts, performance/image-validation baselines, WIF ADR, Node upgrade + rollback drills — aimed at **single-municipality pilot launch readiness**. Product surface remains the live OI set:
+
+`/report` · `/case` · `/ops` · `/ops/supervisor` · `/ops/map` · `/field` · duplicate review **without** auto-merge.
+
+### Invariants reaffirmed (no change to OI PASS WITH CONDITIONS)
+
+- GIS resolver **`georesolvefunction-00002-kuy`** / dataset **`mdb-wards-2020-v1`** / **`ST_COVERS`** — do not weaken.
+- No image→municipality inference; intelligence **fail-open**.
+- No auto-merge; no citizen exposure of duplicate scores / internal notes.
+- No cross-muni access; field workers see related/assigned jobs only.
+- No face recognition; no speculative AI/SLA engine as production dependency.
+- Deploy only from a **verified SHA** recorded in `docs/reports/DEPLOYMENT_REGISTRY.md`.
+
+### Evidence status
+
+| Item | Status |
+|------|--------|
+| Prior OI smoke cases / revisions | Unchanged baseline (see above) |
+| Pilot municipality interactive UAT | TBD |
+| Performance baseline numbers | TBD — see `docs/reports/PERFORMANCE_BASELINE.md` |
+| Image similarity validation write-up | TBD fill — see `docs/reports/IMAGE_SIMILARITY_VALIDATION.md` |
+| Production rollback drill | TBD — see `docs/runbooks/PRODUCTION_ROLLBACK_DRILL.md` |
+
+This addendum **does not** claim a new unconditional PASS for operational intelligence features beyond the original certification. Pilot launch remains **PASS WITH CONDITIONS** until open conditions in the master cert are closed or accepted.

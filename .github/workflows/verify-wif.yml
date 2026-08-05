@@ -1,0 +1,82 @@
+# Proves GitHub OIDC → GCP WIF auth without a JSON key.
+# Metadata only — never prints tokens or private keys.
+name: Verify WIF
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/verify-wif.yml'
+      - 'infra/scripts/06_oidc_github.sh'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PROJECT_ID: servesa-aad53
+      WORKLOAD_IDENTITY_PROVIDER: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+      DEPLOY_SERVICE_ACCOUNT: ${{ vars.DEPLOY_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require WIF variables
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          if [[ -z "${WORKLOAD_IDENTITY_PROVIDER:-}" || -z "${DEPLOY_SERVICE_ACCOUNT:-}" ]]; then
+            echo "::error::Set repository variables WORKLOAD_IDENTITY_PROVIDER and DEPLOY_SERVICE_ACCOUNT"
+            exit 1
+          fi
+          echo "wif_vars_present=true"
+          echo "deploy_sa_expected=${DEPLOY_SERVICE_ACCOUNT}"
+
+      - name: Authenticate via WIF (no JSON key)
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          cleanup_credentials: true
+          export_environment_variables: true
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify identity (metadata only)
+        shell: bash
+        run: |
+          set +x
+          set -euo pipefail
+          EMAIL="$(gcloud auth list --filter=status:ACTIVE --format='value(account)')"
+          echo "auth_success=true"
+          echo "auth_mode=wif"
+          echo "service_account_email=${EMAIL}"
+          gcloud config set project "${PROJECT_ID}"
+          ACTUAL="$(gcloud config get-value project)"
+          if [[ "${ACTUAL}" != "${PROJECT_ID}" ]]; then
+            echo "::error::Project mismatch: ${ACTUAL}"
+            exit 1
+          fi
+          if [[ "${EMAIL}" != "${DEPLOY_SERVICE_ACCOUNT}" ]]; then
+            echo "::error::Unexpected SA: ${EMAIL}"
+            exit 1
+          fi
+          # Prove token works without dumping it
+          gcloud projects describe "${PROJECT_ID}" --format='value(projectId)' >/dev/null
+          echo "verification=PASS"
+
+      - name: Cleanup credentials (always)
+        if: always()
+        shell: bash
+        run: |
+          set +x
+          if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" && -f "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
+            rm -f "${GOOGLE_APPLICATION_CREDENTIALS}" || true
+          fi
+          rm -f "${RUNNER_TEMP}"/gha-creds-*.json 2>/dev/null || true

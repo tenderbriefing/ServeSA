@@ -78,9 +78,25 @@ service firebase.storage {
       allow delete: if isAuthenticated() && isAdmin();
     }
 
+    // KNOWN CONDITION: derived thumbnails remain publicly readable (allow read: if true).
+    // Do not broaden further. Original case media above stays auth-scoped.
     match /cases/{caseId}/thumbnails/{fileName} {
       allow read: if true;
       allow create, update: if false;
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+
+    /**
+     * QA / phash fixture prefix — NOT public (no anonymous/public read).
+     * Production phash verification should use signed URLs or Cloud Functions mediation;
+     * do not grant public read on this prefix or on case media.
+     */
+    match /qa/phash-fixtures/{fileName} {
+      allow read: if isAuthenticated() && isAdmin();
+      allow create, update: if isAuthenticated() &&
+        isAdmin() &&
+        isValidImageType() &&
+        isUnderImageMaxSize();
       allow delete: if isAuthenticated() && isAdmin();
     }
 

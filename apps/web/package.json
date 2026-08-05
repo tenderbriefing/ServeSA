@@ -11,7 +11,9 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "deploy:dev": "npm run build:static && firebase deploy --only hosting:dev",
-    "deploy:prod": "npm run build:static && firebase deploy --only hosting:prod"
+    "deploy:prod": "npm run build:static && firebase deploy --only hosting:prod",
+    "test:e2e": "playwright test --config=../../playwright.config.ts",
+    "test:e2e:pilot": "playwright test --config=../../playwright.config.ts --grep @pilot"
   },
   "dependencies": {
     "@servesa/case-contract": "*",

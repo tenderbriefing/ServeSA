@@ -1,5 +1,13 @@
-# Production deploy via long-lived SERVICE_ACCOUNT JSON key.
-# Prefer migrating to GitHub OIDC + Workload Identity Federation (see docs/security/OIDC_WIF_MIGRATION.md).
+# Production deploy via GitHub OIDC + Workload Identity Federation (preferred).
+# Manual only — no auto-deploy on push to main.
+# See docs/security/OIDC_WIF_MIGRATION.md and docs/architecture/ADR_GITHUB_WIF.md.
+#
+# Required GitHub Actions variables (Settings → Variables):
+#   WORKLOAD_IDENTITY_PROVIDER  — full provider resource name from 06_oidc_github.sh
+#   DEPLOY_SERVICE_ACCOUNT      — github-actions-deploy@servesa-aad53.iam.gserviceaccount.com
+#
+# Deprecated fallback (temporary): secret SERVICE_ACCOUNT (JSON key).
+# Remove the JSON key path once WIF verification passes.
 name: Deploy Production
 
 on:
@@ -20,6 +28,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: production-deploy
@@ -34,19 +43,55 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Record deployed SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "deployed_sha=${GITHUB_SHA}"
+          echo "deployed_ref=${GITHUB_REF}"
+          {
+            echo "### Deploy record"
+            echo "deployed_sha=\`${GITHUB_SHA}\`"
+            echo "deployed_ref=\`${GITHUB_REF}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
 
-      - name: Authenticate to Google Cloud
-        id: auth
+      - name: Authenticate via WIF (preferred)
+        id: auth-wif
+        if: ${{ vars.WORKLOAD_IDENTITY_PROVIDER != '' && vars.DEPLOY_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          cleanup_credentials: true
+          export_environment_variables: true
+
+      - name: Authenticate via SERVICE_ACCOUNT JSON (deprecated)
+        id: auth-json
+        if: ${{ vars.WORKLOAD_IDENTITY_PROVIDER == '' || vars.DEPLOY_SERVICE_ACCOUNT == '' }}
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.SERVICE_ACCOUNT }}
           create_credentials_file: true
           cleanup_credentials: true
           export_environment_variables: true
+
+      - name: Auth path notice
+        shell: bash
+        run: |
+          set +x
+          if [[ -n "${{ vars.WORKLOAD_IDENTITY_PROVIDER }}" && -n "${{ vars.DEPLOY_SERVICE_ACCOUNT }}" ]]; then
+            echo "auth_mode=wif"
+            echo "Using Workload Identity Federation (preferred)."
+          else
+            echo "auth_mode=credentials_json_deprecated"
+            echo "::warning::WIF vars not set (WORKLOAD_IDENTITY_PROVIDER / DEPLOY_SERVICE_ACCOUNT). Falling back to deprecated secrets.SERVICE_ACCOUNT JSON key. See docs/security/OIDC_WIF_MIGRATION.md"
+          fi
 
       - uses: google-github-actions/setup-gcloud@v2
 

@@ -1,0 +1,2 @@
+Wrote /Users/billionaire/Desktop/ServeSA/docs/reports/evidence/loadtest_baseline.json
+queue p50=0.22ms p95=0.45ms | map p50=0.01ms p95=0.03ms

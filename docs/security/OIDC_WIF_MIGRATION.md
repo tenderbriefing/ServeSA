@@ -2,9 +2,17 @@
 
 ## Status
 
-Production enablement currently authenticates GitHub Actions with the long-lived JSON key stored in repository secret `SERVICE_ACCOUNT` (`${{ secrets.SERVICE_ACCOUNT }}`).
+**In progress — script and workflows ready; GCP pool/provider/SA not assumed live until operator runs the setup script and sets GitHub variables.**
 
-This is acceptable for the current certified deployment path, but **keyless authentication via GitHub OIDC + Google Cloud Workload Identity Federation (WIF)** is the preferred end state.
+| Layer | State |
+|-------|--------|
+| `infra/scripts/06_oidc_github.sh` | Rewritten: pool `github-actions-pool`, provider `github-oidc`, SA `github-actions-deploy@…`, least privilege, no JSON keys |
+| `.github/workflows/deploy-production.yml` | WIF preferred; deprecated JSON-key fallback; `workflow_dispatch` only; Node 22 |
+| `.github/workflows/verify-wif.yml` | WIF smoke auth (metadata only) |
+| `.github/workflows/verify-service-account.yml` | Dual-path: WIF preferred, JSON fallback |
+| `.github/workflows/ci.yml` | Lint / type-check / tests on Node 22 (no deploy) |
+| GitHub variables `WORKLOAD_IDENTITY_PROVIDER` / `DEPLOY_SERVICE_ACCOUNT` | Operator must set after script run |
+| Secret `SERVICE_ACCOUNT` | Still valid as **deprecated** fallback / PR hosting preview |
 
 ## Why migrate
 
@@ -13,31 +21,50 @@ This is acceptable for the current certified deployment path, but **keyless auth
 - Reduces blast radius if a secret is leaked
 - Aligns with Google Cloud and GitHub hardening guidance
 
-## Current binding
+## Target binding (canonical)
 
-- Secret name: `SERVICE_ACCOUNT` (must remain a **secret**, never `vars.SERVICE_ACCOUNT`)
-- Workflows: `.github/workflows/verify-service-account.yml`, `.github/workflows/deploy-production.yml`, `.github/workflows/firebase-hosting-pull-request.yml`
-- Auth action: `google-github-actions/auth@v2` with `credentials_json`
-- Credential files are created only under the runner temp directory, with `cleanup_credentials: true` and an `always()` cleanup step; shell tracing is disabled (`set +x`)
+| Item | Value |
+|------|--------|
+| Project | `servesa-aad53` |
+| Pool | `github-actions-pool` |
+| Provider | `github-oidc` |
+| Issuer | `https://token.actions.githubusercontent.com` |
+| Attribute condition | `assertion.repository=='tenderbriefing/ServeSA'` |
+| Deploy SA | `github-actions-deploy@servesa-aad53.iam.gserviceaccount.com` |
+| WIF principal | `principalSet://iam.googleapis.com/.../attribute.repository/tenderbriefing/ServeSA` |
 
-## Target pattern
-
-Use repository script `infra/scripts/06_oidc_github.sh` (or equivalent) to create:
-
-1. Workload Identity Pool + OIDC provider for `token.actions.githubusercontent.com`
-2. Attribute condition locked to `tenderbriefing/ServeSA`
-3. Bind `roles/iam.workloadIdentityUser` on the deploy service account
-4. Replace workflow auth with:
+Workflow auth:
 
 ```yaml
 - uses: google-github-actions/auth@v2
   with:
-    workload_identity_provider: projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL/providers/PROVIDER
-    service_account: github-action-XXXX@servesa-aad53.iam.gserviceaccount.com
+    workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+    service_account: ${{ vars.DEPLOY_SERVICE_ACCOUNT }}
 ```
 
-Then delete the JSON key versions and remove `SERVICE_ACCOUNT` from GitHub secrets.
+Permissions on deploy/verify jobs: `contents: read`, `id-token: write`.
 
-## Non-blocking note
+## Operator steps (parent)
 
-OIDC/WIF migration does **not** block the current production certification unless repository policy mandates keyless auth. Track as a follow-up hardening item after case-creation receives a defensible PASS.
+1. Authenticated `gcloud` with permission to create WI pools and IAM bindings on `servesa-aad53`.
+2. Run:
+
+```bash
+bash infra/scripts/06_oidc_github.sh
+```
+
+3. Copy printed `WORKLOAD_IDENTITY_PROVIDER` and `DEPLOY_SERVICE_ACCOUNT` into GitHub Actions **variables** (not committed).
+4. Confirm org/repo allows OIDC for Actions.
+5. Run workflow **Verify WIF**.
+6. After PASS, use **Deploy Production** (still manual `workflow_dispatch`).
+7. Later: delete JSON key versions and remove `SERVICE_ACCOUNT` when PR hosting no longer needs it.
+
+## Rollback
+
+See `docs/runbooks/WIF_ROLLBACK.md`.
+
+## Related docs
+
+- `docs/architecture/ADR_GITHUB_WIF.md`
+- `docs/runbooks/NODE_RUNTIME_UPGRADE.md`
+- `docs/runbooks/WIF_ROLLBACK.md`

@@ -1,0 +1,32 @@
+PASS|hosting/|HTTP 200
+PASS|hosting/report|HTTP 200
+PASS|hosting/ops|HTTP 200
+PASS|hosting/ops/supervisor|HTTP 200
+PASS|hosting/ops/map|HTTP 200
+PASS|hosting/field|HTTP 200
+PASS|hosting/case|HTTP 200
+PASS|hosting/auth|HTTP 200
+PASS|hosting/help|HTTP 200
+PASS|hosting/privacy|HTTP 200
+PASS|hosting/terms|HTTP 200
+PASS|hosting/explore|HTTP 200
+PASS|gis_revision|georesolvefunction-00002-kuy
+PASS|gis_runtime_preserved_nodejs20|nodejs20
+PASS|bq_wards_count|4468
+PASS|fn_createcasefunction|createcasefunction-00006-nek|nodejs22
+PASS|fn_uploadmediafunction|uploadmediafunction-00005-hak|nodejs22
+PASS|fn_runimageintelligencefunction|runimageintelligencefunction-00003-vet|nodejs22
+PASS|fn_reviewduplicatefunction|reviewduplicatefunction-00002-gox|nodejs22
+PASS|fn_listsmartworkqueuefunction|listsmartworkqueuefunction-00002-vam|nodejs22
+PASS|fn_listmapcasesfunction|listmapcasesfunction-00002-vok|nodejs22
+PASS|fn_listsupervisorboardfunction|listsupervisorboardfunction-00002-zod|nodejs22
+PASS|fn_listfieldjobsfunction|listfieldjobsfunction-00002-fac|nodejs22
+PASS|fn_updatecasestatusfunction|updatecasestatusfunction-00003-rex|nodejs22
+PASS|fn_assigncasefunction|assigncasefunction-00003-geb|nodejs22
+PASS|wif_pool|ACTIVE
+PASS|wif_repo_condition|assertion.repository=='tenderbriefing/ServeSA'
+PASS|deploy_sa|exists
+PASS|deploy_sa_no_owner|ok
+PASS|firestore_rules_present|ok
+PASS|storage_rules_phash_prefix|ok
+PASS|branch_protection_main|["verify"]

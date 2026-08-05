@@ -1,0 +1,14 @@
+
+=== Deploying to 'servesa-aad53'...
+
+i  deploying storage
+i  storage: ensuring required API firebasestorage.googleapis.com is enabled...
+✔  storage: required API firebasestorage.googleapis.com is enabled
+i  firebase.storage: checking infra/storage.rules for compilation errors...
+✔  firebase.storage: rules file infra/storage.rules compiled successfully
+i  storage: uploading rules infra/storage.rules...
+✔  storage: released rules infra/storage.rules to firebase.storage
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/servesa-aad53/overview

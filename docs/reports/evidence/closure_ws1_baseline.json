@@ -1,0 +1,66 @@
+{
+  "workstream": 1,
+  "captured_utc": "2026-08-05T15:13:03Z",
+  "git": {
+    "branch": "cert/pilot-readiness-hardening",
+    "local_head": "4af4261ded3a67002b1ea0d002460254dea38a19",
+    "origin_main": "052161e67519757a57bda5db58d36c1626d7a755",
+    "origin_cert": "4af4261ded3a67002b1ea0d002460254dea38a19",
+    "merge_base": "052161e67519757a57bda5db58d36c1626d7a755",
+    "cert_ahead_of_main": 9,
+    "cert_behind_main": 0,
+    "working_tree_clean": true
+  },
+  "ci": {
+    "cert_tip_ci": {
+      "run": 31018216070,
+      "sha": "4af4261ded3a67002b1ea0d002460254dea38a19",
+      "conclusion": "success"
+    },
+    "wif_verify": {
+      "run": 31017801968,
+      "sha": "eff734bbe6a2710638fb4da4a554d277ad31126c",
+      "conclusion": "success"
+    }
+  },
+  "github": {
+    "variables": [
+      "DEPLOY_SERVICE_ACCOUNT",
+      "WORKLOAD_IDENTITY_PROVIDER"
+    ],
+    "secrets_present": [
+      "SERVICE_ACCOUNT"
+    ],
+    "branch_protection_main": {
+      "required_checks": [
+        "verify"
+      ],
+      "required_reviews": 1,
+      "enforce_admins": true,
+      "allow_force_pushes": false
+    }
+  },
+  "firebase": {
+    "project": "servesa-aad53",
+    "hosting_live_url": "https://servesa-aad53.web.app",
+    "hosting_last_release_local_obs": "2026-08-05 13:13:14",
+    "gis": {
+      "function": "georesolveFunction",
+      "runtime": "nodejs20",
+      "revision": "georesolvefunction-00002-kuy",
+      "region": "africa-south1"
+    },
+    "non_gis_runtime": "nodejs22",
+    "wif": {
+      "pool": "github-actions-pool",
+      "provider": "github-oidc",
+      "issuer": "https://token.actions.githubusercontent.com",
+      "attributeCondition": "assertion.repository=='tenderbriefing/ServeSA'",
+      "state": "ACTIVE"
+    },
+    "deploy_sa_roles_no_owner_editor": true,
+    "deploy_sa_user_managed_keys": 0,
+    "adminsdk_user_managed_keys": 2
+  },
+  "prior_verdict": "PASS WITH CONDITIONS"
+}

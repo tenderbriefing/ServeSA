@@ -84,7 +84,7 @@ cat > firebase.json <<EOF
   },
   "functions": {
     "source": "apps/functions",
-    "runtime": "nodejs20"
+    "runtime": "nodejs22"
   }
 }
 EOF
