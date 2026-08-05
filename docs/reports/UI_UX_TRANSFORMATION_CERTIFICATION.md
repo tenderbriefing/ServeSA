@@ -12,7 +12,7 @@ The mandatory language-selector and US-flag removals are complete and covered by
 
 ## 3. Final SHA
 
-`7adb20d4c84d52c537f8d78ee758ee848cec349c` — replaced immediately after this certification commit lands.
+`3272ff424df17435983af0ede67e6d29e1f790e8` — tip of `feat/ui-ux-transformation` / PR #6 head at certification close.
 
 ## 4. Branch
 
