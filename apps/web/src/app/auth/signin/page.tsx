@@ -6,8 +6,6 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { signInWithEmail, signInWithGoogle } from '@/lib/auth'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -64,10 +62,8 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8">
+    <div className="bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto">
           <Card>
             <CardHeader className="text-center">
@@ -131,7 +127,7 @@ export default function SignInPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <Link 
+                  <Link
                     href="/auth/forgot-password"
                     className="text-sm text-primary-600 hover:text-primary-700"
                   >
@@ -186,8 +182,8 @@ export default function SignInPage() {
 
               <div className="text-center mt-6">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
-                  <Link 
+                  Don&apos;t have an account?{' '}
+                  <Link
                     href="/auth/signup"
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
@@ -198,9 +194,7 @@ export default function SignInPage() {
             </CardContent>
           </Card>
         </div>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   )
 }
