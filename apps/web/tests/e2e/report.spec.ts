@@ -67,7 +67,17 @@ test.describe('ServeSA Report Flow', () => {
     await page.fill('[data-testid="reporter-email"]', 'test@example.com')
     await page.check('[data-testid="consent"]')
 
-    // Without live functions, assert client validation path remains ready
+    // Certified contract: at least one photo is mandatory before submit enables.
+    await expect(page.locator('[data-testid="submit"]')).toBeDisabled()
+    await page.setInputFiles('[data-testid="photo-upload"]', {
+      name: 'issue.jpg',
+      mimeType: 'image/jpeg',
+      buffer: Buffer.from(
+        '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAGcP//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAQUCf//EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQMBAT8Bf//EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQIBAT8Bf//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEABj8Cf//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAT8hf//Z',
+        'base64'
+      ),
+    })
+    await expect(page.getByText(/1 photo/i)).toBeVisible()
     await expect(page.locator('[data-testid="submit"]')).toBeEnabled()
   })
 

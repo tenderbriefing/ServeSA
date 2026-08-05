@@ -44,6 +44,12 @@ jobs:
       - name: Type-check functions
         run: npm run type-check -w @servesa/functions
 
+      - name: Type-check web
+        run: npm run type-check -w @servesa/web
+
+      - name: UI/UX static unit checks
+        run: npm run test:unit -w @servesa/web
+
       - name: Test functions
         run: npm test -w @servesa/functions -- --passWithNoTests
 

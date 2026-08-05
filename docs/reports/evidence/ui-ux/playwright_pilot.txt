@@ -1,0 +1,54 @@
+(node:73151) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 16 tests using 5 workers
+
+(node:73155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73153) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73155) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:73152) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:73155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73156) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:73156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73154) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:73154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73153) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:73153) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -   3 [chromium] › apps/web/tests/e2e/citizen.spec.ts:48:7 › Citizen UAT @pilot › authenticated citizen timeline path (optional token)
+  ✓   1 [chromium] › apps/web/tests/e2e/field.spec.ts:13:7 › Field UAT @pilot › field page loads (sign-in gate or field chrome) @pilot (722ms)
+  ✓   5 [chromium] › apps/web/tests/e2e/citizen.spec.ts:27:7 › Citizen UAT @pilot › case page loads without exposing duplicate scores @pilot (740ms)
+  -   6 [chromium] › apps/web/tests/e2e/field.spec.ts:21:7 › Field UAT @pilot › field jobs UI when token present
+  ✓   2 [chromium] › apps/web/tests/e2e/citizen.spec.ts:14:7 › Citizen UAT @pilot › report page loads with report UI elements @pilot (746ms)
+  ✓   4 [chromium] › apps/web/tests/e2e/citizen.spec.ts:38:7 › Citizen UAT @pilot › auth pages load @pilot (950ms)
+  ✓   9 [chromium] › apps/web/tests/e2e/isolation.spec.ts:23:7 › Isolation UAT @pilot › citizen case page without auth does not show ops duplicate review @pilot (426ms)
+  ✓   7 [chromium] › apps/web/tests/e2e/field.spec.ts:32:7 › Field UAT @pilot › unauthenticated field does not list job cards @pilot (496ms)
+  -  11 [chromium] › apps/web/tests/e2e/isolation.spec.ts:41:7 › Isolation UAT @pilot › official token from one muni cannot be assumed to show foreign muni data
+  -  13 [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present
+  ✓  10 [chromium] › apps/web/tests/e2e/isolation.spec.ts:31:7 › Isolation UAT @pilot › suspended user path — sign-in available; ops stays gated @pilot (716ms)
+  ✓  12 [chromium] › apps/web/tests/e2e/official.spec.ts:14:7 › Official UAT @pilot › ops page loads (gate or queue UI) @pilot (533ms)
+  ✓  14 [chromium] › apps/web/tests/e2e/official.spec.ts:34:7 › Official UAT @pilot › unauthenticated ops does not render municipality case rows @pilot (497ms)
+  -  16 [chromium] › apps/web/tests/e2e/supervisor.spec.ts:21:7 › Supervisor UAT @pilot › supervisor board metrics when token present
+  ✓   8 [chromium] › apps/web/tests/e2e/isolation.spec.ts:13:7 › Isolation UAT @pilot › cross-muni ops pages do not leak case lists without auth @pilot (1.5s)
+  ✓  15 [chromium] › apps/web/tests/e2e/supervisor.spec.ts:13:7 › Supervisor UAT @pilot › supervisor page loads (gate or board) @pilot (796ms)
+
+  5 skipped
+  11 passed (3.3s)
+
+To open last HTML report run:
+
+  npx playwright show-report
+

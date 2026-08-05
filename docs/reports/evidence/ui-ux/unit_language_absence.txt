@@ -1,0 +1,16 @@
+
+> @servesa/web@1.0.0 test:unit
+> node --test tests/unit/**/*.test.mjs
+
+✔ no LanguageSwitcher component files remain (0.575791ms)
+✔ no US flag emoji in source (6.401333ms)
+✔ no react-i18next / i18next imports in source (1.7425ms)
+✔ citizen navigation labels are present in Header (0.156708ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.52425
