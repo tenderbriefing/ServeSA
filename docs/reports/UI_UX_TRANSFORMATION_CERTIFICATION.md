@@ -12,7 +12,7 @@ The mandatory language-selector and US-flag removals are complete and covered by
 
 ## 3. Final SHA
 
-`d8ca6d7e3d60085ec56dd9fd0cfc9641964b0086` — tip of `feat/ui-ux-transformation` / PR #6 head at certification close.
+`2816d57c8de1efaff90233cc6ab5f2c0e1bfef17` — PR #6 head OID (`gh pr view 6 --json headRefOid`); authoritative for review. Product code landed at/before this tip.
 
 ## 4. Branch
 
