@@ -7,7 +7,7 @@
 | Project | servesa-aad53 |
 | Branch | `cert/pilot-readiness-hardening` |
 | Starting SHA | `052161e67519757a57bda5db58d36c1626d7a755` |
-| Deployed SHA (functions Node 22 selective) | same tip as final repo SHA after push (functions from this branch build) |
+| Deployed SHA (functions Node 22 selective) | `30b4df35258cc2f4fe5404964ba0bb62f7800103` (cert tip; functions built/deployed from this branch with engines.node=22; Hosting not redeployed this sprint) |
 | Hosting | https://servesa-aad53.web.app (`/report`, `/ops`, `/ops/map`, `/ops/supervisor`, `/field`, `/case`) — Hosting tip still prior release unless redeployed |
 | Functions region | africa-south1 (Gen2) |
 | GIS dataset | mdb-wards-2020-v1 (4468 wards, ST_COVERS) |
@@ -24,7 +24,7 @@
 
 | Date (UTC) | Release | Branch | Starting SHA | Deployed SHA | GIS rev | Notes / cert |
 |------------|---------|--------|--------------|--------------|---------|--------------|
-| 2026-08-05 | **Pilot readiness hardening** | `cert/pilot-readiness-hardening` | `052161e` | _fill final repo SHA after push_ | `georesolvefunction-00002-kuy` (**unchanged**) | Node 22 selective (excl. GIS); WIF pool live; Playwright 11 pass / 5 skip; storage qa/phash-fixtures; smoke 30/30 |
+| 2026-08-05 | **Pilot readiness hardening** | `cert/pilot-readiness-hardening` | `052161e` | `30b4df3` | `georesolvefunction-00002-kuy` (**unchanged**) | Node 22 selective (excl. GIS); WIF pool live; Playwright 11 pass / 5 skip; storage qa/phash-fixtures; smoke 30/30 |
 | 2026-08-05 | Operational Intelligence + Field Productivity | main | `2316f2d` | `e90fdc0` | `georesolvefunction-00002-kuy` | Cert tip `405839d` |
 | 2026-08-05 | Municipality Ops MVP | main | — | `8b70884` / cert `2316f2d` | unchanged | `/ops` lifecycle |
 | 2026-08-05 | Geospatial Routing | main | — | `062323d` | `georesolvefunction-00002-kuy` | mdb-wards-2020-v1 |
