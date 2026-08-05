@@ -62,13 +62,18 @@ test.describe('Isolation UAT @pilot', () => {
   test('official token from one muni cannot be assumed to show foreign muni data', async ({
     page,
   }) => {
-    test.skip(!hasToken('official'), 'PILOT_UAT_OFFICIAL_TOKEN not set')
-    await injectSyntheticAuth(page, UAT_TOKENS.official)
+    const token = UAT_TOKENS.officialCpt || UAT_TOKENS.official
+    test.skip(!token?.trim(), 'PILOT_UAT_OFFICIAL_CPT_TOKEN / PILOT_UAT_OFFICIAL_TOKEN not set')
+    await injectSyntheticAuth(page, token)
     await expectPageLoads(page, '/ops')
     // Soft check: municipality claim chrome may appear; foreign muni codes must not
     // be mixed in client-visible queue without server filter (server is source of truth).
     const body = await page.locator('body').innerText()
     // Queue must be empty or scoped — never dump raw multi-muni JSON blobs
     expect(body).not.toMatch(/"muniCode"\s*:\s*\[/)
+    // CPT official must not render as JHB claim chrome
+    if (UAT_TOKENS.officialCpt?.trim()) {
+      await expect(page.getByText(/\bCPT\b/).first()).toBeVisible({ timeout: 25_000 })
+    }
   })
 })

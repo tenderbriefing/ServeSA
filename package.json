@@ -29,6 +29,7 @@
     "pilot:evidence": "ts-node tools/pilot/evidence_pack.ts --benchmark pilot_out/benchmark/summary.json --points pilot_out/pilot_points.geojson --out pilot_out/evidence",
     "test:e2e": "playwright test",
     "test:e2e:pilot": "playwright test --grep @pilot",
+    "pilot:uat-identities": "node tools/pilot/provision_uat_identities.js",
     "test:image-similarity": "npm run run -w @servesa/image-similarity",
     "test:load:synthetic": "npx tsc tools/loadtest/synthetic_load_bench.ts --outDir tools/loadtest --esModuleInterop --module commonjs --target es2020 --skipLibCheck && node tools/loadtest/synthetic_load_bench.js"
   },

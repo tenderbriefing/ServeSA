@@ -1,0 +1,52 @@
+{
+  "project": "servesa-aad53",
+  "generated_utc": "2026-08-05T15:17:42.321Z",
+  "auth_mode": "email_password",
+  "custom_tokens_available": false,
+  "identities": [
+    {
+      "uid": "i5PUcFNX7pZcSgvde2c9U45ZNdJ3",
+      "email": "uat.citizen.pilot@servesa.test",
+      "key": "CITIZEN",
+      "disabled": false
+    },
+    {
+      "uid": "pCMt1FvVnlhyNjiuhDnA3DRGtjT2",
+      "email": "uat.official.jhb.pilot@servesa.test",
+      "key": "OFFICIAL",
+      "disabled": false
+    },
+    {
+      "uid": "rNjRO23wG5QvBc9Yut8ev1O6kYl1",
+      "email": "uat.admin.jhb.pilot@servesa.test",
+      "key": "ADMIN",
+      "disabled": false
+    },
+    {
+      "uid": "0On5CfOebzefE5J7UaZTwy769qf1",
+      "email": "uat.supervisor.jhb.pilot@servesa.test",
+      "key": "SUPERVISOR",
+      "disabled": false
+    },
+    {
+      "uid": "9AGXgdDmewMNXhAX16RZdpZrTOk1",
+      "email": "uat.field.jhb.pilot@servesa.test",
+      "key": "FIELD",
+      "disabled": false
+    },
+    {
+      "uid": "70vf03XO33hgk4JUHa7h1O7YbT42",
+      "email": "uat.official.cpt.pilot@servesa.test",
+      "key": "OFFICIAL_CPT",
+      "disabled": false
+    },
+    {
+      "uid": "tBdwu0hMnyP8EzhbzrbkClDjPl32",
+      "email": "uat.suspended.pilot@servesa.test",
+      "key": "SUSPENDED",
+      "disabled": true
+    }
+  ],
+  "token_file": "docs/reports/evidence/uat_tokens.env",
+  "note": "Passwords in uat_tokens.env only; never commit."
+}

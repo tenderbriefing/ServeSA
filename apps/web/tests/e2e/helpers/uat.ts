@@ -1,12 +1,19 @@
 import { Page, expect, test } from '@playwright/test'
 
-/** Optional synthetic Firebase ID tokens — never commit real credentials. */
+/**
+ * Optional synthetic Firebase *custom* tokens for signInWithCustomToken.
+ * Provision via: node tools/pilot/provision_uat_identities.js
+ * Load env: set -a && source docs/reports/evidence/uat_tokens.env && set +a
+ * Never commit token values.
+ */
 export const UAT_TOKENS = {
   citizen: process.env.PILOT_UAT_CITIZEN_TOKEN,
   official: process.env.PILOT_UAT_OFFICIAL_TOKEN,
   supervisor: process.env.PILOT_UAT_SUPERVISOR_TOKEN,
   field: process.env.PILOT_UAT_FIELD_TOKEN,
   suspended: process.env.PILOT_UAT_SUSPENDED_TOKEN,
+  admin: process.env.PILOT_UAT_ADMIN_TOKEN,
+  officialCpt: process.env.PILOT_UAT_OFFICIAL_CPT_TOKEN,
 }
 
 export function hasToken(role: keyof typeof UAT_TOKENS): boolean {
@@ -14,7 +21,8 @@ export function hasToken(role: keyof typeof UAT_TOKENS): boolean {
 }
 
 /**
- * Inject a synthetic Firebase Auth persistence hint when a token env is set.
+ * Inject a synthetic Firebase custom token before page scripts run.
+ * AuthProvider calls signInWithCustomToken when __PILOT_UAT_ID_TOKEN is set.
  * Without tokens, tests stay on unauthenticated page-load / UI structure checks.
  */
 export async function injectSyntheticAuth(
@@ -22,9 +30,9 @@ export async function injectSyntheticAuth(
   token: string | undefined
 ): Promise<boolean> {
   if (!token?.trim()) return false
-  await page.addInitScript((idToken) => {
+  await page.addInitScript((customToken) => {
     ;(window as unknown as { __PILOT_UAT_ID_TOKEN?: string }).__PILOT_UAT_ID_TOKEN =
-      idToken
+      customToken
   }, token.trim())
   return true
 }
