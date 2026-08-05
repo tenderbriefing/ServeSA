@@ -42,6 +42,15 @@ export function decodeUatPayload(
   return null
 }
 
+/** Dismiss first-run tutorial modal if present. */
+export async function dismissOnboardingIfPresent(page: Page) {
+  const skip = page.getByText(/skip tutorial/i).first()
+  if (await skip.isVisible().catch(() => false)) {
+    await skip.click()
+    await skip.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined)
+  }
+}
+
 /**
  * Inject password/custom-token payload before page scripts run.
  * AuthProvider bootstraps sign-in (JWT = 3 segments; else base64url password JSON).
@@ -58,7 +67,10 @@ export async function injectSyntheticAuth(
   return true
 }
 
-/** Authenticate via init-script bootstrap then open a protected path. */
+/**
+ * Prefer AuthProvider init-script bootstrap; fall back to form submit if redirect.
+ * Form path clicks `form button[type=submit]` to avoid header "Sign In" collision.
+ */
 export async function signInAndGoto(
   page: Page,
   token: string | undefined,
@@ -68,16 +80,26 @@ export async function signInAndGoto(
   if (!ok) throw new Error('UAT token missing')
   await page.goto(path, { waitUntil: 'domcontentloaded' })
   await page
-    .getByText(/checking access/i)
+    .getByText(/^checking access/i)
     .first()
     .waitFor({ state: 'hidden', timeout: 30_000 })
     .catch(() => undefined)
-  // Confirm we did not bounce to sign-in
+  await dismissOnboardingIfPresent(page)
+
   if (page.url().includes('/auth/signin')) {
     const creds = decodeUatPayload(token)
-    throw new Error(
-      `UAT bootstrap left sign-in for ${creds?.email || 'unknown'} at ${page.url()}`
-    )
+    if (!creds) throw new Error('UAT bootstrap failed and token is not a password payload')
+    await page.goto('/auth/signin', { waitUntil: 'domcontentloaded' })
+    await page.getByPlaceholder(/enter your email/i).fill(creds.email)
+    await page.getByPlaceholder(/enter your password/i).fill(creds.password)
+    await page.locator('form button[type="submit"]').click()
+    await page.waitForURL(/\/dashboard(\/|$|\?)/, { timeout: 45_000 })
+    await page.goto(path, { waitUntil: 'domcontentloaded' })
+    await dismissOnboardingIfPresent(page)
+  }
+
+  if (page.url().includes('/auth/signin')) {
+    throw new Error(`UAT auth failed for path ${path}`)
   }
 }
 
