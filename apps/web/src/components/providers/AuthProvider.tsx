@@ -72,7 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    const unsubscribe = onAuthStateChanged(auth, async (next) => {
+    let uatBootstrapDone = !window.__PILOT_UAT_ID_TOKEN?.trim()
+
+    const applyUser = async (next: User | null) => {
       setUser(next)
       if (next) {
         try {
@@ -80,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userDoc.exists()) {
             setUserProfile(userDoc.data() as UserProfile)
           }
-          const token = await next.getIdTokenResult()
+          const token = await next.getIdTokenResult(true)
           const roles = Array.isArray(token.claims.roles)
             ? (token.claims.roles as string[])
             : []
@@ -98,32 +100,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setClaimsRoles([])
         setMunicipalityCode(null)
       }
-      setLoading(false)
+      // Do not clear loading until optional UAT sign-in has been attempted,
+      // otherwise OpsShell redirects to /auth/signin before bootstrap finishes.
+      if (uatBootstrapDone && !cancelled) {
+        setLoading(false)
+      }
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, (next) => {
+      void applyUser(next)
     })
 
     // Pilot UAT: Playwright injects a custom token or password payload before navigation.
     const bootstrapUat = async () => {
       const raw = window.__PILOT_UAT_ID_TOKEN?.trim()
-      if (!raw || auth.currentUser) return
+      if (!raw) {
+        // No UAT payload — rely solely on onAuthStateChanged (incl. persistence).
+        // Do NOT clear loading here: auth.currentUser is often still null before
+        // IndexedDB restore, and OpsShell would redirect to /auth/signin.
+        uatBootstrapDone = true
+        return
+      }
       try {
-        if (raw.startsWith('eyJ')) {
-          await signInWithCustomToken(auth, raw)
-          return
-        }
-        // base64url JSON password payload from provision_uat_identities.js
-        const padded = raw.replace(/-/g, '+').replace(/_/g, '/')
-        const pad = padded.length % 4 === 0 ? '' : '='.repeat(4 - (padded.length % 4))
-        const json = JSON.parse(atob(padded + pad)) as {
-          email?: string
-          password?: string
-          mode?: string
-        }
-        if (json?.email && json?.password) {
-          await signInWithEmailAndPassword(auth, json.email, json.password)
+        if (!auth.currentUser) {
+          // JWT custom tokens have three base64url segments separated by '.'.
+          // Password payloads are base64url JSON and often also start with "eyJ".
+          const isJwt = raw.split('.').length === 3
+          if (isJwt) {
+            await signInWithCustomToken(auth, raw)
+          } else {
+            const padded = raw.replace(/-/g, '+').replace(/_/g, '/')
+            const pad =
+              padded.length % 4 === 0 ? '' : '='.repeat(4 - (padded.length % 4))
+            const json = JSON.parse(atob(padded + pad)) as {
+              email?: string
+              password?: string
+              mode?: string
+            }
+            if (json?.email && json?.password) {
+              await signInWithEmailAndPassword(auth, json.email, json.password)
+            }
+          }
         }
       } catch (error) {
         if (!cancelled) {
           console.error('Pilot UAT sign-in failed:', error)
+        }
+      } finally {
+        uatBootstrapDone = true
+        if (!cancelled) {
+          // If auth state already applied before the flag flipped, re-apply so
+          // loading clears; if sign-in failed, clear loading for the gate UI.
+          if (auth.currentUser) {
+            void applyUser(auth.currentUser)
+          } else {
+            setLoading(false)
+          }
         }
       }
     }

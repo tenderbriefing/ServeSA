@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | **Accepted** (GCP pool/provider ACTIVE; GitHub variables set; Actions WIF verify SUCCESS) |
+| Status | **Accepted** (WIF production deploy PASS; JSON-key path **retired**) |
 | Date | 2026-08-05 |
 | Deciders | Serve SA Platform / Security |
 | Project | `servesa-aad53` |
@@ -33,8 +33,8 @@ Production GitHub Actions historically authenticated with a long-lived Google Cl
    - `DEPLOY_SERVICE_ACCOUNT` (`github-actions-deploy@servesa-aad53.iam.gserviceaccount.com`)
 4. Production deploy remains **`workflow_dispatch` only** (no auto-deploy on push to `main`).
 5. **Deploy only from a verified SHA**; record every production tip in `docs/reports/DEPLOYMENT_REGISTRY.md`. WIF does not relax review.
-6. Temporary dual-path: if WIF vars are unset, fall back to deprecated `secrets.SERVICE_ACCOUNT` with an explicit warning. Remove the JSON key after WIF smoke passes.
-7. PR Hosting previews may still need `firebaseServiceAccount` JSON until `FirebaseExtended/action-hosting-deploy` supports pure WIF/ADC.
+6. ~~Temporary dual-path: if WIF vars are unset, fall back to deprecated `secrets.SERVICE_ACCOUNT`.~~ **Retired** after first WIF production Hosting deploy (run `31020673782` on SHA `d3aeff6`).
+7. PR Hosting previews use WIF + `firebase hosting:channel:deploy` (no JSON key).
 8. Node runtime for CI/functions is tracked separately (`docs/runbooks/NODE_RUNTIME_UPGRADE.md`) — coordinated on the same hardening track, not a substitute for WIF.
 
 ## Non-goals
@@ -62,9 +62,9 @@ Org/repo settings must allow Actions OIDC (`permissions.id-token: write`).
 | Attribute condition | `assertion.repository=='tenderbriefing/ServeSA'` |
 | Deploy SA | `github-actions-deploy@servesa-aad53.iam.gserviceaccount.com` (no Owner/Editor) |
 | GitHub variables | `WORKLOAD_IDENTITY_PROVIDER`, `DEPLOY_SERVICE_ACCOUNT` set |
-| Workflows green on WIF | **PASS** — runs 31017777435 / 31017770944 SUCCESS |
-| JSON key deleted | **Not yet** — `SERVICE_ACCOUNT` secret retained until WIF smoke PASS |
-| Rollback drill practiced | Documented — `docs/runbooks/WIF_ROLLBACK.md` |
+| Workflows green on WIF | **PASS** — verify + Deploy Production `31020673782` SUCCESS (`auth_mode=wif`) |
+| JSON key deleted | **PASS** — GitHub secret `SERVICE_ACCOUNT` removed; Actions USER_MANAGED key `a4ecd48b…` deleted |
+| Rollback drill practiced | **PASS** — live Hosting rollback+restore (`docs/reports/evidence/hosting_rollback_drill.json`) |
 
 ## Rollback
 

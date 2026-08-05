@@ -1,0 +1,147 @@
+(node:46225) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:46362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46362) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › apps/web/tests/e2e/field.spec.ts:13:7 › Field UAT @pilot › field page loads (sign-in gate or field chrome) @pilot (692ms)
+  ✘   2 [chromium] › apps/web/tests/e2e/field.spec.ts:21:7 › Field UAT @pilot › field jobs UI when token present (1.1s)
+(node:46399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46399) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -   3 [chromium] › apps/web/tests/e2e/field.spec.ts:32:7 › Field UAT @pilot › unauthenticated field does not list job cards @pilot
+  ✓   4 [chromium] › apps/web/tests/e2e/isolation.spec.ts:13:7 › Isolation UAT @pilot › cross-muni ops pages do not leak case lists without auth @pilot (663ms)
+  ✓   5 [chromium] › apps/web/tests/e2e/isolation.spec.ts:23:7 › Isolation UAT @pilot › citizen case page without auth does not show ops duplicate review @pilot (366ms)
+  ✓   6 [chromium] › apps/web/tests/e2e/isolation.spec.ts:31:7 › Isolation UAT @pilot › suspended user path — sign-in available; ops stays gated @pilot (764ms)
+  ✘   7 [chromium] › apps/web/tests/e2e/isolation.spec.ts:59:7 › Isolation UAT @pilot › official token from one muni cannot be assumed to show foreign muni data (523ms)
+(node:46425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46425) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:46425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 [chromium] › apps/web/tests/e2e/official.spec.ts:14:7 › Official UAT @pilot › ops page loads (gate or queue UI) @pilot (1.6s)
+  ✘   9 [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present (1.4s)
+(node:50929) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50929) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:50929) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  10 [chromium] › apps/web/tests/e2e/official.spec.ts:34:7 › Official UAT @pilot › unauthenticated ops does not render municipality case rows @pilot
+  ✓  11 [chromium] › apps/web/tests/e2e/supervisor.spec.ts:13:7 › Supervisor UAT @pilot › supervisor page loads (gate or board) @pilot (402ms)
+  ✘  12 [chromium] › apps/web/tests/e2e/supervisor.spec.ts:21:7 › Supervisor UAT @pilot › supervisor board metrics when token present (703ms)
+
+
+  1) [chromium] › apps/web/tests/e2e/field.spec.ts:21:7 › Field UAT @pilot › field jobs UI when token present 
+
+    Error: UAT sign-in failed for uat.field.jhb.pilot@servesa.test: unknown error
+
+       at helpers/uat.ts:79
+
+      77 |       .then(async () => {
+      78 |         const err = await page.locator('.text-red-600, [role="alert"]').first().textContent()
+    > 79 |         throw new Error(`UAT sign-in failed for ${creds.email}: ${err || 'unknown error'}`)
+         |               ^
+      80 |       }),
+      81 |   ])
+      82 |
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:79:15
+        at signInViaForm (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:71:3)
+        at signInAndGoto (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:94:3)
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/field.spec.ts:26:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/field-Field-UAT-pilot-field-jobs-UI-when-token-present-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/field-Field-UAT-pilot-field-jobs-UI-when-token-present-chromium/error-context.md
+
+  2) [chromium] › apps/web/tests/e2e/isolation.spec.ts:59:7 › Isolation UAT @pilot › official token from one muni cannot be assumed to show foreign muni data 
+
+    Error: UAT sign-in failed for uat.official.cpt.pilot@servesa.test: unknown error
+
+       at helpers/uat.ts:79
+
+      77 |       .then(async () => {
+      78 |         const err = await page.locator('.text-red-600, [role="alert"]').first().textContent()
+    > 79 |         throw new Error(`UAT sign-in failed for ${creds.email}: ${err || 'unknown error'}`)
+         |               ^
+      80 |       }),
+      81 |   ])
+      82 |
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:79:15
+        at signInViaForm (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:71:3)
+        at injectSyntheticAuth (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:109:3)
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/isolation.spec.ts:64:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/isolation-Isolation-UAT-pi-5adb4-d-to-show-foreign-muni-data-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/isolation-Isolation-UAT-pi-5adb4-d-to-show-foreign-muni-data-chromium/error-context.md
+
+  3) [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present 
+
+    Error: UAT sign-in failed for uat.official.jhb.pilot@servesa.test: unknown error
+
+       at helpers/uat.ts:79
+
+      77 |       .then(async () => {
+      78 |         const err = await page.locator('.text-red-600, [role="alert"]').first().textContent()
+    > 79 |         throw new Error(`UAT sign-in failed for ${creds.email}: ${err || 'unknown error'}`)
+         |               ^
+      80 |       }),
+      81 |   ])
+      82 |
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:79:15
+        at signInViaForm (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:71:3)
+        at signInAndGoto (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:94:3)
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/official.spec.ts:24:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/official-Official-UAT-pilo-88375-when-official-token-present-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/official-Official-UAT-pilo-88375-when-official-token-present-chromium/error-context.md
+
+  4) [chromium] › apps/web/tests/e2e/supervisor.spec.ts:21:7 › Supervisor UAT @pilot › supervisor board metrics when token present 
+
+    Error: UAT sign-in failed for uat.supervisor.jhb.pilot@servesa.test: unknown error
+
+       at helpers/uat.ts:79
+
+      77 |       .then(async () => {
+      78 |         const err = await page.locator('.text-red-600, [role="alert"]').first().textContent()
+    > 79 |         throw new Error(`UAT sign-in failed for ${creds.email}: ${err || 'unknown error'}`)
+         |               ^
+      80 |       }),
+      81 |   ])
+      82 |
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:79:15
+        at signInViaForm (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:71:3)
+        at injectSyntheticAuth (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:109:3)
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/supervisor.spec.ts:26:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/supervisor-Supervisor-UAT--c0009--metrics-when-token-present-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/supervisor-Supervisor-UAT--c0009--metrics-when-token-present-chromium/error-context.md
+
+  4 failed
+    [chromium] › apps/web/tests/e2e/field.spec.ts:21:7 › Field UAT @pilot › field jobs UI when token present 
+    [chromium] › apps/web/tests/e2e/isolation.spec.ts:59:7 › Isolation UAT @pilot › official token from one muni cannot be assumed to show foreign muni data 
+    [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present 
+    [chromium] › apps/web/tests/e2e/supervisor.spec.ts:21:7 › Supervisor UAT @pilot › supervisor board metrics when token present 
+  2 skipped
+  6 passed (12.3s)
+
+To open last HTML report run:
+
+  npx playwright show-report
+

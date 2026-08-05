@@ -1,0 +1,53 @@
+You can view your function in the Cloud Console here: https://console.cloud.google.com/functions/details/africa-south1/georesolveFunction?project=servesa-aad53
+
+buildConfig:
+  automaticUpdatePolicy: {}
+  build: projects/171401876896/locations/africa-south1/builds/422e05a4-76d3-4c06-84b0-04a3c592e4cd
+  dockerRegistry: ARTIFACT_REGISTRY
+  dockerRepository: projects/servesa-aad53/locations/africa-south1/repositories/gcf-artifacts
+  entryPoint: georesolveFunction
+  environmentVariables:
+    GOOGLE_NODE_RUN_SCRIPTS: ''
+  runtime: nodejs22
+  serviceAccount: projects/servesa-aad53/serviceAccounts/171401876896-compute@developer.gserviceaccount.com
+  source:
+    storageSource:
+      bucket: gcf-v2-sources-171401876896-africa-south1
+      generation: '1785946288215743'
+      object: georesolveFunction/function-source.zip
+  sourceProvenance:
+    resolvedStorageSource:
+      bucket: gcf-v2-sources-171401876896-africa-south1
+      generation: '1785946288215743'
+      object: georesolveFunction/function-source.zip
+createTime: '2026-08-04T20:19:02.577598609Z'
+environment: GEN_2
+labels:
+  deployment-callable: 'true'
+  deployment-tool: cli-firebase
+  firebase-functions-hash: 2f269439ce9720ceaeceebe5c779e0ecf746f0ed
+name: projects/servesa-aad53/locations/africa-south1/functions/georesolveFunction
+satisfiesPzi: true
+satisfiesPzs: true
+serviceConfig:
+  allTrafficOnLatestRevision: true
+  availableCpu: '1'
+  availableMemory: 256Mi
+  environmentVariables:
+    EVENTARC_CLOUD_EVENT_SOURCE: projects/servesa-aad53/locations/africa-south1/services/georesolveFunction
+    FIREBASE_CONFIG: '{"projectId":"servesa-aad53","storageBucket":"servesa-aad53.firebasestorage.app"}'
+    FUNCTION_SIGNATURE_TYPE: http
+    FUNCTION_TARGET: georesolveFunction
+    GCLOUD_PROJECT: servesa-aad53
+    LOG_EXECUTION_ID: 'true'
+  ingressSettings: ALLOW_ALL
+  maxInstanceCount: 20
+  maxInstanceRequestConcurrency: 80
+  revision: georesolvefunction-00004-yoh
+  service: projects/servesa-aad53/locations/africa-south1/services/georesolvefunction
+  serviceAccountEmail: 171401876896-compute@developer.gserviceaccount.com
+  timeoutSeconds: 60
+  uri: https://georesolvefunction-ra6drlkxtq-bq.a.run.app
+state: ACTIVE
+updateTime: '2026-08-05T16:16:52.437271679Z'
+url: https://africa-south1-servesa-aad53.cloudfunctions.net/georesolveFunction

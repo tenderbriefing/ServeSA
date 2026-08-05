@@ -1,0 +1,28 @@
+{
+  "drill_utc": "2026-08-05T15:39:46Z",
+  "method": "firebasehosting.googleapis.com channels/live/releases",
+  "current_version_before": "3af9a65002876d20",
+  "rollback_version": "ad480fa224d9b7cb",
+  "restored_version": "3af9a65002876d20",
+  "live_version_after_restore": "3af9a65002876d20",
+  "recovery_seconds": 26,
+  "after_rollback_routes": {
+    "/report": 200,
+    "/ops": 200,
+    "/ops/map": 200,
+    "/ops/supervisor": 200,
+    "/field": 200,
+    "/case": 200
+  },
+  "after_restore_routes": {
+    "/report": 200,
+    "/ops": 200,
+    "/ops/map": 200,
+    "/ops/supervisor": 200,
+    "/field": 200,
+    "/case": 200
+  },
+  "gis_revision_after": "georesolvefunction-00002-kuy",
+  "gis_runtime_after": "nodejs20",
+  "left_on_approved_release": true
+}

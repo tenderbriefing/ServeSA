@@ -1,0 +1,18 @@
+
+=== Deploying to 'servesa-aad53'...
+
+i  deploying hosting
+i  hosting[servesa-aad53]: beginning deploy...
+i  hosting[servesa-aad53]: found 137 files in apps/web/out
+i  hosting: uploading new files [0/66] (0%)
+i  hosting: upload complete
+✔  hosting[servesa-aad53]: file upload complete
+i  hosting[servesa-aad53]: finalizing version...
+✔  hosting[servesa-aad53]: version finalized
+i  hosting[servesa-aad53]: releasing new version...
+✔  hosting[servesa-aad53]: release complete
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/servesa-aad53/overview
+Hosting URL: https://servesa-aad53.web.app

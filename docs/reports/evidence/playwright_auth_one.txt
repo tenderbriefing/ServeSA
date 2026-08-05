@@ -1,0 +1,41 @@
+(node:56661) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+[1A[2K(node:56662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:56662) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+[1A[2K(node:56662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show wher  ✘  1 [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present (30.8s)
+
+
+  1) [chromium] › apps[1A[2K  1 passed (6.1s)
+ec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present 
+
+    Error: UAT sign-in failed for uat.official.jhb.pilot@servesa.test: https://servesa-aad53.web.app/auth/signin
+
+       at helpers/uat.ts:79
+
+      77 |     const creds = decodeUatPayload(token)
+      78 |     throw new Error(
+    > 79 |       `UAT bootstrap left sign-in for ${creds?.email || 'unknown'} at ${page.url()}`
+         |           ^
+      80 |     )
+      81 |   }
+      82 | }
+        at signInViaForm (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:79:11)
+        at signInAndGoto (/Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/helpers/uat.ts:91:3)
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/official.spec.ts:24:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/official-Official-UAT-pilo-88375-when-official-token-present-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/official-Official-UAT-pilo-88375-when-official-token-present-chromium/error-context.md
+
+  1 failed
+    [chromium] › apps/web/tests/e2e/official.spec.ts:22:7 › Official UAT @pilot › work queue UI structure when official token present 

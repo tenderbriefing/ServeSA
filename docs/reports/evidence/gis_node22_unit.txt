@@ -1,0 +1,21 @@
+
+> @servesa/functions@1.0.0 test
+> jest --testPathPattern=georesolve --passWithNoTests
+
+PASS src/__tests__/georesolve.test.ts
+  georesolve
+    ✓ rejects coordinates outside South Africa (2 ms)
+    ✓ returns unique ward match (4 ms)
+    ✓ returns unresolved on no match
+    ✓ returns ambiguous when multiple polygons match
+    ✓ georesolveSafe returns unresolved on timeout
+    ✓ georesolveSafe returns unresolved on permission failure
+    ✓ treats malformed rows as infrastructure-safe unresolved
+  routingPending semantics
+    ✓ only polygon_match clears routing pending
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        1.214 s, estimated 5 s
+Ran all test suites matching /georesolve/i.
