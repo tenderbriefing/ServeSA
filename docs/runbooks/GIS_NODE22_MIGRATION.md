@@ -18,11 +18,14 @@ Migrate **only** `georesolveFunction` runtime from Node 20 → Node 22 with **ze
 
 ## Assessment checklist
 
-- [ ] `apps/functions` `engines.node` / `infra/firebase.json` runtime = `nodejs22`
-- [ ] BigQuery client compatible
-- [ ] Unit tests (`georesolve.test.ts`) PASS
-- [ ] Source-load / build PASS
-- [ ] No SQL or match-logic diff vs certified revision
+- [x] `apps/functions` `engines.node` / `infra/firebase.json` runtime = `nodejs22`
+- [x] BigQuery client compatible
+- [x] Unit tests (`georesolve.test.ts`) PASS (8/8)
+- [x] Source-load / build PASS
+- [x] No SQL or match-logic diff vs certified revision
+- [x] Deployed revision `georesolvefunction-00003-xoj` (`nodejs22`)
+- [x] Prior revision `georesolvefunction-00002-kuy` retained
+- [x] BQ smoke: unique JHB + unresolved ocean point (`docs/reports/evidence/gis_node22_smoke.json`)
 
 ## Deploy
 

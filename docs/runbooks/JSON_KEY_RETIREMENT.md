@@ -4,9 +4,16 @@
 
 Remove the long-lived GitHub `SERVICE_ACCOUNT` JSON-key dependency **only after** a successful production deploy authenticated via WIF.
 
-## Hard gate
+## Status (2026-08-05)
 
-Do **not** delete or disable the JSON key until:
+| Gate | Status |
+|------|--------|
+| First WIF production deploy | **PASS** — run `31020673782` on `d3aeff6` |
+| Workflows WIF-only | **PASS** — PR #3 removed JSON fallback |
+| GitHub secret `SERVICE_ACCOUNT` | **Deleted** (`gh api …/secrets` total_count=0) |
+| Deploy SA USER_MANAGED keys | **None** on `github-actions-deploy@…` |
+| Residual adminsdk USER_MANAGED key | `948e53bf…` on `firebase-adminsdk-fbsvc@…` — not used by Actions; owner may delete after confirming no local/automation dependency |
+
 
 1. `verify-wif.yml` PASS
 2. `deploy-production.yml` PASS with `auth_mode=wif` on the intended SHA

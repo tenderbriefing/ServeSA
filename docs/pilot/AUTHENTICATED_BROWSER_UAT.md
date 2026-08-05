@@ -53,3 +53,14 @@ npm run test:e2e
 - `docs/pilot/PILOT_UAT_SCRIPT.md`
 - `apps/web/tests/e2e/`
 - `tools/pilot/provision_uat_identities.js`
+
+## Closure evidence (2026-08-05)
+
+| Metric | Value |
+|--------|-------|
+| Command | `set -a && source docs/reports/evidence/uat_tokens.env && set +a && npx playwright test --grep @pilot` |
+| Result | **14 passed / 2 skipped / 0 failed** |
+| Skips | Unauthenticated leak checks skipped when tokens are loaded (by design) |
+| Auth path | Production `/auth/signin` form (`form button[type=submit]`) — avoid header "Sign In" collision |
+| Evidence | `docs/reports/evidence/playwright_auth_uat.txt` |
+
