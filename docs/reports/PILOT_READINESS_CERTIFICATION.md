@@ -1,5 +1,8 @@
 # Pilot Municipality Readiness Certification
 
+> **Closure update (2026-08-05T17:23:57Z):** See `docs/reports/PILOT_READINESS_CLOSURE_CERTIFICATION.md`. Mainline merged (PR #1/#2/#3). First WIF production deploy PASS (`31020673782`). Authenticated Playwright 14 passed / 2 skipped / 0 failed. GIS on Node 22 (`georesolvefunction-00003-xoj`). Hosting rollback drill restored. JSON GitHub secret deleted; workflows WIF-only.
+
+
 | Field | Value |
 |-------|-------|
 | Template version | 1.1 (closure) |
