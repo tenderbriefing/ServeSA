@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | **Accepted** (GCP pool/provider ACTIVE; GitHub variables set; Actions WIF smoke pending first push of `verify-wif.yml`) |
+| Status | **Accepted** (GCP pool/provider ACTIVE; GitHub variables set; Actions WIF verify SUCCESS) |
 | Date | 2026-08-05 |
 | Deciders | Serve SA Platform / Security |
 | Project | `servesa-aad53` |
@@ -62,7 +62,7 @@ Org/repo settings must allow Actions OIDC (`permissions.id-token: write`).
 | Attribute condition | `assertion.repository=='tenderbriefing/ServeSA'` |
 | Deploy SA | `github-actions-deploy@servesa-aad53.iam.gserviceaccount.com` (no Owner/Editor) |
 | GitHub variables | `WORKLOAD_IDENTITY_PROVIDER`, `DEPLOY_SERVICE_ACCOUNT` set |
-| Workflows green on WIF | Pending first remote run of `.github/workflows/verify-wif.yml` after push |
+| Workflows green on WIF | **PASS** — runs 31017777435 / 31017770944 SUCCESS |
 | JSON key deleted | **Not yet** — `SERVICE_ACCOUNT` secret retained until WIF smoke PASS |
 | Rollback drill practiced | Documented — `docs/runbooks/WIF_ROLLBACK.md` |
 

@@ -12,8 +12,8 @@
 | Starting tip (main nav fix) | `052161e67519757a57bda5db58d36c1626d7a755` |
 | Prior OI tip | `e90fdc0e5f592261e0a73e552890f242eb63c184` |
 | Prior OI cert tip | `405839d` |
-| Deployed SHA (this sprint) | `eff734bbe6a2710638fb4da4a554d277ad31126c` (Node 22 functions + storage rules; Hosting not redeployed) |
-| Cert SHA (this document) | `eff734bbe6a2710638fb4da4a554d277ad31126c` |
+| Deployed SHA (this sprint) | `fe14b96c1eb708b308f5348df4d7060de9a6e99f` (Node 22 functions + storage rules; Hosting not redeployed) |
+| Cert SHA (this document) | `fe14b96c1eb708b308f5348df4d7060de9a6e99f` |
 | GIS resolver revision | `georesolvefunction-00002-kuy` (**unchanged**; still `nodejs20`) |
 | GIS dataset | `mdb-wards-2020-v1` (`servesa-aad53.geo.wards`, **4468** wards, `ST_COVERS`) |
 | Pilot municipality | Template ready — fill `docs/pilot/PILOT_CONFIGURATION_TEMPLATE.md` before go-live |
@@ -45,7 +45,7 @@ Out of scope for this cert: public league tables, speculative AI/SLA engines, fa
 | **PASS WITH CONDITIONS** | Core pilot path works; listed conditions are non-blocking for a controlled pilot |
 | **FAIL** | Any protected invariant broken, or core path not deployable from a verified SHA |
 
-**Sprint close verdict:** **PASS WITH CONDITIONS** — production baseline intact; Node 22 on non-GIS functions; WIF pool live; CI + main branch protection enabled; Playwright unauthenticated UAT green; fixture image metrics recorded; storage phash prefix narrowed; synthetic load bench recorded; rollback dry-run documented. Remaining conditions: interactive authenticated municipal UAT tokens, WIF Actions smoke after branch push, JSON key retirement, live Hosting rollback click, `generateDailyReport` europe-west1 scheduler flake.
+**Sprint close verdict:** **PASS WITH CONDITIONS** — production baseline intact; Node 22 on non-GIS functions; WIF pool live; CI + main branch protection enabled; Playwright unauthenticated UAT green; fixture image metrics recorded; storage phash prefix narrowed; synthetic load bench recorded; rollback dry-run documented. Remaining conditions: interactive authenticated municipal UAT tokens, JSON key retirement after first WIF production deploy, live Hosting rollback click, GIS Node 22 cutover before 2026-10-31, `generateDailyReport` europe-west1 scheduler flake.
 
 ---
 
@@ -85,7 +85,7 @@ Out of scope for this cert: public league tables, speculative AI/SLA engines, fa
 | W15 | Incident response | PASS | `docs/runbooks/PILOT_INCIDENT_RESPONSE.md` |
 | W16 | Observability baselines | PASS WITH CONDITIONS | Synthetic bench filled; prod latency TBD week 1 |
 | W17 | Node runtime upgrade | PASS WITH CONDITIONS | Non-GIS → `nodejs22`; GIS stays `nodejs20` until separate GIS window |
-| W18 | GitHub WIF | PASS WITH CONDITIONS | Pool/provider ACTIVE; GH vars set; JSON key retained until Actions WIF smoke |
+| W18 | GitHub WIF | PASS WITH CONDITIONS | Pool/provider ACTIVE; `verify-wif.yml` SUCCESS; JSON key retained until first WIF production deploy |
 | W19 | Deployment registry | PASS | This sprint row updated |
 | W20 | Image similarity validation | PASS WITH CONDITIONS | Fixture precision=1.0 recall=0.4; exact+resized+negative PASS; rotated/recompressed/cropped FAIL (documented limits) |
 
@@ -111,7 +111,7 @@ Monitor without logging PII (no emails, phone numbers, free-text descriptions, o
 |----|-----------|-----------|-------|--------|
 | C1 | Interactive authenticated official/field browser UAT with pilot municipality identities | Yes for launch | Pilot lead | Pre-go-live |
 | C2 | Final cert SHA + registry tip after merge to main / production Hosting tip if hosting redeployed | Yes for signed unconditional PASS | Release eng | Sprint close push |
-| C3 | GitHub Actions WIF smoke (`verify-wif.yml`) after workflow is on default remote branch; then retire `SERVICE_ACCOUNT` JSON secret | No (tracked) | Platform | After push + green WIF run |
+| C3 | Retire `SERVICE_ACCOUNT` JSON secret after first successful WIF `Deploy Production` workflow_dispatch | No (tracked) | Platform | Next production deploy |
 | C4 | GIS resolver remains on Node 20 until dedicated GIS change window | No until Node 20 EOL **2026-10-31** | Platform | GIS runbook |
 | C5 | Visual embeddings / multimodal AI remain disabled | No (by design) | Product | Deferred |
 | C6 | Full offline field lifecycle deferred | No (by design) | Product | Deferred |
