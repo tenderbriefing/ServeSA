@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-08-05T14:49:22.518Z",
+  "disclaimer": "LOCAL in-memory synthetic benchmark only. Does not write to or read from production Firebase. Not a production SLA claim.",
+  "corpus": {
+    "activeCases": 1000,
+    "historicalCases": 10000,
+    "total": 11000,
+    "municipalityFilter": "JHB"
+  },
+  "algorithms": {
+    "smartQueue": "mirrors opsQueues.classifyCase + bucketPriority + sort/slice",
+    "mapFilter": "mirrors listMapCasesOps client-side category/ward/status filters",
+    "pagination": "createdAt desc page slices",
+    "geohash": "synthetic lat/lng bucket keys (not authoritative GIS)"
+  },
+  "latencyMs": {
+    "smart_queue_filter_sort": {
+      "p50": 0.222834,
+      "p95": 0.44975,
+      "mean": 0.25642709999999996
+    },
+    "map_filter": {
+      "p50": 0.00925,
+      "p95": 0.025834,
+      "mean": 0.013281275000000004
+    },
+    "list_pagination": {
+      "p50": 0.287208,
+      "p95": 0.351875,
+      "mean": 0.2952676499999999
+    },
+    "geohash_bucket": {
+      "p50": 0.554208,
+      "p95": 0.646958,
+      "mean": 0.5685219000000001
+    }
+  },
+  "p50": {
+    "smart_queue_filter_sort": 0.222834,
+    "map_filter": 0.00925,
+    "list_pagination": 0.287208,
+    "geohash_bucket": 0.554208
+  },
+  "p95": {
+    "smart_queue_filter_sort": 0.44975,
+    "map_filter": 0.025834,
+    "list_pagination": 0.351875,
+    "geohash_bucket": 0.646958
+  }
+}

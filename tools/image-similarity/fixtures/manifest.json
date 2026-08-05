@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-08-05T14:54:30.268Z",
+  "base": "base.jpg",
+  "variants": [
+    {
+      "file": "exact.jpg",
+      "expectedLabel": "match",
+      "notes": "byte-identical copy of base"
+    },
+    {
+      "file": "resized.jpg",
+      "expectedLabel": "similar",
+      "notes": "half resolution"
+    },
+    {
+      "file": "rotated_mild.jpg",
+      "expectedLabel": "known-limitation",
+      "notes": "5° rotation — current block-hash phash is rotation-sensitive; exact+resize+recompress remain primary"
+    },
+    {
+      "file": "rotated90.jpg",
+      "expectedLabel": "known-limitation",
+      "notes": "90° geometric rotation — known phash limitation (auto-orient only handles EXIF)"
+    },
+    {
+      "file": "recompressed.jpg",
+      "expectedLabel": "similar",
+      "notes": "JPEG quality 55"
+    },
+    {
+      "file": "cropped.jpg",
+      "expectedLabel": "known-limitation",
+      "notes": "edge crop — current phash is crop-sensitive; officials still review recommendations manually"
+    },
+    {
+      "file": "different_angle.jpg",
+      "expectedLabel": "known-limitation",
+      "notes": "8° rotate + cover crop — viewpoint shifts not in production hash-primary policy; embeddings deferred"
+    },
+    {
+      "file": "negative.jpg",
+      "expectedLabel": "non-match",
+      "notes": "unrelated synthetic image"
+    }
+  ]
+}

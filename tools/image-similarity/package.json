@@ -1,0 +1,20 @@
+{
+  "name": "@servesa/image-similarity",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline fixture generation and phash/scorePair validation (no production writes)",
+  "scripts": {
+    "generate": "ts-node --transpile-only generate-fixtures.ts",
+    "validate": "ts-node --transpile-only validate-fixtures.ts",
+    "run": "npm run generate && npm run validate"
+  },
+  "dependencies": {
+    "image-hash": "^5.3.2",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.2.0"
+  }
+}
