@@ -13,7 +13,7 @@
 | Prior OI tip | `e90fdc0e5f592261e0a73e552890f242eb63c184` |
 | Prior OI cert tip | `405839d` |
 | Deployed SHA (this sprint) | Node 22 functions + storage rules deployed from working tree on `cert/pilot-readiness-hardening` (pre-commit tip `052161e`; final cert SHA recorded after push) |
-| Cert SHA (this document) | _filled after commit/push_ |
+| Cert SHA (this document) |  |
 | GIS resolver revision | `georesolvefunction-00002-kuy` (**unchanged**; still `nodejs20`) |
 | GIS dataset | `mdb-wards-2020-v1` (`servesa-aad53.geo.wards`, **4468** wards, `ST_COVERS`) |
 | Pilot municipality | Template ready — fill `docs/pilot/PILOT_CONFIGURATION_TEMPLATE.md` before go-live |
