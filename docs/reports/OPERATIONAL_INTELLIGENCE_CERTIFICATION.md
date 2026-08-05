@@ -4,7 +4,8 @@
 **Release:** Serve SA Operational Intelligence and Field Productivity Release  
 **Date (UTC):** 2026-08-05  
 **Project:** `servesa-aad53`  
-**Starting SHA (verified):** `2316f2d4704e154d10af4ecf277f8833dc4c907f`  
+**Starting SHA (verified):** `2316f2d4704e154d10af4ecf277f8833dc4c907f`
+**Final repository SHA:** `e90fdc0e5f592261e0a73e552890f242eb63c184`  
 **GIS resolver revision (unchanged):** `georesolvefunction-00002-kuy`  
 **Dataset:** `mdb-wards-2020-v1` (4468 wards, ST_COVERS)
 

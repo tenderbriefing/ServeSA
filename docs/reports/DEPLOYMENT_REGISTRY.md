@@ -7,7 +7,7 @@
 | Project | servesa-aad53 |
 | Branch | main |
 | Starting SHA | `2316f2d4704e154d10af4ecf277f8833dc4c907f` |
-| Deployed SHA | *(see git tip after OI commit)* |
+| Deployed SHA | `e90fdc0e5f592261e0a73e552890f242eb63c184` |
 | Hosting | https://servesa-aad53.web.app (`/report`, `/ops`, `/ops/map`, `/ops/supervisor`, `/field`, `/case`) |
 | Functions region | africa-south1 (Gen2) |
 | GIS dataset | mdb-wards-2020-v1 (4468 wards) |
