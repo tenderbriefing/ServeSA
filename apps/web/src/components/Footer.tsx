@@ -1,81 +1,49 @@
 import Link from 'next/link'
-import { MapPin, Mail, Phone, Globe, Twitter, Facebook, Instagram } from 'lucide-react'
+import { MapPin, Mail } from 'lucide-react'
 
-const quickLinks = [
-  { href: '/report', label: 'Report Issue' },
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/explore', label: 'Explore' },
-  { href: '/community', label: 'Community' },
-  { href: '/messaging', label: 'Messaging' },
-]
-
-const resourceLinks = [
-  { href: '/bulk-report', label: 'Bulk Report' },
-  { href: '/anonymous-report', label: 'Anonymous Report' },
-  { href: '/evidence', label: 'Evidence' },
-  { href: '/training', label: 'Training' },
-  { href: '/budget', label: 'Budget' },
-  { href: '/municipality', label: 'My Municipality' },
+const citizenLinks = [
+  { href: '/report', label: 'Report an Issue' },
+  { href: '/case', label: 'Track a Case' },
+  { href: '/dashboard', label: 'My Cases' },
+  { href: '/notifications', label: 'Notifications' },
 ]
 
 const supportLinks = [
-  { href: '/help', label: 'Help Center' },
-  { href: '/contact', label: 'Contact Us' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/about', label: 'About Us' },
+  { href: '/help', label: 'Help' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Use' },
+  { href: '/auth/signin', label: 'Sign in' },
 ]
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer className="no-print border-t border-border bg-surface-inverse text-ink-inverse">
+      <div className="container py-12">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">ServeSA</span>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-500">
+                <MapPin className="h-4 w-4 text-white" aria-hidden />
+              </span>
+              <span className="text-lg font-semibold">Serve SA</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              Connecting South Africans with quality service delivery. Report
-              issues, track progress, and build better communities.
+            <p className="max-w-sm text-sm leading-relaxed text-slate-300">
+              Report local service issues and track progress with your
+              municipality. Serve SA is a civic reporting platform for South
+              Africa — plain, secure, and designed for everyday use.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://twitter.com"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="https://facebook.com"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://instagram.com"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-            </div>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-300 mb-4">
-              Quick Links
-            </h3>
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-200">
+              For citizens
+            </h2>
             <ul className="space-y-2.5">
-              {quickLinks.map((link) => (
+              {citizenLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-sm text-slate-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
@@ -85,87 +53,36 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-300 mb-4">
-              Resources
-            </h3>
-            <ul className="space-y-2.5">
-              {resourceLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-300 mb-4">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-200">
               Support
-            </h3>
-            <ul className="space-y-2.5 mb-6">
+            </h2>
+            <ul className="mb-6 space-y-2.5">
               {supportLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-sm text-slate-300 transition-colors hover:text-white"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Mail className="w-4 h-4 shrink-0" />
-                <a
-                  href="mailto:support@servesa.co.za"
-                  className="hover:text-white transition-colors"
-                >
-                  support@servesa.co.za
-                </a>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Phone className="w-4 h-4 shrink-0" />
-                <span>+27 11 123 4567</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Globe className="w-4 h-4 shrink-0" />
-                <span>servesa.co.za</span>
-              </div>
+            <div className="flex items-center gap-2 text-sm text-slate-300">
+              <Mail className="h-4 w-4 shrink-0" aria-hidden />
+              <a
+                href="mailto:support@servesa.co.za"
+                className="hover:text-white"
+              >
+                support@servesa.co.za
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-10 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} ServeSA. All rights reserved.
-            </p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              <Link
-                href="/privacy"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/cookies"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Cookie Policy
-              </Link>
-            </div>
-          </div>
+        <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-slate-700 pt-8 text-sm text-slate-400 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} Serve SA. All rights reserved.</p>
+          <p>Built for South African municipalities and the people they serve.</p>
         </div>
       </div>
     </footer>

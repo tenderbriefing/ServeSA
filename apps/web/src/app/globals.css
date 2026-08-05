@@ -2,56 +2,151 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Serve SA design tokens — single source of truth.
+ * Colour channels are stored as space separated RGB so Tailwind can apply
+ * opacity modifiers (bg-primary/10) via rgb(var(--token) / <alpha-value>).
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
-    --radius: 0.5rem;
+    /* Brand — deep navy */
+    --primary-50: 242 247 251;
+    --primary-100: 225 237 246;
+    --primary-200: 187 214 234;
+    --primary-300: 127 177 216;
+    --primary-400: 59 132 191;
+    --primary-500: 20 99 159;
+    --primary-600: 14 76 126;
+    --primary-700: 10 59 99;
+    --primary-800: 7 43 74;
+    --primary-900: 4 24 43;
+
+    /* Brand — civic teal */
+    --secondary-50: 239 250 247;
+    --secondary-100: 220 242 236;
+    --secondary-200: 167 222 208;
+    --secondary-300: 95 194 171;
+    --secondary-400: 18 144 122;
+    --secondary-500: 14 115 97;
+    --secondary-600: 11 92 78;
+    --secondary-700: 8 69 58;
+
+    /* Accent — restrained gold, used sparingly for emphasis and focus */
+    --accent-50: 255 251 235;
+    --accent-100: 253 243 215;
+    --accent-200: 242 223 160;
+    --accent-300: 217 169 60;
+    --accent-400: 192 138 24;
+    --accent-500: 161 98 7;
+    --accent-600: 124 74 5;
+
+    /* Surfaces and ink */
+    --canvas: 247 248 250;
+    --surface: 255 255 255;
+    --surface-muted: 244 246 248;
+    --surface-inverse: 7 43 74;
+    --ink: 22 32 42;
+    --ink-muted: 70 83 95;
+    --ink-subtle: 94 107 120;
+    --ink-inverse: 255 255 255;
+    --border: 217 222 228;
+    --border-strong: 185 193 202;
+
+    /* Semantic states — each has an accessible text colour on its own tint */
+    --success: 20 108 67;
+    --success-tint: 231 245 236;
+    --success-border: 169 214 188;
+    --warning: 161 98 7;
+    --warning-tint: 253 246 227;
+    --warning-border: 235 208 138;
+    --danger: 179 38 30;
+    --danger-tint: 253 236 234;
+    --danger-border: 240 180 175;
+    --info: 14 76 126;
+    --info-tint: 233 242 249;
+    --info-border: 169 200 224;
+
+    /* Shape */
+    --radius-sm: 0.25rem;
+    --radius: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    /* Focus */
+    --focus: 14 76 126;
+    --focus-width: 3px;
+    --focus-offset: 2px;
+
+    /* Motion */
+    --motion-fast: 120ms;
+    --motion-base: 180ms;
+    --motion-slow: 280ms;
+    --motion-ease: cubic-bezier(0.2, 0, 0.13, 1);
+
+    /* Aliases kept for existing shadcn-style primitives */
+    --background: var(--canvas);
+    --foreground: var(--ink);
+    --card: var(--surface);
+    --card-foreground: var(--ink);
+    --popover: var(--surface);
+    --popover-foreground: var(--ink);
+    --primary: var(--primary-600);
+    --primary-foreground: 255 255 255;
+    --secondary: var(--surface-muted);
+    --secondary-foreground: var(--ink);
+    --muted: var(--surface-muted);
+    --muted-foreground: var(--ink-muted);
+    --accent: var(--surface-muted);
+    --accent-foreground: var(--ink);
+    --destructive: var(--danger);
+    --destructive-foreground: 255 255 255;
+    --input: var(--border-strong);
+    --ring: var(--focus);
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+  /*
+   * Ops consoles run on a dark chrome. Tokens are re-pointed rather than
+   * hard-coded so staff surfaces inherit the same scale and contrast rules.
+   */
+  .theme-ops {
+    --canvas: 7 20 32;
+    --surface: 15 28 42;
+    --surface-muted: 22 38 54;
+    --ink: 240 244 248;
+    --ink-muted: 186 197 209;
+    --ink-subtle: 154 168 181;
+    --border: 38 55 72;
+    --border-strong: 61 82 102;
+    --focus: 217 169 60;
+    --success-tint: 12 48 34;
+    --success-border: 24 90 62;
+    --success: 126 214 168;
+    --warning-tint: 54 38 8;
+    --warning-border: 108 76 16;
+    --warning: 240 198 116;
+    --danger-tint: 58 20 17;
+    --danger-border: 112 40 34;
+    --danger: 248 165 158;
+    --info-tint: 12 38 60;
+    --info-border: 26 74 112;
+    --info: 148 197 233;
+    --background: var(--canvas);
+    --foreground: var(--ink);
+    --card: var(--surface);
+    --card-foreground: var(--ink);
+    --popover: var(--surface);
+    --popover-foreground: var(--ink);
+    --primary: 59 132 191;
+    --primary-foreground: 4 24 43;
+    --secondary: var(--surface-muted);
+    --secondary-foreground: var(--ink);
+    --muted: var(--surface-muted);
+    --muted-foreground: var(--ink-muted);
+    --accent: var(--surface-muted);
+    --accent-foreground: var(--ink);
+    --input: var(--border-strong);
+    --ring: var(--focus);
   }
 }
 
@@ -59,35 +154,91 @@
   * {
     @apply border-border;
   }
-  
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
 
   html {
+    /* Never below 16px: smaller base text triggers zoom on mobile Safari. */
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas text-ink;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-ink;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  /*
+   * iOS zooms the viewport when a focused control renders below 16px, so the
+   * floor is enforced on the control itself rather than left to utilities.
+   */
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
+  }
+
+  :focus-visible {
+    outline: var(--focus-width) solid rgb(var(--focus));
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: rgb(var(--primary-100));
+    color: rgb(var(--primary-900));
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-  }
-  
-  .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-  }
-  
-  .card {
-    @apply bg-card text-card-foreground rounded-lg border shadow-sm;
-  }
-  
-  .input-field {
-    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  .container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus-visible {
+    @apply not-sr-only fixed left-4 top-4 z-skiplink rounded-md bg-primary-700 px-4 py-3 text-base font-semibold text-white shadow-md;
+  }
+
+  /* Status dots carry a shape as well as a colour so meaning never relies on hue alone. */
+  .status-dot {
+    @apply inline-block h-2 w-2 shrink-0 rounded-full;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
   }
 }

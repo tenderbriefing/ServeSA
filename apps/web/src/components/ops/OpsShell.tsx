@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { cn } from '@/lib/utils'
+import { Menu, X } from 'lucide-react'
 
 const NAV = [
   { href: '/ops', label: 'Queue' },
@@ -20,6 +21,7 @@ export function OpsShell({ children }: { children: React.ReactNode }) {
   const { user, loading, isOfficial, municipalityCode } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     if (loading) return
@@ -32,30 +34,40 @@ export function OpsShell({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, isOfficial, router])
 
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
   if (loading || !user || !isOfficial) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f1419] text-slate-300">
-        Checking access…
+      <div className="theme-ops flex min-h-screen items-center justify-center bg-canvas text-ink-muted">
+        Checking staff access…
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1419] text-slate-100">
-      <header className="border-b border-slate-800 bg-[#12181f]">
+    <div className="theme-ops min-h-screen bg-canvas text-ink">
+      <a href="#ops-main" className="skip-link">
+        Skip to staff content
+      </a>
+      <header className="sticky top-0 z-sticky border-b border-border bg-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-6">
-            <Link href="/ops" className="font-semibold tracking-tight text-white">
-              ServeSA Ops
+          <div className="flex items-center gap-4">
+            <Link
+              href="/ops"
+              className="font-semibold tracking-tight text-ink"
+            >
+              Serve SA Ops
             </Link>
-            <nav className="flex gap-1">
+            <nav className="hidden gap-1 lg:flex" aria-label="Staff">
               {NAV.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'rounded-md px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white',
-                    pathname === item.href && 'bg-slate-800 text-white'
+                    'inline-flex min-h-touch items-center rounded-md px-3 text-sm text-ink-muted hover:bg-surface-muted hover:text-ink',
+                    pathname === item.href && 'bg-surface-muted text-ink'
                   )}
                 >
                   {item.label}
@@ -63,12 +75,55 @@ export function OpsShell({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
           </div>
-          <div className="text-xs text-slate-400">
-            {municipalityCode || 'No municipality claim'}
+          <div className="flex items-center gap-3">
+            <div className="hidden text-xs text-ink-subtle sm:block">
+              {municipalityCode || 'Municipality claim missing'}
+            </div>
+            <Link
+              href="/"
+              className="hidden text-sm text-ink-muted hover:text-ink sm:inline"
+            >
+              Citizen site
+            </Link>
+            <button
+              type="button"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted lg:hidden"
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? 'Close staff menu' : 'Open staff menu'}
+              onClick={() => setMobileOpen((open) => !open)}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+        {mobileOpen ? (
+          <nav
+            className="border-t border-border px-4 py-3 lg:hidden"
+            aria-label="Staff mobile"
+          >
+            <div className="flex flex-col gap-1">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'min-h-touch rounded-md px-3 py-2 text-sm text-ink-muted hover:bg-surface-muted hover:text-ink',
+                    pathname === item.href && 'bg-surface-muted text-ink'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Link href="/" className="min-h-touch rounded-md px-3 py-2 text-sm">
+                Citizen site
+              </Link>
+            </div>
+          </nav>
+        ) : null}
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main id="ops-main" className="mx-auto max-w-6xl px-4 py-6" tabIndex={-1}>
+        {children}
+      </main>
     </div>
   )
 }
