@@ -1,0 +1,6 @@
+/report 200
+/ops 200
+/ops/map 200
+/ops/supervisor 200
+/field 200
+/case 200
