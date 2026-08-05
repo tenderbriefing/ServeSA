@@ -12,7 +12,7 @@ The mandatory language-selector and US-flag removals are complete and covered by
 
 ## 3. Final SHA
 
-`ffe417c286214ebaf4be254adb87059362445dd2` — replaced immediately after this certification commit lands.
+`2a41a7d75775b8f7ad82dc57cfe67ad10599a38a` — replaced immediately after this certification commit lands.
 
 ## 4. Branch
 
