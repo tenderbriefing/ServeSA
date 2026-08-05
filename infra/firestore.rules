@@ -32,58 +32,45 @@ service cloud.firestore {
              (isOfficial() && request.auth.token.wardId == wardId);
     }
 
-    function isCaseOwner() {
-      return isAuthenticated() && resource.data.reporterUid == request.auth.uid;
-    }
-
-    function publicCaseFieldsOnly() {
-      // Client reads of another user's case are denied; share views go via Cloud Functions.
-      return false;
-    }
-
     match /users/{userId} {
       allow read: if isAuthenticated() && (isOwner(userId) || isOfficial());
       allow create: if isAuthenticated() && isOwner(userId);
-      allow update: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'roles', 'municipalityCode', 'municipalityId', 'departmentId', 'role'
+        ]);
       allow delete: if isAuthenticated() && isAdmin();
     }
 
     match /cases/{caseId} {
-      // Citizens read own cases; officials read within municipality
       allow read: if isAuthenticated() && (
         resource.data.reporterUid == request.auth.uid ||
         (isOfficial() && canAccessMunicipality(resource.data.muniCode))
       );
 
-      // Case creation is performed by Admin SDK (Cloud Functions).
-      // Citizens must not write reporter contact fields directly from the client.
-      allow create: if false;
-
-      // Officials may update operational fields only. Authoritative routing fields
-      // are server-controlled (Admin SDK / reconciliation). Admins may override.
-      allow update: if isAuthenticated() && (
-        isAdmin() ||
-        (
-          isOfficial() &&
-          canAccessMunicipality(resource.data.muniCode) &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-            'wardId',
-            'muniCode',
-            'georesolution',
-            'routingPending',
-            'routingManualOverride',
-            'location',
-            'reporter',
-            'reporterUid',
-            'anonymousSessionId',
-            'clientRequestId'
-          ])
-        )
-      );
-
-      allow delete: if isAuthenticated() && isAdmin();
+      // All case writes are Admin SDK (Cloud Functions) only.
+      allow create, update, delete: if false;
 
       match /events/{eventId} {
+        allow read: if isAuthenticated() && (
+          get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid ||
+          (isOfficial() && canAccessMunicipality(
+            get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode
+          ))
+        );
+        allow create, update, delete: if false;
+      }
+
+      // Municipal staff only — never citizen-readable
+      match /internal_notes/{noteId} {
+        allow read: if isAuthenticated() && isOfficial() && canAccessMunicipality(
+          get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode
+        );
+        allow create, update, delete: if false;
+      }
+
+      // Citizen-visible updates
+      match /public_updates/{updateId} {
         allow read: if isAuthenticated() && (
           get(/databases/$(database)/documents/cases/$(caseId)).data.reporterUid == request.auth.uid ||
           (isOfficial() && canAccessMunicipality(
@@ -96,8 +83,17 @@ service cloud.firestore {
 
     match /municipalities/{muniCode} {
       allow read: if true;
-      allow update: if isAuthenticated() && canAccessMunicipality(muniCode);
-      allow create, delete: if isAuthenticated() && isAdmin();
+      allow create, update, delete: if false;
+
+      match /departments/{departmentId} {
+        allow read: if isAuthenticated() && canAccessMunicipality(muniCode);
+        allow create, update, delete: if false;
+      }
+
+      match /category_department_map/{category} {
+        allow read: if isAuthenticated() && canAccessMunicipality(muniCode);
+        allow create, update, delete: if false;
+      }
     }
 
     match /wards/{wardId} {
@@ -136,7 +132,6 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Idempotency, media metadata, ledger — Admin SDK only
     match /case_idempotency/{id} {
       allow read, write: if false;
     }

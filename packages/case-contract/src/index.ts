@@ -18,6 +18,16 @@ export {
 } from './schema'
 
 export {
+  CaseLifecycleStatusSchema,
+  CASE_STATUS_TRANSITIONS,
+  canTransition,
+  assertTransition,
+  CITIZEN_STATUS_LABEL,
+  OFFICIAL_PRIMARY_ACTION,
+  type CaseLifecycleStatus,
+} from './lifecycle'
+
+export {
   CATEGORY_DEFINITIONS,
   CANONICAL_CATEGORIES,
   mapUiCategoryToCanonical,

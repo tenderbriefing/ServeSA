@@ -32,6 +32,26 @@
         "destination": "/report.html"
       },
       {
+        "source": "/ops",
+        "destination": "/ops.html"
+      },
+      {
+        "source": "/ops/cases",
+        "destination": "/ops/cases.html"
+      },
+      {
+        "source": "/ops/case",
+        "destination": "/ops/case.html"
+      },
+      {
+        "source": "/ops/team",
+        "destination": "/ops/team.html"
+      },
+      {
+        "source": "/ops/settings",
+        "destination": "/ops/settings.html"
+      },
+      {
         "source": "/case",
         "destination": "/case.html"
       },

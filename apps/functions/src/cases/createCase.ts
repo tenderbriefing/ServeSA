@@ -16,6 +16,7 @@ import {
   type GeoresolutionStatus,
 } from '@servesa/case-contract'
 import { georesolveSafe } from '../routing/georesolve'
+import { resolveDepartmentRouting } from '../routing/departmentRouting'
 import { caseCreationLimiter } from '../utils/rateLimit'
 import { logCaseTelemetry } from '../telemetry/caseEvents'
 
@@ -113,6 +114,11 @@ export async function createCase(
     }
 
     const geo = await georesolveSafe(parsed.latitude, parsed.longitude)
+    const deptRouting = await resolveDepartmentRouting({
+      georesolutionStatus: geo.status,
+      municipalityId: geo.municipalityId,
+      category: parsed.category,
+    })
 
     let municipalitySla: any = null
     if (geo.municipalityId) {
@@ -190,6 +196,13 @@ export async function createCase(
         failureReason: geo.failureReason || null,
       },
       routingManualOverride: false,
+      triageQueue: deptRouting.triageQueue,
+      assignedDepartment: deptRouting.assignedDepartment,
+      assignedDepartmentName: deptRouting.departmentName,
+      departmentRouting: {
+        status: deptRouting.departmentRoutingStatus,
+        mappingSource: deptRouting.mappingSource,
+      },
       sla: {
         targetHours: sla.targetHours,
         slaStartedAt: Timestamp.fromDate(sla.slaStartedAt),

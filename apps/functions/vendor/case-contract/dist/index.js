@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTargetHours = exports.calculateSlaFields = exports.DEFAULT_SLA_HOURS = exports.SLA_POLICY_VERSION = exports.isValidSaPhone = exports.normalizeSaPhone = exports.assertSouthAfricaCoords = exports.isWithinSouthAfrica = exports.SA_BOUNDS = exports.isCanonicalCategory = exports.listCitizenCategories = exports.getCategoryDefinition = exports.mapUiCategoryToCanonical = exports.CANONICAL_CATEGORIES = exports.CATEGORY_DEFINITIONS = exports.safeParseCreateCaseInput = exports.parseCreateCaseInput = exports.CreateCaseResponseSchema = exports.CreateCaseInputSchema = exports.GeoresolutionStatusSchema = exports.LocationSourceSchema = exports.PrioritySchema = exports.CanonicalCategorySchema = exports.CONSENT_POLICY_VERSION = exports.CASE_CONTRACT_VERSION = void 0;
+exports.getTargetHours = exports.calculateSlaFields = exports.DEFAULT_SLA_HOURS = exports.SLA_POLICY_VERSION = exports.isValidSaPhone = exports.normalizeSaPhone = exports.assertSouthAfricaCoords = exports.isWithinSouthAfrica = exports.SA_BOUNDS = exports.isCanonicalCategory = exports.listCitizenCategories = exports.getCategoryDefinition = exports.mapUiCategoryToCanonical = exports.CANONICAL_CATEGORIES = exports.CATEGORY_DEFINITIONS = exports.OFFICIAL_PRIMARY_ACTION = exports.CITIZEN_STATUS_LABEL = exports.assertTransition = exports.canTransition = exports.CASE_STATUS_TRANSITIONS = exports.CaseLifecycleStatusSchema = exports.safeParseCreateCaseInput = exports.parseCreateCaseInput = exports.CreateCaseResponseSchema = exports.CreateCaseInputSchema = exports.GeoresolutionStatusSchema = exports.LocationSourceSchema = exports.PrioritySchema = exports.CanonicalCategorySchema = exports.CONSENT_POLICY_VERSION = exports.CASE_CONTRACT_VERSION = void 0;
 var schema_1 = require("./schema");
 Object.defineProperty(exports, "CASE_CONTRACT_VERSION", { enumerable: true, get: function () { return schema_1.CASE_CONTRACT_VERSION; } });
 Object.defineProperty(exports, "CONSENT_POLICY_VERSION", { enumerable: true, get: function () { return schema_1.CONSENT_POLICY_VERSION; } });
@@ -12,6 +12,13 @@ Object.defineProperty(exports, "CreateCaseInputSchema", { enumerable: true, get:
 Object.defineProperty(exports, "CreateCaseResponseSchema", { enumerable: true, get: function () { return schema_1.CreateCaseResponseSchema; } });
 Object.defineProperty(exports, "parseCreateCaseInput", { enumerable: true, get: function () { return schema_1.parseCreateCaseInput; } });
 Object.defineProperty(exports, "safeParseCreateCaseInput", { enumerable: true, get: function () { return schema_1.safeParseCreateCaseInput; } });
+var lifecycle_1 = require("./lifecycle");
+Object.defineProperty(exports, "CaseLifecycleStatusSchema", { enumerable: true, get: function () { return lifecycle_1.CaseLifecycleStatusSchema; } });
+Object.defineProperty(exports, "CASE_STATUS_TRANSITIONS", { enumerable: true, get: function () { return lifecycle_1.CASE_STATUS_TRANSITIONS; } });
+Object.defineProperty(exports, "canTransition", { enumerable: true, get: function () { return lifecycle_1.canTransition; } });
+Object.defineProperty(exports, "assertTransition", { enumerable: true, get: function () { return lifecycle_1.assertTransition; } });
+Object.defineProperty(exports, "CITIZEN_STATUS_LABEL", { enumerable: true, get: function () { return lifecycle_1.CITIZEN_STATUS_LABEL; } });
+Object.defineProperty(exports, "OFFICIAL_PRIMARY_ACTION", { enumerable: true, get: function () { return lifecycle_1.OFFICIAL_PRIMARY_ACTION; } });
 var categories_1 = require("./categories");
 Object.defineProperty(exports, "CATEGORY_DEFINITIONS", { enumerable: true, get: function () { return categories_1.CATEGORY_DEFINITIONS; } });
 Object.defineProperty(exports, "CANONICAL_CATEGORIES", { enumerable: true, get: function () { return categories_1.CANONICAL_CATEGORIES; } });

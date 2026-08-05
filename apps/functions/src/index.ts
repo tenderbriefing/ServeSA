@@ -9,7 +9,16 @@ import { ZodError } from 'zod'
 admin.initializeApp()
 
 import { createCaseCallable, CaseCreationError } from './cases/createCase'
-import { updateCaseStatus } from './cases/updateCaseStatus'
+import {
+  updateCaseStatusOps,
+  assignCaseOps,
+  addInternalNoteOps,
+  addPublicUpdateOps,
+  setOfficialClaimsOps,
+  upsertDepartmentOps,
+  upsertCategoryDepartmentMapOps,
+  OpsError,
+} from './cases/municipalityOps'
 import { getCaseAnalytics } from './cases/getCaseAnalytics'
 import { dedupeCase, getDuplicateCases } from './cases/dedupe'
 import {
@@ -47,6 +56,19 @@ function mapCallableError(error: unknown): never {
       error.message
     )
   }
+  if (error instanceof OpsError) {
+    const code =
+      error.status === 401
+        ? 'unauthenticated'
+        : error.status === 403
+          ? 'permission-denied'
+          : error.status === 404
+            ? 'not-found'
+            : error.status === 409
+              ? 'failed-precondition'
+              : 'invalid-argument'
+    throw new HttpsError(code, error.message)
+  }
   if (error instanceof ZodError) {
     throw new HttpsError(
       'invalid-argument',
@@ -70,7 +92,80 @@ export const createCaseFunction = onCall(async (request) => {
 })
 
 export const updateCaseStatusFunction = onCall(async (request) => {
-  return await updateCaseStatus(request.data)
+  try {
+    return await updateCaseStatusOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const assignCaseFunction = onCall(async (request) => {
+  try {
+    return await assignCaseOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const addInternalNoteFunction = onCall(async (request) => {
+  try {
+    return await addInternalNoteOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const addPublicUpdateFunction = onCall(async (request) => {
+  try {
+    return await addPublicUpdateOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const setOfficialClaimsFunction = onCall(async (request) => {
+  try {
+    return await setOfficialClaimsOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const upsertDepartmentFunction = onCall(async (request) => {
+  try {
+    return await upsertDepartmentOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const upsertCategoryDepartmentMapFunction = onCall(async (request) => {
+  try {
+    return await upsertCategoryDepartmentMapOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 export const getCaseAnalyticsFunction = onCall(async (request) => {
