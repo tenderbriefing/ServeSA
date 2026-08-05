@@ -1,0 +1,49 @@
+{
+  "importer_version": "1.0.0",
+  "dataset_version": "mdb-wards-2020-v1",
+  "gates_pass": true,
+  "status": "certified",
+  "publisher": "Municipal Demarcation Board",
+  "dataset_title": "MDB Wards 2020",
+  "boundary_cycle": "2020-LGE",
+  "source_sha256": "5206e877d08b428bb3136b1a41dd4fe54cd8b49a97f457764bbdd3b664b3c036",
+  "source_url": "https://www.arcgis.com/home/item.html?id=e0223a825ea2481fa72220ad3204276b",
+  "source_gcs_uri": "gs://servesa-aad53-gis-sources/mdb/wards_2020/MDB_Wards_2020_shapefile.zip",
+  "licence": "MDB public Spatial Knowledge Hub publication; attribution to Municipal Demarcation Board required",
+  "bq_quality": {
+    "distinct_ward_id": "4468",
+    "empty_geom": "0",
+    "max_lat": "-22.125030057790863",
+    "max_lng": "32.94498494489935",
+    "min_lat": "-34.83417000334293",
+    "min_lng": "16.4518900004232",
+    "missing_muni": "0",
+    "missing_province": "0",
+    "missing_ward_id": "0",
+    "municipality_count": "213",
+    "null_geom": "0",
+    "province_count": "9",
+    "repaired_count": "4",
+    "row_count": "4468",
+    "invalid_geom": "0",
+    "duplicate_centroid_groups": "0",
+    "wards_sharing_centroid": "0"
+  },
+  "local_validation": {
+    "accepted_rows": 4468,
+    "rejected": 0,
+    "geometry_repaired_count": 4,
+    "unique_municipalities": 213,
+    "unique_provinces": [
+      "Eastern Cape",
+      "Free State",
+      "Gauteng",
+      "KwaZulu-Natal",
+      "Limpopo",
+      "Mpumalanga",
+      "North West",
+      "Northern Cape",
+      "Western Cape"
+    ]
+  }
+}

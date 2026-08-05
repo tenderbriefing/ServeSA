@@ -72,3 +72,13 @@ packages/*/dist/
 # Certification working artifacts
 *.cert.tmp
 apps/functions/lib/
+
+# Authoritative GIS raw binaries (checksums + manifests are committed)
+data/gis/raw/
+data/gis/staging/
+*.shp
+*.shx
+*.dbf
+*.sbn
+*.sbx
+*.cpg

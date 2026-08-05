@@ -1,0 +1,36 @@
+{
+  "importer_version": "1.0.0",
+  "dataset_version": "mdb-wards-2020-v1",
+  "source_file": "/Users/billionaire/Desktop/ServeSA/data/gis/raw/mdb_wards_2020/MDB_Wards_2020_shapefile.zip",
+  "source_format": "shapefile",
+  "source_sha256": "5206e877d08b428bb3136b1a41dd4fe54cd8b49a97f457764bbdd3b664b3c036",
+  "retrieval_timestamp": "2026-08-05T04:42:44Z",
+  "publisher": "Municipal Demarcation Board",
+  "dataset_title": "MDB Wards 2020",
+  "boundary_cycle": "2020-LGE",
+  "licence": "MDB public Spatial Knowledge Hub publication; attribution required",
+  "source_url": "https://www.arcgis.com/home/item.html?id=e0223a825ea2481fa72220ad3204276b",
+  "source_gcs_uri": "gs://servesa-aad53-gis-sources/mdb/wards_2020/MDB_Wards_2020_shapefile.zip",
+  "local_validation": {
+    "input_features": 4468,
+    "accepted_rows": 4468,
+    "rejected": 0,
+    "geometry_repaired_count": 4,
+    "errors_sample": [],
+    "error_count": 0,
+    "unique_provinces": [
+      "Eastern Cape",
+      "Free State",
+      "Gauteng",
+      "KwaZulu-Natal",
+      "Limpopo",
+      "Mpumalanga",
+      "North West",
+      "Northern Cape",
+      "Western Cape"
+    ],
+    "unique_municipalities": 213
+  },
+  "dry_run": true,
+  "status": "dry_run"
+}
