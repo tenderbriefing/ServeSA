@@ -59,8 +59,27 @@ service cloud.firestore {
       // Citizens must not write reporter contact fields directly from the client.
       allow create: if false;
 
-      allow update: if isAuthenticated() && isOfficial() &&
-        canAccessMunicipality(resource.data.muniCode);
+      // Officials may update operational fields only. Authoritative routing fields
+      // are server-controlled (Admin SDK / reconciliation). Admins may override.
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        (
+          isOfficial() &&
+          canAccessMunicipality(resource.data.muniCode) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'wardId',
+            'muniCode',
+            'georesolution',
+            'routingPending',
+            'routingManualOverride',
+            'location',
+            'reporter',
+            'reporterUid',
+            'anonymousSessionId',
+            'clientRequestId'
+          ])
+        )
+      );
 
       allow delete: if isAuthenticated() && isAdmin();
 
