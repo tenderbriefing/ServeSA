@@ -10,55 +10,17 @@ import {
   type CaseLifecycleStatus,
 } from '@servesa/case-contract'
 import { logCaseTelemetry } from '../telemetry/caseEvents'
+import {
+  OpsError,
+  assertOfficial,
+  type AuthCtx,
+} from './municipalityOpsShared'
+
+export { OpsError, assertOfficial }
+export type { AuthCtx }
 
 const db = getFirestore()
 const auth = getAuth()
-
-export class OpsError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-    public readonly status: number = 400
-  ) {
-    super(message)
-    this.name = 'OpsError'
-  }
-}
-
-type AuthCtx = {
-  uid: string
-  token?: Record<string, unknown> | null
-}
-
-function rolesOf(ctx: AuthCtx): string[] {
-  const t = ctx.token || {}
-  const roles = t.roles
-  if (Array.isArray(roles)) return roles.map(String)
-  return []
-}
-
-function municipalityOf(ctx: AuthCtx): string | null {
-  const code = ctx.token?.municipalityCode
-  return code ? String(code) : null
-}
-
-export function assertOfficial(ctx: AuthCtx): {
-  roles: string[]
-  muniCode: string | null
-  isAdmin: boolean
-} {
-  if (!ctx.uid) throw new OpsError('Authentication required', 'unauthenticated', 401)
-  const roles = rolesOf(ctx)
-  const isAdmin = roles.includes('admin')
-  const isOfficial =
-    isAdmin || roles.includes('official') || roles.includes('moderator')
-  if (!isOfficial) throw new OpsError('Official role required', 'permission_denied', 403)
-  const muniCode = municipalityOf(ctx)
-  if (!isAdmin && !muniCode) {
-    throw new OpsError('Municipality claim required', 'permission_denied', 403)
-  }
-  return { roles, muniCode, isAdmin }
-}
 
 async function loadCase(caseId: string) {
   const ref = db.collection('cases').doc(caseId)
@@ -202,6 +164,14 @@ export async function assignCaseOps(
   const { ref, data } = await loadCase(raw.caseId)
   assertSameMunicipality(data, official)
 
+  if (data.operationalLocked && data.incidentLink?.role === 'merged_support') {
+    throw new OpsError(
+      'Case is operationally merged — work the primary incident',
+      'operational_locked',
+      409
+    )
+  }
+
   if (data.routingPending === true || !data.muniCode) {
     throw new OpsError(
       'Cannot assign until authoritative municipality routing succeeds',
@@ -338,9 +308,23 @@ export async function setOfficialClaimsOps(
   if (!official.isAdmin) {
     throw new OpsError('Admin role required', 'permission_denied', 403)
   }
+  const allowedRoles = new Set([
+    'official',
+    'moderator',
+    'admin',
+    'field_worker',
+  ])
   const roles = Array.from(
-    new Set(['official', ...(raw.roles || [])].filter(Boolean).map(String))
+    new Set(
+      (raw.roles || [])
+        .filter(Boolean)
+        .map(String)
+        .filter((r) => allowedRoles.has(r))
+    )
   )
+  if (roles.length === 0) {
+    roles.push('official')
+  }
   if (!raw.municipalityCode?.trim()) {
     throw new OpsError('municipalityCode required', 'validation_failed')
   }
@@ -359,13 +343,13 @@ export async function setOfficialClaimsOps(
         municipalityId: raw.municipalityCode.trim(),
         departmentId: raw.departmentId || null,
         displayName: raw.displayName || null,
-        role: 'official',
+        role: roles.includes('field_worker') ? 'field_worker' : 'official',
         updatedAt: FieldValue.serverTimestamp(),
         updatedBy: ctx.uid,
       },
       { merge: true }
     )
-  return { success: true, uid: raw.uid, municipalityCode: raw.municipalityCode }
+  return { success: true, uid: raw.uid, municipalityCode: raw.municipalityCode, roles }
 }
 
 export async function upsertDepartmentOps(

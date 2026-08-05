@@ -57,3 +57,10 @@ Municipality Operations MVP is live at `/ops`. Privileged case mutations are ser
 - ADR: `docs/architecture/ADR_MUNICIPALITY_OPERATIONS.md`
 - Onboarding: `docs/runbooks/MUNICIPALITY_ONBOARDING.md`
 - User guide: `docs/runbooks/MUNICIPAL_USER_GUIDE.md`
+
+
+## Addendum — Operational Intelligence (2026-08-05)
+
+- `/ops` is now Smart Work Queue; supervisor board + map + field mode added.
+- Duplicate review + citizen_confirmed path exercised in OI smoke.
+- See `docs/reports/OPERATIONAL_INTELLIGENCE_CERTIFICATION.md`.

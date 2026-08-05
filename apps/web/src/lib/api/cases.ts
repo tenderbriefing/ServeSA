@@ -52,11 +52,13 @@ export class CasesAPI {
     const fileData = await Promise.all(
       files.map(async (file) => {
         const base64 = await this.fileToBase64(file)
+        const contentHash = await this.sha256Hex(file)
         return {
           name: file.name,
           type: file.type,
           size: file.size,
           data: base64,
+          contentHash,
         }
       })
     )
@@ -86,6 +88,26 @@ export class CasesAPI {
       timeWindow,
     })
     return result.data
+  }
+
+  async citizenConfirm(caseId: string, confirmed: boolean, reason?: string, rating?: number) {
+    const fn = httpsCallable(functions, 'citizenConfirmResolutionFunction')
+    const result = await fn({ caseId, confirmed, reason, rating })
+    return result.data
+  }
+
+  async getCitizenTimeline(caseId: string) {
+    const fn = httpsCallable(functions, 'getCitizenTimelineFunction')
+    const result = await fn({ caseId })
+    return result.data
+  }
+
+  private async sha256Hex(file: File): Promise<string> {
+    const buf = await file.arrayBuffer()
+    const hash = await crypto.subtle.digest('SHA-256', buf)
+    return Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
   }
 
   private fileToBase64(file: File): Promise<string> {

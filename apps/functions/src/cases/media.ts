@@ -1,12 +1,15 @@
 /**
  * Case media upload — only against an existing owned case.
  * Paths: cases/{caseId}/media/{fileName}
+ * Triggers async image intelligence after successful store (fail-open).
  */
 
 import * as admin from 'firebase-admin'
+import * as crypto from 'crypto'
 import { getFirestore, FieldValue } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
 import { logCaseTelemetry } from '../telemetry/caseEvents'
+import { runImageIntelligenceForMedia } from '../intelligence/imageDuplicate'
 
 const db = getFirestore()
 const storage = getStorage()
@@ -142,6 +145,9 @@ export const processMediaUpload = async (
         }
 
         validateFile(file)
+        if (file.size <= 0 && !file.data) {
+          throw new Error('Empty file rejected')
+        }
         const processed = await processFile(file, caseId, userId || 'anonymous')
         mediaUrls.push(processed.url)
       } catch (error) {
@@ -218,11 +224,19 @@ async function processFile(
   file: { name: string; type: string; size: number; data: string; contentHash?: string },
   caseId: string,
   userId: string
-): Promise<{ name: string; type: string; size: number; url: string }> {
+): Promise<{ name: string; type: string; size: number; url: string; mediaId: string }> {
   const timestamp = Date.now()
   const fileName = `cases/${caseId}/media/${timestamp}_${sanitizeFileName(file.name)}`
-  const downloadToken = require('crypto').randomUUID()
+  const downloadToken = crypto.randomUUID()
   const fileBuffer = Buffer.from(file.data, 'base64')
+  // Server-authoritative content hash — do not trust client alone
+  const contentHash = crypto.createHash('sha256').update(fileBuffer).digest('hex')
+  if (file.contentHash && file.contentHash !== contentHash) {
+    console.warn('client contentHash mismatch; using server hash', {
+      caseId,
+      client: file.contentHash.slice(0, 12),
+    })
+  }
   const bucket = storage.bucket()
   const fileRef = bucket.file(fileName)
 
@@ -233,6 +247,7 @@ async function processFile(
         caseId,
         userId,
         originalName: file.name,
+        contentHash,
         uploadedAt: new Date().toISOString(),
         firebaseStorageDownloadTokens: downloadToken,
       },
@@ -243,25 +258,35 @@ async function processFile(
   const encodedPath = encodeURIComponent(fileName)
   const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`
 
-  await db.collection('case_media').add({
+  const mediaRef = await db.collection('case_media').add({
     caseId,
     fileName,
     originalName: file.name,
     type: file.type,
     size: file.size,
+    byteLength: fileBuffer.length,
     url: downloadUrl,
     storagePath: fileName,
-    contentHash: file.contentHash || null,
+    contentHash,
     processingStatus: 'stored',
+    intelligenceStatus: 'pending',
     uploadedBy: userId,
     uploadedAt: FieldValue.serverTimestamp(),
   })
+
+  // Fingerprint + duplicate recommendation — fail-open, within upload timeout
+  try {
+    await runImageIntelligenceForMedia(mediaRef.id)
+  } catch (err) {
+    console.error('image intelligence failure (non-blocking)', mediaRef.id, err)
+  }
 
   return {
     name: file.name,
     type: file.type,
     size: file.size,
     url: downloadUrl,
+    mediaId: mediaRef.id,
   }
 }
 

@@ -52,6 +52,18 @@
         "destination": "/ops/settings.html"
       },
       {
+        "source": "/ops/map",
+        "destination": "/ops/map.html"
+      },
+      {
+        "source": "/ops/supervisor",
+        "destination": "/ops/supervisor.html"
+      },
+      {
+        "source": "/field",
+        "destination": "/field.html"
+      },
+      {
         "source": "/case",
         "destination": "/case.html"
       },

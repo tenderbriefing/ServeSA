@@ -178,3 +178,10 @@ Atomic `case_created` event recorded under the case.
 ## 22. Updated certification report path
 
 `docs/reports/CASE_CREATION_PRODUCTION_CERTIFICATION.md`
+
+
+## Addendum — Operational Intelligence (2026-08-05)
+
+- Mandatory image enforced in `/report` UI; `media.required=true` on create.
+- Durable create-before-media retained; intelligence fail-open.
+- See `docs/reports/OPERATIONAL_INTELLIGENCE_CERTIFICATION.md`.

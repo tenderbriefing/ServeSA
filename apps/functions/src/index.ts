@@ -19,6 +19,22 @@ import {
   upsertCategoryDepartmentMapOps,
   OpsError,
 } from './cases/municipalityOps'
+import {
+  reviewDuplicateRecommendationOps,
+  unlinkCasesOps,
+  citizenConfirmResolutionOps,
+  getCitizenTimelineOps,
+} from './cases/duplicateReview'
+import {
+  listSmartWorkQueueOps,
+  listSupervisorBoardOps,
+  listMapCasesOps,
+  listFieldJobsOps,
+  startFieldWorkOps,
+  proposeFieldCompletionOps,
+  searchOpsCasesOps,
+} from './cases/opsQueues'
+import { runImageIntelligenceForCase } from './intelligence/imageDuplicate'
 import { getCaseAnalytics } from './cases/getCaseAnalytics'
 import { dedupeCase, getDuplicateCases } from './cases/dedupe'
 import {
@@ -168,6 +184,146 @@ export const upsertCategoryDepartmentMapFunction = onCall(async (request) => {
   }
 })
 
+export const reviewDuplicateFunction = onCall(async (request) => {
+  try {
+    return await reviewDuplicateRecommendationOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const unlinkCasesFunction = onCall(async (request) => {
+  try {
+    return await unlinkCasesOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const citizenConfirmResolutionFunction = onCall(async (request) => {
+  try {
+    return await citizenConfirmResolutionOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getCitizenTimelineFunction = onCall(async (request) => {
+  try {
+    return await getCitizenTimelineOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listSmartWorkQueueFunction = onCall(async (request) => {
+  try {
+    return await listSmartWorkQueueOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listSupervisorBoardFunction = onCall(async (request) => {
+  try {
+    return await listSupervisorBoardOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listMapCasesFunction = onCall(async (request) => {
+  try {
+    return await listMapCasesOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listFieldJobsFunction = onCall(async (request) => {
+  try {
+    return await listFieldJobsOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const startFieldWorkFunction = onCall(async (request) => {
+  try {
+    return await startFieldWorkOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const proposeFieldCompletionFunction = onCall(async (request) => {
+  try {
+    return await proposeFieldCompletionOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const searchOpsCasesFunction = onCall(async (request) => {
+  try {
+    return await searchOpsCasesOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const runImageIntelligenceFunction = onCall(
+  { memory: '1GiB', timeoutSeconds: 180 },
+  async (request) => {
+    try {
+      const token = request.auth?.token as Record<string, unknown> | undefined
+      const roles = (token?.roles as string[] | undefined) || []
+      if (!request.auth || !roles.some((r) => r === 'admin' || r === 'official' || r === 'moderator')) {
+        throw new HttpsError('permission-denied', 'Official role required')
+      }
+      const caseId = String(request.data?.caseId || '')
+      if (!caseId) throw new HttpsError('invalid-argument', 'caseId required')
+      await runImageIntelligenceForCase(caseId)
+      return { success: true, caseId }
+    } catch (error) {
+      mapCallableError(error)
+    }
+  }
+)
+
 export const getCaseAnalyticsFunction = onCall(async (request) => {
   return await getCaseAnalytics(request.data)
 })
@@ -182,7 +338,7 @@ export const getDuplicateCasesFunction = onCall(async (request) => {
 
 /** Client callable for base64 media upload after durable case creation */
 export const uploadMediaFunction = onCall(
-  { memory: '512MiB', timeoutSeconds: 120 },
+  { memory: '1GiB', timeoutSeconds: 180 },
   async (request) => {
     return await processMediaUpload({
       caseId: request.data.caseId,

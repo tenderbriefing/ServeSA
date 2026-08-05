@@ -114,13 +114,22 @@ export default function ReportPage() {
   const canProceedStep3 = Boolean(
     state.reporter.name.trim().length >= 2 &&
       (state.reporter.email.trim() || state.reporter.phone.trim()) &&
-      state.consent.dataProcessing
+      state.consent.dataProcessing &&
+      photos.length >= 1
   )
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []).filter((f) =>
-      f.type.startsWith('image/')
-    )
+    const files = Array.from(event.target.files || []).filter((f) => {
+      const okType = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+        'image/heic',
+        'image/heif',
+      ].includes(f.type)
+      return okType && f.size > 0 && f.size <= 10 * 1024 * 1024
+    })
     setPhotos((prev) => [...prev, ...files].slice(0, 5))
   }
 
@@ -177,6 +186,13 @@ export default function ReportPage() {
     setIsSubmitting(true)
     trackReportEvent('submission_started')
 
+    if (photos.length < 1) {
+      setSubmitError('At least one photo of the issue is required.')
+      submitLock.current = false
+      setIsSubmitting(false)
+      return
+    }
+
     try {
       const created = await casesAPI.createCase(payload as any)
       setResult(created)
@@ -184,32 +200,31 @@ export default function ReportPage() {
         georesolutionStatus: created.georesolutionStatus,
       })
 
-      // Media after durable case id
-      if (photos.length > 0) {
-        setMediaStatus('uploading')
-        trackReportEvent('media_upload_started', { count: photos.length })
-        try {
-          const mediaResult = await casesAPI.uploadMedia(created.caseId, photos)
-          setMediaStatus(mediaResult.status)
-          if (!mediaResult.success) {
-            setMediaError(
-              mediaResult.error || 'Photos could not be uploaded. You can retry.'
-            )
-          }
-          trackReportEvent('media_upload_completed', {
-            status: mediaResult.status,
-          })
-        } catch (mediaErr) {
-          setMediaStatus('failed')
+      // Mandatory media after durable case id
+      setMediaStatus('uploading')
+      trackReportEvent('media_upload_started', { count: photos.length })
+      try {
+        const mediaResult = await casesAPI.uploadMedia(created.caseId, photos)
+        setMediaStatus(mediaResult.status)
+        if (!mediaResult.success) {
           setMediaError(
-            mediaErr instanceof Error
-              ? mediaErr.message
-              : 'Photo upload failed. Your case was still created.'
+            mediaResult.error ||
+              'Photos could not be uploaded. Your case was created — please retry photos.'
           )
         }
+        trackReportEvent('media_upload_completed', {
+          status: mediaResult.status,
+        })
+      } catch (mediaErr) {
+        setMediaStatus('failed')
+        setMediaError(
+          mediaErr instanceof Error
+            ? mediaErr.message
+            : 'Photo upload failed. Your case was still created — please retry.'
+        )
       }
 
-      // Duplicate assessment — non-blocking
+      // Duplicate assessment — non-blocking advisory (legacy geo+text)
       try {
         await casesAPI.checkDuplicates(created.caseId)
         trackReportEvent('duplicate_assessment_completed')
@@ -506,21 +521,23 @@ export default function ReportPage() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photos (optional)
+          Photos <span className="text-red-600">*</span>
         </label>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
           <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
           <p className="text-sm text-gray-600 mb-2">
-            Up to 5 images, max 10MB each. Photos upload after your case is created.
+            At least one photo is required. Up to 5 images, JPEG/PNG/WebP/HEIC, max 10MB
+            each. Your case is saved first, then photos upload securely.
           </p>
           <input
             type="file"
             multiple
-            accept="image/jpeg,image/png,image/webp,image/heic"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
             onChange={handlePhotoUpload}
             className="hidden"
             id="photo-upload"
             data-testid="photo-upload"
+            required
           />
           <label htmlFor="photo-upload" className="cursor-pointer inline-block">
             <span className="inline-flex items-center px-3 py-2 border rounded-md text-sm min-h-[44px]">
@@ -529,8 +546,12 @@ export default function ReportPage() {
             </span>
           </label>
         </div>
-        {photos.length > 0 && (
+        {photos.length > 0 ? (
           <p className="text-sm text-gray-600 mt-2">{photos.length} photo(s) selected</p>
+        ) : (
+          <p className="text-sm text-amber-700 mt-2">
+            Add at least one clear photo of the issue to submit.
+          </p>
         )}
       </div>
 

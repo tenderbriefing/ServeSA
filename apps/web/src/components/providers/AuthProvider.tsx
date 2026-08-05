@@ -91,7 +91,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isOfficial =
     mergedRoles.includes('official') ||
     mergedRoles.includes('admin') ||
-    mergedRoles.includes('moderator')
+    mergedRoles.includes('moderator') ||
+    mergedRoles.includes('field_worker')
   const isAdmin = mergedRoles.includes('admin')
 
   return (

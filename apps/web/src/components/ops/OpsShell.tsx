@@ -7,10 +7,13 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { cn } from '@/lib/utils'
 
 const NAV = [
-  { href: '/ops', label: 'Dashboard' },
+  { href: '/ops', label: 'Queue' },
   { href: '/ops/cases', label: 'Cases' },
+  { href: '/ops/map', label: 'Map' },
+  { href: '/ops/supervisor', label: 'Supervisor' },
   { href: '/ops/team', label: 'Team' },
   { href: '/ops/settings', label: 'Settings' },
+  { href: '/field', label: 'Field' },
 ]
 
 export function OpsShell({ children }: { children: React.ReactNode }) {

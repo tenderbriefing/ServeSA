@@ -225,9 +225,27 @@ export async function createCase(
         consentedAt: FieldValue.serverTimestamp(),
       },
       media: {
-        status: 'none',
+        status: 'pending',
+        required: true,
         count: 0,
         paths: [],
+      },
+      imageIntelligence: {
+        status: 'pending',
+        version: null,
+      },
+      duplicateReview: {
+        status: 'none',
+        recommendation: 'none',
+        confidence: 'none',
+        candidates: [],
+        anomaly: false,
+        decision: null,
+      },
+      incidentLink: {
+        primaryCaseId: null,
+        linkedCaseIds: [],
+        role: 'standalone',
       },
       duplicateAssessment: {
         status: 'pending',

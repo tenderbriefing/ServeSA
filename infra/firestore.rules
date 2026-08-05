@@ -15,7 +15,7 @@ service cloud.firestore {
     }
 
     function isOfficial() {
-      return hasRole(['official', 'moderator', 'admin']);
+      return hasRole(['official', 'moderator', 'admin', 'field_worker']);
     }
 
     function isAdmin() {
@@ -61,9 +61,9 @@ service cloud.firestore {
         allow create, update, delete: if false;
       }
 
-      // Municipal staff only — never citizen-readable
+      // Municipal staff only — never citizen-readable (field workers may read own muni notes if official-scoped)
       match /internal_notes/{noteId} {
-        allow read: if isAuthenticated() && isOfficial() && canAccessMunicipality(
+        allow read: if isAuthenticated() && hasRole(['official', 'moderator', 'admin']) && canAccessMunicipality(
           get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode
         );
         allow create, update, delete: if false;
