@@ -4,6 +4,7 @@ import {
   injectSyntheticAuth,
   UAT_TOKENS,
   hasToken,
+  waitForAuthSettled,
 } from './helpers/uat'
 
 /**
@@ -27,6 +28,7 @@ test.describe('Official UAT @pilot', () => {
   test('work queue UI structure when official token present', async ({ page }) => {
     test.skip(!hasToken('official'), 'PILOT_UAT_OFFICIAL_TOKEN not set')
     await expectPageLoads(page, '/ops')
+    await waitForAuthSettled(page)
     await expect(
       page.getByRole('heading', { name: /smart work queue/i })
     ).toBeVisible({ timeout: 25_000 })

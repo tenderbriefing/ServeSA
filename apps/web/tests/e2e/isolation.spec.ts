@@ -4,6 +4,7 @@ import {
   injectSyntheticAuth,
   UAT_TOKENS,
   hasToken,
+  waitForAuthSettled,
 } from './helpers/uat'
 
 /**
@@ -66,6 +67,7 @@ test.describe('Isolation UAT @pilot', () => {
     test.skip(!token?.trim(), 'PILOT_UAT_OFFICIAL_CPT_TOKEN / PILOT_UAT_OFFICIAL_TOKEN not set')
     await injectSyntheticAuth(page, token)
     await expectPageLoads(page, '/ops')
+    await waitForAuthSettled(page)
     // Soft check: municipality claim chrome may appear; foreign muni codes must not
     // be mixed in client-visible queue without server filter (server is source of truth).
     const body = await page.locator('body').innerText()

@@ -4,6 +4,7 @@ import {
   injectSyntheticAuth,
   UAT_TOKENS,
   hasToken,
+  waitForAuthSettled,
 } from './helpers/uat'
 
 /**
@@ -28,6 +29,7 @@ test.describe('Supervisor UAT @pilot', () => {
       'PILOT_UAT_SUPERVISOR_TOKEN / PILOT_UAT_OFFICIAL_TOKEN not set'
     )
     await expectPageLoads(page, '/ops/supervisor')
+    await waitForAuthSettled(page)
     await expect(
       page.getByRole('heading', { name: /supervisor operations board/i })
     ).toBeVisible({ timeout: 25_000 })

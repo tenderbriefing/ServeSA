@@ -44,6 +44,19 @@ export async function expectPageLoads(page: Page, path: string) {
   await expect(page.locator('body')).toBeVisible()
 }
 
+/** Wait until AuthProvider finishes optional UAT bootstrap (loading gate clears). */
+export async function waitForAuthSettled(page: Page, timeoutMs = 25_000) {
+  await page.waitForFunction(
+    () => {
+      const body = document.body?.innerText || ''
+      // Still bootstrapping
+      if (/checking access/i.test(body)) return false
+      return true
+    },
+    { timeout: timeoutMs }
+  )
+}
+
 /** Skip auth-dependent block when synthetic token missing (CI-safe). */
 export function skipWithoutToken(role: keyof typeof UAT_TOKENS, reason?: string) {
   test.skip(

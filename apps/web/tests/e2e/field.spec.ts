@@ -4,6 +4,7 @@ import {
   injectSyntheticAuth,
   UAT_TOKENS,
   hasToken,
+  waitForAuthSettled,
 } from './helpers/uat'
 
 /**
@@ -28,6 +29,7 @@ test.describe('Field UAT @pilot', () => {
       'PILOT_UAT_FIELD_TOKEN / PILOT_UAT_OFFICIAL_TOKEN not set'
     )
     await expectPageLoads(page, '/field')
+    await waitForAuthSettled(page)
     await expect(page.getByRole('heading', { name: /^field$/i })).toBeVisible({
       timeout: 25_000,
     })
