@@ -1,0 +1,237 @@
+{
+  "releases": [
+    {
+      "name": "projects/servesa-aad53/sites/servesa-aad53/releases/1785944369195000",
+      "version": {
+        "name": "projects/servesa-aad53/sites/servesa-aad53/versions/3af9a65002876d20",
+        "status": "FINALIZED",
+        "config": {
+          "headers": [
+            {
+              "headers": {
+                "X-Frame-Options": "DENY",
+                "X-Content-Type-Options": "nosniff",
+                "Permissions-Policy": "camera=(self), microphone=(), geolocation=(self)"
+              },
+              "glob": "**"
+            }
+          ],
+          "rewrites": [
+            {
+              "glob": "/report",
+              "path": "/report.html"
+            },
+            {
+              "glob": "/ops",
+              "path": "/ops.html"
+            },
+            {
+              "glob": "/ops/cases",
+              "path": "/ops/cases.html"
+            },
+            {
+              "glob": "/ops/case",
+              "path": "/ops/case.html"
+            },
+            {
+              "glob": "/ops/team",
+              "path": "/ops/team.html"
+            },
+            {
+              "glob": "/ops/settings",
+              "path": "/ops/settings.html"
+            },
+            {
+              "glob": "/ops/map",
+              "path": "/ops/map.html"
+            },
+            {
+              "glob": "/ops/supervisor",
+              "path": "/ops/supervisor.html"
+            },
+            {
+              "glob": "/field",
+              "path": "/field.html"
+            },
+            {
+              "glob": "/case",
+              "path": "/case.html"
+            },
+            {
+              "glob": "/dashboard",
+              "path": "/dashboard.html"
+            },
+            {
+              "glob": "/explore",
+              "path": "/explore.html"
+            },
+            {
+              "glob": "/community",
+              "path": "/community.html"
+            },
+            {
+              "glob": "/auth",
+              "path": "/auth.html"
+            },
+            {
+              "glob": "/help",
+              "path": "/help.html"
+            },
+            {
+              "glob": "/privacy",
+              "path": "/privacy.html"
+            },
+            {
+              "glob": "/terms",
+              "path": "/terms.html"
+            },
+            {
+              "glob": "/case/**",
+              "path": "/case.html"
+            }
+          ],
+          "cleanUrls": true,
+          "trailingSlashBehavior": "REMOVE"
+        },
+        "labels": {
+          "deployment-tool": "cli-firebase"
+        },
+        "createTime": "2026-08-05T15:32:51.751619Z",
+        "createUser": {
+          "email": "github-actions-deploy@servesa-aad53.iam.gserviceaccount.com",
+          "imageUrl": "https://lh3.googleusercontent.com/a-/ALV-UjVdOoxUxQ7GX8Jzb7dWJ1SDToYuAzdZ2enk_NT8I3y5WY8eihA"
+        },
+        "finalizeTime": "2026-08-05T15:32:57.574802Z",
+        "finalizeUser": {
+          "email": "github-actions-deploy@servesa-aad53.iam.gserviceaccount.com",
+          "imageUrl": "https://lh3.googleusercontent.com/a-/ALV-UjVdOoxUxQ7GX8Jzb7dWJ1SDToYuAzdZ2enk_NT8I3y5WY8eihA"
+        },
+        "fileCount": "139",
+        "versionBytes": "1305441"
+      },
+      "type": "ROLLBACK",
+      "releaseTime": "2026-08-05T15:39:29.195Z",
+      "releaseUser": {
+        "email": "smartprocure.ai@gmail.com",
+        "imageUrl": "https://lh3.googleusercontent.com/a/ACg8ocLHGLqha6C87or9hiNdVeY_HwmVJQezjp7-_r8bix4zTpNlOQ=mo"
+      }
+    },
+    {
+      "name": "projects/servesa-aad53/sites/servesa-aad53/releases/1785944357111000",
+      "version": {
+        "name": "projects/servesa-aad53/sites/servesa-aad53/versions/ad480fa224d9b7cb",
+        "status": "FINALIZED",
+        "config": {
+          "headers": [
+            {
+              "headers": {
+                "X-Frame-Options": "DENY",
+                "X-Content-Type-Options": "nosniff",
+                "Permissions-Policy": "camera=(self), microphone=(), geolocation=(self)"
+              },
+              "glob": "**"
+            }
+          ],
+          "rewrites": [
+            {
+              "glob": "/report",
+              "path": "/report.html"
+            },
+            {
+              "glob": "/ops",
+              "path": "/ops.html"
+            },
+            {
+              "glob": "/ops/cases",
+              "path": "/ops/cases.html"
+            },
+            {
+              "glob": "/ops/case",
+              "path": "/ops/case.html"
+            },
+            {
+              "glob": "/ops/team",
+              "path": "/ops/team.html"
+            },
+            {
+              "glob": "/ops/settings",
+              "path": "/ops/settings.html"
+            },
+            {
+              "glob": "/ops/map",
+              "path": "/ops/map.html"
+            },
+            {
+              "glob": "/ops/supervisor",
+              "path": "/ops/supervisor.html"
+            },
+            {
+              "glob": "/field",
+              "path": "/field.html"
+            },
+            {
+              "glob": "/case",
+              "path": "/case.html"
+            },
+            {
+              "glob": "/dashboard",
+              "path": "/dashboard.html"
+            },
+            {
+              "glob": "/explore",
+              "path": "/explore.html"
+            },
+            {
+              "glob": "/community",
+              "path": "/community.html"
+            },
+            {
+              "glob": "/auth",
+              "path": "/auth.html"
+            },
+            {
+              "glob": "/help",
+              "path": "/help.html"
+            },
+            {
+              "glob": "/privacy",
+              "path": "/privacy.html"
+            },
+            {
+              "glob": "/terms",
+              "path": "/terms.html"
+            },
+            {
+              "glob": "/case/**",
+              "path": "/case.html"
+            }
+          ],
+          "cleanUrls": true,
+          "trailingSlashBehavior": "REMOVE"
+        },
+        "labels": {
+          "deployment-tool": "cli-firebase"
+        },
+        "createTime": "2026-08-05T11:13:08.228807Z",
+        "createUser": {
+          "email": "smartprocure.ai@gmail.com",
+          "imageUrl": "https://lh3.googleusercontent.com/a/ACg8ocLHGLqha6C87or9hiNdVeY_HwmVJQezjp7-_r8bix4zTpNlOQ=mo"
+        },
+        "finalizeTime": "2026-08-05T11:13:14.349719Z",
+        "finalizeUser": {
+          "email": "smartprocure.ai@gmail.com",
+          "imageUrl": "https://lh3.googleusercontent.com/a/ACg8ocLHGLqha6C87or9hiNdVeY_HwmVJQezjp7-_r8bix4zTpNlOQ=mo"
+        },
+        "fileCount": "139",
+        "versionBytes": "1301728"
+      },
+      "type": "ROLLBACK",
+      "releaseTime": "2026-08-05T15:39:17.111Z",
+      "releaseUser": {
+        "email": "smartprocure.ai@gmail.com",
+        "imageUrl": "https://lh3.googleusercontent.com/a/ACg8ocLHGLqha6C87or9hiNdVeY_HwmVJQezjp7-_r8bix4zTpNlOQ=mo"
+      }
+    }
+  ],
+  "nextPageToken": "Cg1zZXJ2ZXNhLWFhZDUzENiJ-pfpiZYD"
+}

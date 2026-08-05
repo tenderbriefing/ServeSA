@@ -1,0 +1,95 @@
+{
+  "unique_jhb": {
+    "wardId": "79800060",
+    "wardName": "JHB_60",
+    "wardNumber": "60",
+    "municipalityId": "JHB",
+    "municipalityName": "City of Johannesburg Metropolitan Municipality",
+    "districtCode": "JHB",
+    "districtName": "City of Johannesburg",
+    "province": "Gauteng",
+    "confidence": 1,
+    "cached": true,
+    "status": "polygon_match",
+    "method": "st_covers",
+    "datasetVersion": "mdb-wards-2020-v1",
+    "boundaryCycle": "2020-LGE",
+    "resolvedAt": "2026-08-05T05:00:35.464Z",
+    "routingSource": "authoritative_gis",
+    "candidateCount": 1,
+    "failureReason": null,
+    "errorClass": null
+  },
+  "unresolved_ocean": {
+    "wardId": null,
+    "wardName": null,
+    "wardNumber": null,
+    "municipalityId": null,
+    "municipalityName": null,
+    "districtCode": null,
+    "districtName": null,
+    "province": null,
+    "confidence": 0,
+    "cached": false,
+    "datasetVersion": null,
+    "boundaryCycle": null,
+    "resolvedAt": "2026-08-05T17:19:56.655Z",
+    "routingSource": "none",
+    "candidateCount": 0,
+    "failureReason": "coordinates_outside_south_africa",
+    "errorClass": "outside_bounds",
+    "status": "unresolved",
+    "method": "bounds_check"
+  },
+  "outside_bounds": {
+    "wardId": null,
+    "wardName": null,
+    "wardNumber": null,
+    "municipalityId": null,
+    "municipalityName": null,
+    "districtCode": null,
+    "districtName": null,
+    "province": null,
+    "confidence": 0,
+    "cached": false,
+    "datasetVersion": null,
+    "boundaryCycle": null,
+    "resolvedAt": "2026-08-05T17:19:57.013Z",
+    "routingSource": "none",
+    "candidateCount": 0,
+    "failureReason": "coordinates_outside_south_africa",
+    "errorClass": "outside_bounds",
+    "status": "unresolved",
+    "method": "bounds_check"
+  },
+  "create_case": {
+    "caseId": "CASE-MSGCR6IJ-6EA0FS",
+    "routingPending": false
+  },
+  "runtime_revision": "nodejs22\tgeoresolvefunction-00004-yoh",
+  "protected_prior": "georesolvefunction-00002-kuy",
+  "captured_utc": "2026-08-05T17:19:59Z",
+  "create_case_full": {
+    "caseId": "CASE-MSGCRN8Z-RN7CD2",
+    "reference": "CASE-MSGCRN8Z-RN7CD2",
+    "shareUrl": "https://servesa-aad53.web.app/case/CASE-MSGCRN8Z-RN7CD2",
+    "status": "submitted",
+    "municipality": {
+      "id": "JHB",
+      "name": "City of Johannesburg Metropolitan Municipality"
+    },
+    "ward": {
+      "id": "79800060",
+      "name": "JHB_60",
+      "number": "60"
+    },
+    "slaTarget": "2026-08-12T17:20:19.571Z",
+    "targetHours": 168,
+    "georesolutionStatus": "polygon_match",
+    "mediaUploadPath": "cases/CASE-MSGCRN8Z-RN7CD2/media",
+    "routingPending": false,
+    "duplicateAssessment": {
+      "status": "pending"
+    }
+  }
+}

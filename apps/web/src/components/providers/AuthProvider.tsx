@@ -115,13 +115,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const bootstrapUat = async () => {
       const raw = window.__PILOT_UAT_ID_TOKEN?.trim()
       if (!raw) {
+        // No UAT payload — rely solely on onAuthStateChanged (incl. persistence).
+        // Do NOT clear loading here: auth.currentUser is often still null before
+        // IndexedDB restore, and OpsShell would redirect to /auth/signin.
         uatBootstrapDone = true
-        if (!auth.currentUser && !cancelled) setLoading(false)
         return
       }
       try {
         if (!auth.currentUser) {
-          if (raw.startsWith('eyJ')) {
+          // JWT custom tokens have three base64url segments separated by '.'.
+          // Password payloads are base64url JSON and often also start with "eyJ".
+          const isJwt = raw.split('.').length === 3
+          if (isJwt) {
             await signInWithCustomToken(auth, raw)
           } else {
             const padded = raw.replace(/-/g, '+').replace(/_/g, '/')

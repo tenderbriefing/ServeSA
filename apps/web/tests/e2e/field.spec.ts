@@ -1,20 +1,15 @@
 import { test, expect } from '@playwright/test'
 import {
   expectPageLoads,
-  injectSyntheticAuth,
+  signInAndGoto,
   UAT_TOKENS,
   hasToken,
-  waitForAuthSettled,
 } from './helpers/uat'
 
 /**
  * Field worker UAT — /field.
  */
 test.describe('Field UAT @pilot', () => {
-  test.beforeEach(async ({ page }) => {
-    await injectSyntheticAuth(page, UAT_TOKENS.field || UAT_TOKENS.official)
-  })
-
   test('field page loads (sign-in gate or field chrome) @pilot', async ({ page }) => {
     await expectPageLoads(page, '/field')
     const gateOrField = page
@@ -28,10 +23,9 @@ test.describe('Field UAT @pilot', () => {
       !(hasToken('field') || hasToken('official')),
       'PILOT_UAT_FIELD_TOKEN / PILOT_UAT_OFFICIAL_TOKEN not set'
     )
-    await expectPageLoads(page, '/field')
-    await waitForAuthSettled(page)
+    await signInAndGoto(page, UAT_TOKENS.field || UAT_TOKENS.official, '/field')
     await expect(page.getByRole('heading', { name: /^field$/i })).toBeVisible({
-      timeout: 25_000,
+      timeout: 30_000,
     })
   })
 
