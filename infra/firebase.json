@@ -75,7 +75,7 @@
   },
   "functions": {
     "source": "apps/functions",
-    "runtime": "nodejs20",
+    "runtime": "nodejs22",
     "region": "africa-south1",
     "codebase": "default"
   },

@@ -26,14 +26,19 @@
     "headers:apply": "bash ./infra/scripts/14_hosting_headers.sh",
     "pilot:points": "ts-node tools/pilot/generate_pilot_points.ts --muni JHB,CPT,TSH --perWard 20 --out pilot_out/pilot_points",
     "pilot:benchmark": "ts-node tools/pilot/benchmark_georesolve.ts --points pilot_out/pilot_points.csv --out pilot_out/benchmark --threshold 0.95",
-    "pilot:evidence": "ts-node tools/pilot/evidence_pack.ts --benchmark pilot_out/benchmark/summary.json --points pilot_out/pilot_points.geojson --out pilot_out/evidence"
+    "pilot:evidence": "ts-node tools/pilot/evidence_pack.ts --benchmark pilot_out/benchmark/summary.json --points pilot_out/pilot_points.geojson --out pilot_out/evidence",
+    "test:e2e": "playwright test",
+    "test:e2e:pilot": "playwright test --grep @pilot",
+    "test:image-similarity": "npm run run -w @servesa/image-similarity",
+    "test:load:synthetic": "npx tsc tools/loadtest/synthetic_load_bench.ts --outDir tools/loadtest --esModuleInterop --module commonjs --target es2020 --skipLibCheck && node tools/loadtest/synthetic_load_bench.js"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",
+    "@playwright/test": "^1.40.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/helpers": "^6.5.0",
     "@turf/random": "^6.5.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.0.0",
     "@types/node-fetch": "^2.6.0",
     "eslint": "^8.0.0",
     "playwright": "^1.40.0",
@@ -43,7 +48,7 @@
     "typescript": "^5.2.0"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22",
     "npm": ">=9.0.0"
   }
 }
