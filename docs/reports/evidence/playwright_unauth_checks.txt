@@ -1,0 +1,28 @@
+(node:57433) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 2 tests using 2 workers
+
+[1A[2K(node:57435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:57434) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:57435) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+[1A[2K(node:57434) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+[1A[2K(node:57434) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:57435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/2] [chromium] › apps/web/tests/e2e/official.spec.ts:34:7 › Official UAT @pilot › unauthenticated ops does not render municipality case rows @pilot
+[1A[2K[2/2] [chromium] › apps/web/tests/e2e/field.spec.ts:32:7 › Field UAT @pilot › unauthenticated field does not list job cards @pilot
+[1A[2K  2 passed (2.5s)

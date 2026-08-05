@@ -1,0 +1,130 @@
+
+> @servesa/web@1.0.0 build
+> next build
+
+   ▲ Next.js 15.5.2
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully in 2.9s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/34) ...
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/map. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+react-i18next:: You will need to pass in an i18next instance by using initReactI18next
+ ⚠ Unsupported metadata viewport is configured in metadata export in /bulk-report. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+react-i18next:: You will need to pass in an i18next instance by using initReactI18next
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/cases. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/case. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /case. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/supervisor. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/settings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /evidence. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /community/guidelines. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /community. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /explore. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Generating static pages (8/34) 
+   Generating static pages (16/34) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /report. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /terms. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /privacy. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /training. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /ops/team. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /budget. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/data. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /help. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /municipality. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /field. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /auth/signin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /notifications. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /auth. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Generating static pages (25/34) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /messaging. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ✓ Generating static pages (34/34)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /anonymous-report. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Finalizing page optimization ...
+   Collecting build traces ...
+   Exporting (0/2) ...
+ ✓ Exporting (2/2)
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    5.03 kB         247 kB
+├ ○ /_not-found                            993 B         103 kB
+├ ○ /admin                               4.59 kB         113 kB
+├ ○ /admin/dashboard                     5.07 kB         241 kB
+├ ○ /admin/data                          7.44 kB         243 kB
+├ ○ /anonymous-report                    8.23 kB         273 kB
+├ ○ /auth                                5.01 kB         273 kB
+├ ○ /auth/signin                         4.79 kB         278 kB
+├ ○ /budget                              6.29 kB         148 kB
+├ ○ /bulk-report                         6.55 kB         272 kB
+├ ○ /case                                4.35 kB         259 kB
+├ ○ /community                           10.3 kB         256 kB
+├ ○ /community/guidelines                5.24 kB         114 kB
+├ ○ /dashboard                           3.12 kB         261 kB
+├ ○ /evidence                            6.95 kB         253 kB
+├ ○ /explore                             4.68 kB         113 kB
+├ ○ /field                                2.5 kB         269 kB
+├ ○ /help                                5.94 kB         115 kB
+├ ○ /messaging                           7.31 kB         276 kB
+├ ○ /municipality                          307 B         252 kB
+├ ○ /notifications                         15 kB         251 kB
+├ ○ /ops                                 3.05 kB         276 kB
+├ ○ /ops/case                            3.96 kB         292 kB
+├ ○ /ops/cases                            2.6 kB         276 kB
+├ ○ /ops/map                             3.11 kB         276 kB
+├ ○ /ops/settings                        2.54 kB         275 kB
+├ ○ /ops/supervisor                       2.3 kB         275 kB
+├ ○ /ops/team                            1.84 kB         275 kB
+├ ○ /privacy                             1.16 kB         103 kB
+├ ○ /report                              10.9 kB         266 kB
+├ ○ /terms                               1.29 kB         103 kB
+└ ○ /training                            8.24 kB         127 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/18-3c6bdb50985778b1.js        45.8 kB
+  ├ chunks/87c73c54-0375ba195de27293.js  54.2 kB
+  └ other shared chunks (total)          1.93 kB
+
+
+○  (Static)  prerendered as static content
+

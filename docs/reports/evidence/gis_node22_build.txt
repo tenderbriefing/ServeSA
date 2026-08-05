@@ -1,0 +1,8 @@
+
+> @servesa/functions@1.0.0 build
+> npm run build -w @servesa/case-contract && mkdir -p vendor/case-contract && cp ../../packages/case-contract/package.json vendor/case-contract/ && rm -rf vendor/case-contract/dist && cp -R ../../packages/case-contract/dist vendor/case-contract/ && tsc -p tsconfig.deploy.json
+
+
+> @servesa/case-contract@1.0.0 build
+> tsc -p tsconfig.json
+
