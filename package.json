@@ -31,7 +31,8 @@
     "test:e2e:pilot": "playwright test --grep @pilot",
     "pilot:uat-identities": "node tools/pilot/provision_uat_identities.js",
     "test:image-similarity": "npm run run -w @servesa/image-similarity",
-    "test:load:synthetic": "npx tsc tools/loadtest/synthetic_load_bench.ts --outDir tools/loadtest --esModuleInterop --module commonjs --target es2020 --skipLibCheck && node tools/loadtest/synthetic_load_bench.js"
+    "test:load:synthetic": "npx tsc tools/loadtest/synthetic_load_bench.ts --outDir tools/loadtest --esModuleInterop --module commonjs --target es2020 --skipLibCheck && node tools/loadtest/synthetic_load_bench.js",
+    "test:uiux-unit": "npm run test:unit -w @servesa/web"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",

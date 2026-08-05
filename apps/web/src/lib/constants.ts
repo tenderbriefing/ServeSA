@@ -91,15 +91,6 @@ export const PRIORITY_LEVELS = {
   urgent: 'urgent',
 } as const
 
-// Supported Languages
-export const SUPPORTED_LANGUAGES = {
-  en: 'English',
-  zu: 'isiZulu',
-  xh: 'isiXhosa',
-  af: 'Afrikaans',
-  st: 'Sesotho',
-} as const
-
 // API Endpoints
 export const API_ENDPOINTS = {
   base: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://africa-south1-servesa-aad53.cloudfunctions.net',
