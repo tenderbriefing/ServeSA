@@ -9,13 +9,14 @@
 
 # PASS WITH CONDITIONS
 
-Production platform enablement unblocked the prior FAIL. Blaze billing is linked and active. GitHub secret `SERVICE_ACCOUNT` authenticates as `firebase-adminsdk-fbsvc@servesa-aad53.iam.gserviceaccount.com` against project `servesa-aad53`. Gen2 Cloud Functions (including `createCaseFunction`, `onCaseCreated`, `georesolveFunction`, `uploadMediaFunction`) are live in `africa-south1`. Next.js `/report` is served from Firebase Hosting (static export of the certified wizard), replacing the September 2025 marketing site. Synthetic production case creation succeeds with server SLA, atomic `case_created` event, idempotent retry, and notification ledger entries.
+Geospatial Routing Certification Sprint closed the prior GIS polygon and dedupe-index conditions. Authoritative MDB Wards 2020 (4 468 polygons) are loaded in `servesa-aad53.geo.wards` (`mdb-wards-2020-v1`). Production `createCase` returns unique `polygon_match` with `routingPending=false` for in-ward coordinates (smoke `CASE-MSFMCCIU-JN1FTG` → ward `79800060` / JHB), and remains fail-safe unresolved for no-match points (`CASE-MSFMCXRF-1QNS4Z`). Deduplication composites are READY. Case creation, SLA fields, idempotency, media path, and notification ledger remain production-verified.
 
-**Conditions (non-waivable for full georesolution / media perfection):**
-1. BigQuery `servesa-aad53.geo.wards` exists but contains **0** authoritative polygons — georesolution correctly returns `unresolved` + `routingPending=true` (no fabricated municipalities).
-2. Duplicate assessment requires the new Firestore composite index on `cases(category, status, createdAt)` to finish building before advisory dedupe queries succeed.
-3. Media upload path verified with Firebase download tokens (no `signBlob`).
-4. SLA breach engine is **intentionally not deployed** until GIS conditions clear for a full PASS.
+**Remaining conditions:**
+1. OIDC/WIF migration for GitHub `SERVICE_ACCOUNT` — non-blocking (`docs/security/OIDC_WIF_MIGRATION.md`).
+2. MDB ArcGIS item `licenseInfo` empty — public MDB publication with required attribution; legal confirmation recommended.
+3. SLA breach engine is **intentionally not deployed** (out of scope).
+
+Full geospatial evidence: `docs/reports/GEOSPATIAL_ROUTING_CERTIFICATION.md`.
 
 ---
 
@@ -26,11 +27,11 @@ Production platform enablement unblocked the prior FAIL. Blaze billing is linked
 
 ## 3. Final local SHA
 
-`01f4bfc1c3af94725a63eca5ad64ad24e5482044`
+`01b9e4c` (Geospatial Routing Certification tip on `main`)
 
 ## 4. Deployed SHA
 
-`24970a228841ceb47ab1d751a09890ae5d88281d` (runtime Functions/Hosting from enablement commit; tip `01f4bfc` is docs SHA stamp only).
+`01b9e4c` / functions source `d709073` — `createcasefunction-00003-qem`, `georesolvefunction-00002-kuy`.
 
 ## 5. Billing verification
 
@@ -106,7 +107,7 @@ Also granted Gen2 agent bindings (`pubsub.publisher` on GCS SA, `iam.serviceAcco
 | Row count | **0** |
 | Ingestion tooling | `infra/scripts/bq_wards_ingest.sh` (validate / dry-run / MERGE; no fabrication) |
 | Sample-polygon scripts | `04_bq_create_geo.sh` / `05_bq_load_wards.sh` refuse production unless `ALLOW_SAMPLE_POLYGONS=1` |
-| Production georesolution cert | **BLOCKED** until authoritative MDB/Stats SA polygons are loaded |
+| Production georesolution cert | **CLEARED** — see GEOSPATIAL_ROUTING_CERTIFICATION.md |
 
 ## 12. Hosting release
 
