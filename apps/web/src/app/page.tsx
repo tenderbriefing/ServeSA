@@ -1,217 +1,201 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
-import { 
-  MapPin, 
-  AlertTriangle, 
-  Clock, 
-  Users, 
-  Shield, 
-  BarChart3,
+import {
   ArrowRight,
-  CheckCircle
+  Camera,
+  CheckCircle2,
+  FileSearch,
+  MapPin,
+  Shield,
 } from 'lucide-react'
-import { AuthGate } from '@/components/Auth/AuthGate'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { useAuth } from '@/hooks/useAuth'
+import { Spinner } from '@/components/ui/LoadingSkeleton'
+
+const categories = [
+  {
+    name: 'Water & sanitation',
+    description: 'Leaks, sewer overflows, no water',
+  },
+  {
+    name: 'Electricity',
+    description: 'Outages, exposed cables, street lights',
+  },
+  {
+    name: 'Roads & infrastructure',
+    description: 'Potholes, storm damage, traffic signs',
+  },
+  {
+    name: 'Waste management',
+    description: 'Missed collection, illegal dumping',
+  },
+]
 
 export default function HomePage() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <Spinner label="Loading Serve SA…" />
+  }
+
   return (
-    <AuthGate>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white">
-        <div className="container mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge variant="outline" className="mb-4">
-                🚀 Pilot Ready
-              </Badge>
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Report Municipal Issues
-                <span className="text-primary-600 block">Instantly</span>
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                ServeSA connects citizens with local government to report and track service delivery issues. 
-                Get real-time updates on your reports and see the impact in your community.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/report">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    Report an Issue
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/explore">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                    Explore Cases
-                  </Button>
-                </Link>
-              </div>
+    <div className="bg-canvas">
+      <section className="border-b border-border bg-surface">
+        <div className="container grid items-center gap-12 py-14 lg:grid-cols-2 lg:py-20">
+          <div>
+            <Badge
+              variant="outline"
+              className="mb-4 border-secondary-200 bg-secondary-50 text-secondary-700"
+            >
+              Civic reporting for South Africa
+            </Badge>
+            <h1 className="text-4xl font-bold tracking-tight text-ink sm:text-5xl">
+              Report local service issues and track progress.
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-ink-muted">
+              Serve SA helps you tell your municipality about service delivery
+              problems, keep a reference number, and follow updates. Response
+              times depend on the responsible authority — we do not invent
+              promises we cannot keep.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/report">
+                <Button size="lg" className="w-full min-h-touch sm:w-auto">
+                  Report an Issue
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                </Button>
+              </Link>
+              <Link href={user ? '/dashboard' : '/case'}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full min-h-touch sm:w-auto"
+                >
+                  {user ? 'View My Cases' : 'Track a Case'}
+                </Button>
+              </Link>
             </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-8 text-white">
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-6 h-6" />
-                    <span className="font-semibold">Johannesburg, Ward 58</span>
-                  </div>
-                  <h3 className="text-xl font-bold">Water Leak Reported</h3>
-                  <p className="text-primary-100">Main street pipe burst affecting 50+ households</p>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="secondary">High Priority</Badge>
-                    <span className="text-sm">2 hours ago</span>
+            <ul className="mt-8 grid gap-3 text-sm text-ink-muted sm:grid-cols-2">
+              <li className="flex items-start gap-2">
+                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-secondary-600" aria-hidden />
+                Secure submission with a case reference
+              </li>
+              <li className="flex items-start gap-2">
+                <Camera className="mt-0.5 h-4 w-4 shrink-0 text-secondary-600" aria-hidden />
+                Photos required so officials can act
+              </li>
+              <li className="flex items-start gap-2">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-secondary-600" aria-hidden />
+                Location by map, address, or device GPS
+              </li>
+              <li className="flex items-start gap-2">
+                <FileSearch className="mt-0.5 h-4 w-4 shrink-0 text-secondary-600" aria-hidden />
+                Track progress with your reference number
+              </li>
+            </ul>
+          </div>
+
+          <Card className="border-border shadow-md">
+            <CardHeader>
+              <CardTitle className="text-xl">What happens next</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {[
+                {
+                  step: '1',
+                  title: 'Describe the issue',
+                  body: 'Choose a category, add a clear title and description, and attach at least one photo.',
+                },
+                {
+                  step: '2',
+                  title: 'Confirm the place',
+                  body: 'Pin the location on a map, search an address, or use your device location inside South Africa.',
+                },
+                {
+                  step: '3',
+                  title: 'Get a reference',
+                  body: 'After submission you receive a case reference. Use it to track progress or follow up.',
+                },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-700 text-sm font-semibold text-white">
+                    {item.step}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-ink">{item.title}</p>
+                    <p className="mt-1 text-sm text-ink-muted">{item.body}</p>
                   </div>
                 </div>
+              ))}
+              <div className="rounded-md border border-info-border bg-info-tint p-3 text-sm text-info">
+                <p className="font-medium">Is Serve SA official?</p>
+                <p className="mt-1">
+                  Serve SA is a civic platform that routes reports to municipal
+                  teams. It is not a replacement for emergency services — if
+                  someone is in immediate danger, call the appropriate emergency
+                  number.
+                </p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              How ServeSA Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Simple, fast, and transparent reporting system for municipal service delivery
+      <section className="border-b border-border bg-surface-muted/60 py-16">
+        <div className="container">
+          <div className="mx-auto mb-10 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold text-ink">Common report types</h2>
+            <p className="mt-3 text-ink-muted">
+              Start with the category that best matches what you see. You can
+              refine details in the report form.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center border-0 shadow-lg">
-              <CardHeader>
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertTriangle className="w-8 h-8 text-primary-600" />
-                </div>
-                <CardTitle>1. Report Issue</CardTitle>
-                <CardDescription>
-                  Take a photo and describe the problem. Our AI helps categorize and prioritize your report.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center border-0 shadow-lg">
-              <CardHeader>
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-primary-600" />
-                </div>
-                <CardTitle>2. Track Progress</CardTitle>
-                <CardDescription>
-                  Get real-time updates on your case status, estimated resolution time, and progress notifications.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="text-center border-0 shadow-lg">
-              <CardHeader>
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-primary-600" />
-                </div>
-                <CardTitle>3. Issue Resolved</CardTitle>
-                <CardDescription>
-                  Receive confirmation when your issue is resolved and see the impact on your community.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-primary-600 text-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold mb-2">4,237</div>
-              <div className="text-primary-100">Cases Reported</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold mb-2">89%</div>
-              <div className="text-primary-100">Resolution Rate</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold mb-2">24h</div>
-              <div className="text-primary-100">Avg Response Time</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold mb-2">156</div>
-              <div className="text-primary-100">Active Wards</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Report Any Issue
-            </h2>
-            <p className="text-xl text-gray-600">
-              From water leaks to road damage, we handle all municipal service requests
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { name: 'Water & Sewage', count: 1247, sla: '24h', color: 'bg-blue-100 text-blue-600' },
-              { name: 'Electricity', count: 892, sla: '4h', color: 'bg-yellow-100 text-yellow-600' },
-              { name: 'Roads & Infrastructure', count: 2156, sla: '72h', color: 'bg-gray-100 text-gray-600' },
-              { name: 'Waste Management', count: 634, sla: '48h', color: 'bg-green-100 text-green-600' },
-              { name: 'Digital Services', count: 156, sla: '168h', color: 'bg-purple-100 text-purple-600' },
-              { name: 'Emergency Services', count: 89, sla: '1h', color: 'bg-red-100 text-red-600' }
-            ].map((category) => (
-              <Link key={category.name} href={`/report?category=${category.name.toLowerCase().replace(/\s+/g, '-')}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${category.color}`}>
-                        <MapPin className="w-6 h-6" />
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {category.sla}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg group-hover:text-primary-600 transition-colors">
-                      {category.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="text-sm text-gray-500">
-                      {category.count.toLocaleString()} reports
-                    </div>
-                  </CardContent>
-                </Card>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {categories.map((category) => (
+              <Link
+                key={category.name}
+                href="/report"
+                className="rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
+              >
+                <h3 className="font-semibold text-ink">{category.name}</h3>
+                <p className="mt-2 text-sm text-ink-muted">
+                  {category.description}
+                </p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-            Ready to Make a Difference?
-          </h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of citizens who are actively improving their communities through ServeSA
-          </p>
-          <Link href="/report">
-            <Button size="lg" variant="secondary">
-              Start Reporting Now
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </Link>
+      <section className="py-16">
+        <div className="container">
+          <div className="mx-auto max-w-3xl rounded-xl border border-border bg-surface p-8 text-center shadow-sm sm:p-10">
+            <CheckCircle2 className="mx-auto h-10 w-10 text-secondary-600" aria-hidden />
+            <h2 className="mt-4 text-2xl font-bold text-ink">
+              Already reported something?
+            </h2>
+            <p className="mt-3 text-ink-muted">
+              Enter your case reference to see the latest status, or sign in to
+              view every case linked to your account.
+            </p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/case">
+                <Button variant="outline" className="w-full min-h-touch sm:w-auto">
+                  Track a Case
+                </Button>
+              </Link>
+              <Link href={user ? '/dashboard' : '/auth/signin'}>
+                <Button className="w-full min-h-touch sm:w-auto">
+                  {user ? 'Open My Cases' : 'Sign in'}
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
-      </div>
-    </AuthGate>
+    </div>
   )
 }

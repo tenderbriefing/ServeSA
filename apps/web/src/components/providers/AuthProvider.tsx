@@ -10,7 +10,6 @@ import {
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { UserProfile } from '@/types'
-import '@/i18n/config'
 
 declare global {
   interface Window {

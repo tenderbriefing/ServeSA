@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   AlertTriangle,
-  ArrowLeft,
   Camera,
   CheckCircle,
   Copy,
@@ -14,6 +13,10 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { LocationStep } from '@/components/Report/LocationStep'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { Stepper } from '@/components/ui/Stepper'
+import { AlertBanner } from '@/components/ui/AlertBanner'
+import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { useAuth } from '@/hooks/useAuth'
 import { casesAPI } from '@/lib/api/cases'
 import {
@@ -240,7 +243,7 @@ export default function ReportPage() {
       setSubmitError(
         error instanceof Error
           ? error.message
-          : 'Failed to submit case. Please try again.'
+          : 'We could not submit your report. Your answers are saved on this device — check your connection and try again.'
       )
       submitLock.current = false
     } finally {
@@ -288,11 +291,7 @@ export default function ReportPage() {
   }
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-      </div>
-    )
+    return <Spinner label="Preparing the report form…" />
   }
 
   const renderStep1 = () => (
@@ -504,14 +503,20 @@ export default function ReportPage() {
             <input
               id="phone"
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               data-testid="reporter-phone"
               value={state.reporter.phone}
               onChange={(e) =>
                 update({ reporter: { ...state.reporter, phone: e.target.value } })
               }
               placeholder="082 123 4567"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+              aria-describedby="phone-hint"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px] text-base"
             />
+            <p id="phone-hint" className="mt-1 text-xs text-ink-subtle">
+              Enter a South African mobile number, such as 082 123 4567.
+            </p>
           </div>
           {fieldErrors.reporter && (
             <p className="text-sm text-red-600">{fieldErrors.reporter}</p>
@@ -526,8 +531,9 @@ export default function ReportPage() {
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
           <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
           <p className="text-sm text-gray-600 mb-2">
-            At least one photo is required. Up to 5 images, JPEG/PNG/WebP/HEIC, max 10MB
-            each. Your case is saved first, then photos upload securely.
+            At least one clear photo is required so officials can see the issue.
+            You may add up to 5 images (JPEG, PNG, WebP or HEIC), max 10MB each.
+            Your case is saved first, then photos upload securely.
           </p>
           <input
             type="file"
@@ -652,9 +658,10 @@ export default function ReportPage() {
             </div>
           </div>
           {result.routingPending && (
-            <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-2">
-              Municipality routing is still being confirmed for this location.
-            </p>
+            <AlertBanner variant="warning" className="text-left">
+              We are confirming which authority should receive this report. Your
+              case reference is valid while that happens.
+            </AlertBanner>
           )}
         </div>
 
@@ -693,51 +700,23 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 min-h-[44px]">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Report an Issue</h1>
-          <p className="text-gray-600">
-            Help improve your community by reporting service delivery issues
-            {!user && ' — sign-in optional'}
-          </p>
-        </div>
+    <div className="min-h-screen bg-canvas">
+      <div className="container py-8">
+        <PageHeader
+          title="Report an Issue"
+          description="Describe the problem, confirm the place, add at least one photo, and submit. Sign-in is optional."
+          breadcrumbs={[
+            { href: '/', label: 'Home' },
+            { label: 'Report an Issue' },
+          ]}
+        />
 
         {state.step < 4 && (
-          <div className="mb-8" aria-label={`Step ${state.step} of 3`}>
-            <div className="flex items-center justify-between">
-              {[1, 2, 3].map((stepNumber) => (
-                <div key={stepNumber} className="flex items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                      state.step >= stepNumber
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                    aria-current={state.step === stepNumber ? 'step' : undefined}
-                  >
-                    {stepNumber}
-                  </div>
-                  {stepNumber < 3 && (
-                    <div
-                      className={`w-16 h-1 mx-2 ${
-                        state.step > stepNumber ? 'bg-primary-600' : 'bg-gray-200'
-                      }`}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between mt-2 text-sm text-gray-600">
-              <span>What</span>
-              <span>Where</span>
-              <span>Who</span>
-            </div>
-          </div>
+          <Stepper
+            className="mb-8 max-w-2xl"
+            current={state.step}
+            steps={['What', 'Where', 'Who & photos']}
+          />
         )}
 
         <div className="max-w-2xl mx-auto">

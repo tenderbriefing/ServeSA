@@ -52,7 +52,7 @@ export default function TermsPage() {
 
         <h2>6. Limitation of Liability</h2>
         <p>
-          ServeSA is provided "as is" without warranties. We are not liable for 
+          ServeSA is provided &quot;as is&quot; without warranties. We are not liable for 
           any damages arising from the use of the platform, including but not 
           limited to service delivery issues or communication problems.
         </p>

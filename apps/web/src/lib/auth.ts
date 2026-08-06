@@ -83,7 +83,7 @@ export const signUpWithEmail = async (
   password: string, 
   userData: {
     displayName: string;
-    municipalityCode: string;
+    municipalityCode?: string;
     phone?: string;
   }
 ): Promise<User> => {

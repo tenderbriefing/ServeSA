@@ -72,20 +72,20 @@
         "destination": "/dashboard.html"
       },
       {
-        "source": "/explore",
-        "destination": "/explore.html"
-      },
-      {
-        "source": "/community",
-        "destination": "/community.html"
-      },
-      {
         "source": "/auth",
         "destination": "/auth.html"
       },
       {
+        "source": "/auth/signin",
+        "destination": "/auth/signin.html"
+      },
+      {
         "source": "/help",
         "destination": "/help.html"
+      },
+      {
+        "source": "/notifications",
+        "destination": "/notifications.html"
       },
       {
         "source": "/privacy",

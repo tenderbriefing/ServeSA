@@ -252,7 +252,7 @@ export function HelpCenter() {
             <CardHeader>
               <CardTitle>Need More Help?</CardTitle>
               <CardDescription>
-                Can't find what you're looking for? Contact our support team
+                Can&apos;t find what you&apos;re looking for? Contact our support team
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
