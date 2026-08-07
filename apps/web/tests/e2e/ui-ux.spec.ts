@@ -25,10 +25,10 @@ test.describe('UI/UX transformation @uiux', () => {
     expect(html.toLowerCase()).not.toContain('languageswitcher')
   })
 
-  test('header, report, auth, and help never expose language controls', async ({
+  test('header, report, auth, and case never expose language controls', async ({
     page,
   }) => {
-    for (const path of ['/', '/report', '/auth', '/auth/signin', '/help', '/case']) {
+    for (const path of ['/', '/report', '/auth', '/auth/signin', '/case']) {
       await page.goto(path, { waitUntil: 'domcontentloaded' })
       await expect(page.getByText('🇺🇸')).toHaveCount(0)
       await expect(page.locator('[data-testid="language-switcher"]')).toHaveCount(0)
@@ -56,7 +56,7 @@ test.describe('UI/UX transformation @uiux', () => {
     await expect(menu.getByRole('link', { name: 'Report' })).toBeVisible()
     await expect(menu.getByRole('link', { name: 'Track' })).toBeVisible()
     await expect(menu.getByRole('link', { name: 'My Cases' })).toBeVisible()
-    await expect(menu.getByRole('link', { name: 'Help' })).toBeVisible()
+    await expect(menu.getByRole('link', { name: 'Help' })).toHaveCount(0)
     await expect(menu.getByText('🇺🇸')).toHaveCount(0)
 
     await page.keyboard.press('Escape')

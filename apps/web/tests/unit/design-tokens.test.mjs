@@ -41,10 +41,10 @@ test('globals.css defines the same SA anchors as RGB channels', () => {
   assert.match(globals, /--neutral-50:\s*250\s+248\s+243/)
 })
 
-test('citizen primary nav is Report / Track / My Cases / Help', () => {
+test('citizen primary nav is Report / Track / My Cases', () => {
   assert.match(header, /label:\s*'Report'/)
   assert.match(header, /label:\s*'Track'/)
   assert.match(header, /label:\s*'My Cases'/)
-  assert.match(header, /label:\s*'Help'/)
+  assert.doesNotMatch(header, /label:\s*'Help'/)
   assert.doesNotMatch(header, /Explore|Community|Messaging|Budget/)
 })

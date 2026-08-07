@@ -6,7 +6,6 @@ const navLinks = [
   { href: '/report', label: 'Report an Issue' },
   { href: '/case', label: 'Track a Case' },
   { href: '/dashboard', label: 'My Cases' },
-  { href: '/help', label: 'Help' },
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/terms', label: 'Terms of Use' },
   { href: '/auth/signin', label: 'Sign In' },

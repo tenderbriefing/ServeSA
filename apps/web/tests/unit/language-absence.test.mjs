@@ -69,7 +69,7 @@ test('citizen navigation labels are present in Header', () => {
   assert.match(header, /label:\s*'Report'/)
   assert.match(header, /label:\s*'Track'/)
   assert.match(header, /label:\s*'My Cases'/)
-  assert.match(header, /label:\s*'Help'/)
+  assert.doesNotMatch(header, /label:\s*'Help'/)
   assert.doesNotMatch(header, /LanguageSwitcher/)
   assert.doesNotMatch(header, /GIS|georesolution/i)
 })
