@@ -94,14 +94,17 @@ function preprocessCreateCaseInput(raw: unknown): unknown {
     }
   }
 
-  // Normalise empty optional strings
-  if (input.address === '') input.address = undefined
-  if (input.subcategory === '') input.subcategory = undefined
+  // Normalise empty/null optional strings (JSON/Firestore often emit null)
+  if (input.address === '' || input.address === null) input.address = undefined
+  if (input.subcategory === '' || input.subcategory === null) {
+    input.subcategory = undefined
+  }
 
   if (input.reporter && typeof input.reporter === 'object') {
     const reporter = { ...(input.reporter as Record<string, unknown>) }
-    if (reporter.email === '') reporter.email = undefined
-    if (reporter.phone === '') reporter.phone = undefined
+    if (reporter.email === '' || reporter.email === null) reporter.email = undefined
+    if (reporter.phone === '' || reporter.phone === null) reporter.phone = undefined
+    if (reporter.name === null) reporter.name = ''
     input.reporter = reporter
   }
 

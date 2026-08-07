@@ -1,0 +1,46 @@
+(node:36089) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:36090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36090) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:36090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › apps/web/tests/e2e/enterprise_report_live.spec.ts:35:7 › Enterprise live citizen report @enterprise › authenticated homepage → report → submit yields Case ID (3.1m)
+
+
+  1) [chromium] › apps/web/tests/e2e/enterprise_report_live.spec.ts:35:7 › Enterprise live citizen report @enterprise › authenticated homepage → report → submit yields Case ID 
+
+    [31mTest timeout of 120000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m failed
+
+    Locator:  getByText(/CASE-[A-Z0-9-]+/).first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  90000ms
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 90000ms[22m
+    [2m  - waiting for getByText(/CASE-[A-Z0-9-]+/).first()[22m
+
+
+       98 |
+       99 |     const caseIdLocator = page.getByText(/CASE-[A-Z0-9-]+/).first()
+    > 100 |     await expect(caseIdLocator).toBeVisible({ timeout: 90_000 })
+          |                                 ^
+      101 |     const caseIdText = (await caseIdLocator.innerText()).match(
+      102 |       /CASE-[A-Z0-9-]+/
+      103 |     )?.[0]
+        at /Users/billionaire/Desktop/ServeSA/apps/web/tests/e2e/enterprise_report_live.spec.ts:100:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/enterprise_report_live-Ent-bbd93-ort-→-submit-yields-Case-ID-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/enterprise_report_live-Ent-bbd93-ort-→-submit-yields-Case-ID-chromium/error-context.md
+
+  1 failed
+    [chromium] › apps/web/tests/e2e/enterprise_report_live.spec.ts:35:7 › Enterprise live citizen report @enterprise › authenticated homepage → report → submit yields Case ID 

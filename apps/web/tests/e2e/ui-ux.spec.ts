@@ -1,5 +1,5 @@
 import { test, expect, devices } from '@playwright/test'
-import { expectPageLoads } from './helpers/uat'
+import { expectPageLoads, waitForClientHydration } from './helpers/uat'
 
 /**
  * UI/UX transformation certification tests.
@@ -43,10 +43,14 @@ test.describe('UI/UX transformation @uiux', () => {
   }) => {
     await page.setViewportSize({ width: 375, height: 812 })
     await expectPageLoads(page, '/')
+    await waitForClientHydration(page)
 
     const menuButton = page.getByTestId('mobile-menu-button')
     await expect(menuButton).toBeVisible()
     await menuButton.click()
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true', {
+      timeout: 10_000,
+    })
     const menu = page.getByTestId('mobile-menu')
     await expect(menu).toBeVisible()
     await expect(menu.getByRole('link', { name: 'Report an Issue' })).toBeVisible()
@@ -142,9 +146,14 @@ test.describe('UI/UX mobile project smoke @uiux', () => {
   test('iPhone viewport: primary CTA reachable, no US flag', async ({ page }) => {
     await page.setViewportSize(devices['iPhone 12'].viewport!)
     await expectPageLoads(page, '/')
+    await waitForClientHydration(page)
     await expect(page.getByRole('link', { name: /report an issue/i }).first()).toBeVisible()
     await expect(page.getByText('🇺🇸')).toHaveCount(0)
-    await page.getByTestId('mobile-menu-button').click()
+    const menuButton = page.getByTestId('mobile-menu-button')
+    await menuButton.click()
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true', {
+      timeout: 10_000,
+    })
     await expect(page.getByTestId('mobile-menu')).toBeVisible()
   })
 })

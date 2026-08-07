@@ -1,0 +1,10 @@
+route,status,ttfb_ms,bytes,content_type
+/,200,309,22968,text/html; charset=utf-8
+/report,200,229,23730,text/html; charset=utf-8
+/case,200,183,23453,text/html; charset=utf-8
+/ops,200,211,16043,text/html; charset=utf-8
+/field,200,221,15848,text/html; charset=utf-8
+/dashboard,200,219,23448,text/html; charset=utf-8
+/auth/signin,200,685,28707,text/html; charset=utf-8
+/help,200,215,47795,text/html; charset=utf-8
+/notifications,200,199,24886,text/html; charset=utf-8

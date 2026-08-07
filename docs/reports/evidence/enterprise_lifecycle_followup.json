@@ -1,0 +1,43 @@
+{
+  "caseId": "CASE-MSIU81J7-KXEZ5R",
+  "steps": [
+    {
+      "step": "assign",
+      "ok": true,
+      "departmentId": "roads",
+      "data": {
+        "success": true,
+        "caseId": "CASE-MSIU81J7-KXEZ5R",
+        "status": "assigned",
+        "assignedDepartment": "roads",
+        "assignedTo": null
+      }
+    },
+    {
+      "step": "in_progress",
+      "ok": true,
+      "data": {
+        "success": true,
+        "caseId": "CASE-MSIU81J7-KXEZ5R",
+        "status": "in_progress"
+      }
+    },
+    {
+      "step": "reject_illegal_back",
+      "ok": true,
+      "error": "Unable to complete request. Please try again."
+    }
+  ],
+  "timelineStatus": "in_progress",
+  "milestones": [
+    "case_created",
+    "routing_resolution",
+    "media_uploaded",
+    "status_updated",
+    "media_uploaded",
+    "media_uploaded",
+    "media_uploaded",
+    "status_updated"
+  ],
+  "publicUpdates": 1
+}

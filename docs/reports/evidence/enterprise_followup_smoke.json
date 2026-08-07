@@ -1,0 +1,228 @@
+{
+  "captured_utc": "2026-08-07T11:07:30.110Z",
+  "checks": {
+    "gis_unique_lat_lng": {
+      "ok": true,
+      "wardId": "79800060",
+      "wardName": "JHB_60",
+      "wardNumber": "60",
+      "municipalityId": "JHB",
+      "municipalityName": "City of Johannesburg Metropolitan Municipality",
+      "districtCode": "JHB",
+      "districtName": "City of Johannesburg",
+      "province": "Gauteng",
+      "confidence": 1,
+      "cached": true,
+      "status": "polygon_match",
+      "method": "st_covers",
+      "datasetVersion": "mdb-wards-2020-v1",
+      "boundaryCycle": "2020-LGE",
+      "resolvedAt": "2026-08-07T11:04:29.794Z",
+      "routingSource": "authoritative_gis",
+      "candidateCount": 1,
+      "failureReason": null,
+      "errorClass": null
+    },
+    "gis_ocean_lat_lng": {
+      "ok": true,
+      "status": "unresolved",
+      "failureReason": "coordinates_outside_south_africa",
+      "method": "bounds_check"
+    },
+    "upload_reject_exe_soft": {
+      "ok": true,
+      "success": false,
+      "mediaUrls": [],
+      "failed": [
+        {
+          "name": "bad.exe",
+          "reason": "Unsupported file type: application/octet-stream"
+        }
+      ],
+      "status": "failed",
+      "error": "No files were successfully processed"
+    },
+    "upload_png": {
+      "ok": true,
+      "success": true,
+      "mediaUrls": [
+        "https://firebasestorage.googleapis.com/v0/b/servesa-aad53.firebasestorage.app/o/cases%2FCASE-MSIU81J7-KXEZ5R%2Fmedia%2F1786100854144_cert.png?alt=media&token=f43803d7-d710-41b2-82ae-12de93a8bbe4"
+      ],
+      "failed": [],
+      "status": "completed",
+      "error": null
+    },
+    "upload_webp": {
+      "ok": true,
+      "success": true,
+      "mediaUrls": [
+        "https://firebasestorage.googleapis.com/v0/b/servesa-aad53.firebasestorage.app/o/cases%2FCASE-MSIU81J7-KXEZ5R%2Fmedia%2F1786100855411_cert.webp?alt=media&token=72fed531-c28b-4c57-9743-c6667d57b87e"
+      ],
+      "failed": [],
+      "status": "completed",
+      "error": null
+    },
+    "upload_duplicate_hash_idempotent": {
+      "ok": true,
+      "success": true,
+      "mediaUrls": [
+        "https://firebasestorage.googleapis.com/v0/b/servesa-aad53.firebasestorage.app/o/cases%2FCASE-MSIU81J7-KXEZ5R%2Fmedia%2F1786100675482_cert.jpg?alt=media&token=190f0fd4-2417-4ad6-a765-da793b3ccc2b"
+      ],
+      "failed": [],
+      "status": "completed",
+      "error": null
+    },
+    "upload_reject_oversized": {
+      "ok": true,
+      "success": false,
+      "mediaUrls": [],
+      "failed": [
+        {
+          "name": "big.jpg",
+          "reason": "File exceeds 10MB limit"
+        }
+      ],
+      "status": "failed",
+      "error": "No files were successfully processed"
+    },
+    "timeline_after_ack": {
+      "ok": true,
+      "status": "acknowledged",
+      "milestones": [
+        {
+          "type": "case_created",
+          "description": "Case submitted",
+          "actor": "you",
+          "at": {
+            "_seconds": 1786100670,
+            "_nanoseconds": 439000000
+          }
+        },
+        {
+          "type": "routing_resolution",
+          "description": "Authoritative GIS ward resolution",
+          "actor": "system",
+          "at": {
+            "_seconds": 1786100670,
+            "_nanoseconds": 439000000
+          }
+        },
+        {
+          "type": "media_uploaded",
+          "description": "1 media file(s) uploaded",
+          "actor": "system",
+          "at": {
+            "_seconds": 1786100676,
+            "_nanoseconds": 752000000
+          }
+        },
+        {
+          "type": "status_updated",
+          "description": "Status → acknowledged",
+          "actor": "municipality",
+          "at": {
+            "_seconds": 1786100688,
+            "_nanoseconds": 82000000
+          }
+        },
+        {
+          "type": "media_uploaded",
+          "description": "1 media file(s) uploaded",
+          "actor": "system",
+          "at": {
+            "_seconds": 1786100855,
+            "_nanoseconds": 274000000
+          }
+        }
+      ],
+      "publicUpdates": 0
+    },
+    "route_/notifications": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/dashboard": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/field": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/ops": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/report": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/help": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/privacy": {
+      "ok": true,
+      "status": 200
+    },
+    "route_/terms": {
+      "ok": true,
+      "status": 200
+    },
+    "ops_internal_note_shape": {
+      "ok": true,
+      "shape": [
+        "caseId",
+        "body"
+      ],
+      "keys": [
+        "success",
+        "noteId"
+      ]
+    },
+    "ops_public_update_shape": {
+      "ok": true,
+      "shape": [
+        "caseId",
+        "body"
+      ],
+      "keys": [
+        "success",
+        "updateId"
+      ]
+    },
+    "ops_search_shape": {
+      "ok": true,
+      "shape": [
+        "q"
+      ],
+      "type": "object"
+    },
+    "ops_status_in_progress": {
+      "ok": false,
+      "error": "Unable to complete request. Please try again."
+    },
+    "create_case_latency": {
+      "ok": true,
+      "caseId": "CASE-MSIUC8XF-Q7CLF2",
+      "ms": 230,
+      "geo": "polygon_match",
+      "routingPending": false
+    }
+  },
+  "timings": {
+    "georesolve_unique_ms": 1444,
+    "georesolve_ocean_ms": 323,
+    "upload_png_ms": 1272,
+    "upload_webp_ms": 815,
+    "createCase_ms": 230
+  },
+  "followupCaseId": "CASE-MSIUC8XF-Q7CLF2",
+  "summary": {
+    "total": 21,
+    "passed": 20,
+    "failed": [
+      "ops_status_in_progress"
+    ]
+  }
+}

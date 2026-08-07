@@ -138,11 +138,13 @@ export default function ReportPage() {
 
   const buildPayload = () => {
     const categoryDef = getCategoryDefinition(state.uiCategoryId)
+    const address =
+      state.location.address || state.location.summary || undefined
     return {
       title: state.title,
       description: state.description,
       category: state.uiCategoryId,
-      subcategory: categoryDef?.subcategory,
+      subcategory: categoryDef?.subcategory || undefined,
       priority: state.priority,
       latitude: state.location.latitude as number,
       longitude: state.location.longitude as number,
@@ -150,7 +152,7 @@ export default function ReportPage() {
         | 'device_gps'
         | 'map_pin'
         | 'address_search',
-      address: state.location.address || state.location.summary,
+      address: address || undefined,
       reporter: {
         name: state.reporter.name,
         email: state.reporter.email || undefined,
@@ -197,7 +199,7 @@ export default function ReportPage() {
     }
 
     try {
-      const created = await casesAPI.createCase(payload as any)
+      const created = await casesAPI.createCase(parsed.data as any)
       setResult(created)
       trackReportEvent('case_created', {
         georesolutionStatus: created.georesolutionStatus,

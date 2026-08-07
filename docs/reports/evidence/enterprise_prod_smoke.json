@@ -1,0 +1,198 @@
+{
+  "captured_utc": "2026-08-07T11:04:21.315Z",
+  "project": "servesa-aad53",
+  "checks": {
+    "auth_citizen": {
+      "ok": true,
+      "uid": "i5PUcFNX7pZcSgvde2c9U45ZNdJ3",
+      "email": "uat.citizen.pilot@servesa.test"
+    },
+    "gis_unique_jhb": {
+      "ok": false,
+      "status": "unresolved",
+      "wardId": null,
+      "municipalityId": null,
+      "datasetVersion": null,
+      "method": "bounds_check",
+      "candidateCount": 0
+    },
+    "gis_unresolved_ocean": {
+      "ok": true,
+      "status": "unresolved",
+      "candidateCount": 0,
+      "failureReason": "coordinates_outside_south_africa",
+      "method": "bounds_check"
+    },
+    "reject_default_coords": {
+      "ok": true,
+      "error": "functions/invalid-argument"
+    },
+    "create_case": {
+      "ok": true,
+      "caseId": "CASE-MSIU81J7-KXEZ5R",
+      "status": "submitted",
+      "georesolutionStatus": "polygon_match",
+      "routingPending": false,
+      "municipality": {
+        "id": "JHB",
+        "name": "City of Johannesburg Metropolitan Municipality"
+      },
+      "ward": {
+        "id": "79800060",
+        "name": "JHB_60",
+        "number": "60"
+      },
+      "targetHours": 72
+    },
+    "idempotency": {
+      "ok": true,
+      "first": "CASE-MSIU81J7-KXEZ5R",
+      "second": "CASE-MSIU81J7-KXEZ5R"
+    },
+    "upload_jpeg": {
+      "ok": true,
+      "status": "completed",
+      "mediaCount": 1,
+      "failed": []
+    },
+    "upload_reject_exe": {
+      "ok": false,
+      "note": "accepted exe"
+    },
+    "citizen_timeline": {
+      "ok": true,
+      "keys": [
+        "caseId",
+        "reference",
+        "status",
+        "title",
+        "category",
+        "linkedPrimary",
+        "linkedRole",
+        "milestones",
+        "publicUpdates",
+        "canConfirm"
+      ],
+      "status": "submitted"
+    },
+    "track_http_query": {
+      "ok": true,
+      "url": "https://servesa-aad53.web.app/case?id=CASE-MSIU81J7-KXEZ5R",
+      "status": 200
+    },
+    "track_http_path": {
+      "ok": true,
+      "url": "https://servesa-aad53.web.app/case/CASE-MSIU81J7-KXEZ5R",
+      "status": 200
+    },
+    "create_unresolved": {
+      "ok": false,
+      "error": "Selected location is outside South Africa. Please choose a location within South Africa."
+    },
+    "auth_official": {
+      "ok": true,
+      "uid": "pCMt1FvVnlhyNjiuhDnA3DRGtjT2"
+    },
+    "ops_smart_queue": {
+      "ok": true,
+      "type": "object",
+      "keys": [
+        "municipalityCode",
+        "items",
+        "policy"
+      ]
+    },
+    "ops_search_case": {
+      "ok": false,
+      "error": "Query too short"
+    },
+    "ops_status_acknowledged": {
+      "ok": true,
+      "resultKeys": [
+        "success",
+        "caseId",
+        "status"
+      ]
+    },
+    "ops_reject_invalid_status": {
+      "ok": true,
+      "error": "Unable to complete request. Please try again."
+    },
+    "ops_internal_note": {
+      "ok": false,
+      "error": "Note must be 1–4000 characters"
+    },
+    "ops_public_update": {
+      "ok": false,
+      "error": "Update must be 1–2000 characters"
+    },
+    "ops_cross_muni_denial": {
+      "ok": true,
+      "error": "Not authorised for this municipality"
+    },
+    "field_list_jobs": {
+      "ok": true,
+      "keys": [
+        "municipalityCode",
+        "jobs"
+      ]
+    },
+    "storage_unauth_list": {
+      "ok": true,
+      "status": 403
+    },
+    "firestore_unauth_case_read": {
+      "ok": true,
+      "denied": true,
+      "error": "permission-denied"
+    }
+  },
+  "cases": {
+    "primary": {
+      "caseId": "CASE-MSIU81J7-KXEZ5R",
+      "reference": "CASE-MSIU81J7-KXEZ5R",
+      "shareUrl": "https://servesa-aad53.web.app/case/CASE-MSIU81J7-KXEZ5R",
+      "status": "submitted",
+      "municipality": {
+        "id": "JHB",
+        "name": "City of Johannesburg Metropolitan Municipality"
+      },
+      "ward": {
+        "id": "79800060",
+        "name": "JHB_60",
+        "number": "60"
+      },
+      "slaTarget": "2026-08-10T11:04:30.403Z",
+      "targetHours": 72,
+      "georesolutionStatus": "polygon_match",
+      "mediaUploadPath": "cases/CASE-MSIU81J7-KXEZ5R/media",
+      "routingPending": false,
+      "duplicateAssessment": {
+        "status": "pending"
+      }
+    },
+    "media": {
+      "success": true,
+      "mediaUrls": [
+        "https://firebasestorage.googleapis.com/v0/b/servesa-aad53.firebasestorage.app/o/cases%2FCASE-MSIU81J7-KXEZ5R%2Fmedia%2F1786100675482_cert.jpg?alt=media&token=190f0fd4-2417-4ad6-a765-da793b3ccc2b"
+      ],
+      "failed": [],
+      "status": "completed",
+      "error": null
+    }
+  },
+  "errors": [],
+  "summary": {
+    "total": 23,
+    "passed": 17,
+    "failed": [
+      "gis_unique_jhb",
+      "upload_reject_exe",
+      "create_unresolved",
+      "ops_search_case",
+      "ops_internal_note",
+      "ops_public_update"
+    ],
+    "primaryCaseId": "CASE-MSIU81J7-KXEZ5R"
+  }
+}
