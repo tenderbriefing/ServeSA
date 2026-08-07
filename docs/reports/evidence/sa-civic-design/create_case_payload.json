@@ -1,0 +1,21 @@
+{
+  "data": {
+    "title": "South African civic design verification — pothole",
+    "description": "Post-deploy verification for the SA civic design system PR. Synthetic recovery-agent smoke case, safe to ignore.",
+    "category": "roads-infrastructure",
+    "priority": "medium",
+    "latitude": -26.2041,
+    "longitude": 28.0473,
+    "locationSource": "map_pin",
+    "address": "Johannesburg CBD, Gauteng (civic design verification)",
+    "reporter": {
+      "name": "Civic Design Verification",
+      "email": "civic.design.verification@servesa.test"
+    },
+    "consent": {
+      "dataProcessing": true,
+      "communications": false
+    },
+    "clientRequestId": "9bc314ce-fc43-4454-8d11-17b57f2c9170"
+  }
+}
