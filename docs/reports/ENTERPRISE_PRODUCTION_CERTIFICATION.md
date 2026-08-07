@@ -11,7 +11,7 @@
 | Branch (audit tip) | `main` @ `46ce2f9` |
 | Live Hosting SHA (WIF) | `1e88620db1e1fa6d9607464117eb712481c669f8` (run `31078956476`) |
 | Hosting version (live) | `3113534c8b407296` FINALIZED `2026-08-06T06:57:23Z` |
-| Fix branch (this cert) | `fix/report-null-optional-fields` |
+| Fix branch (this cert) | `fix/report-null-optional-fields` @ `59a81a1` — [PR #8](https://github.com/tenderbriefing/ServeSA/pull/8) (CI green; awaiting required review / merge) |
 | GIS revision (live) | **`georesolvefunction-00004-yoh`** (`nodejs22`) |
 | GIS rollback | `georesolvefunction-00002-kuy` (retained) |
 | GIS dataset | `mdb-wards-2020-v1` (4468 wards, `ST_COVERS`) |
