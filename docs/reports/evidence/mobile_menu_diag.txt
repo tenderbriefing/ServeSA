@@ -1,0 +1,14 @@
+(node:35105) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:35107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35107) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:35107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"before":"false","after":"true","menuCount":1,"label":"Close menu","url":"https://servesa-aad53.web.app/"}
+  ✓  1 [chromium] › apps/web/tests/e2e/mobile_menu_diag.spec.ts:3:5 › mobile menu diagnostic (4.0s)
+
+  1 passed (5.2s)

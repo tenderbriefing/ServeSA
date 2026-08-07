@@ -100,6 +100,25 @@ describe('CreateCaseInputSchema', () => {
     }
   })
 
+  it('normalises null optional strings from JSON clients', () => {
+    const result = CreateCaseInputSchema.safeParse({
+      ...validBase,
+      address: null,
+      subcategory: null,
+      reporter: {
+        name: 'Thabo Molefe',
+        email: 'thabo@example.com',
+        phone: null,
+      },
+    })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.address).toBeUndefined()
+      expect(result.data.subcategory).toBeUndefined()
+      expect(result.data.reporter.phone).toBeUndefined()
+    }
+  })
+
   it('normalises whitespace in title and description', () => {
     const result = CreateCaseInputSchema.safeParse({
       ...validBase,

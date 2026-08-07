@@ -1,0 +1,24 @@
+PASS|auth_citizen|{"uid":"i5PUcFNX7pZcSgvde2c9U45ZNdJ3","email":"uat.citizen.pilot@servesa.test"}
+FAIL|gis_unique_jhb|{"status":"unresolved","wardId":null,"municipalityId":null,"datasetVersion":null,"method":"bounds_check","candidateCount":0}
+PASS|gis_unresolved_ocean|{"status":"unresolved","candidateCount":0,"failureReason":"coordinates_outside_south_africa","method":"bounds_check"}
+PASS|reject_default_coords|{"error":"functions/invalid-argument"}
+PASS|create_case|{"caseId":"CASE-MSIU81J7-KXEZ5R","status":"submitted","georesolutionStatus":"polygon_match","routingPending":false,"municipality":{"id":"JHB","name":"City of Johannesburg Metropolitan Municipality"},"ward":{"id":"79800060","name":"JHB_60","number":"60"},"targetHours":72}
+PASS|idempotency|{"first":"CASE-MSIU81J7-KXEZ5R","second":"CASE-MSIU81J7-KXEZ5R"}
+PASS|upload_jpeg|{"status":"completed","mediaCount":1,"failed":[]}
+FAIL|upload_reject_exe|{"note":"accepted exe"}
+PASS|citizen_timeline|{"keys":["caseId","reference","status","title","category","linkedPrimary","linkedRole","milestones","publicUpdates","canConfirm"],"status":"submitted"}
+PASS|track_http_query|{"url":"https://servesa-aad53.web.app/case?id=CASE-MSIU81J7-KXEZ5R","status":200}
+PASS|track_http_path|{"url":"https://servesa-aad53.web.app/case/CASE-MSIU81J7-KXEZ5R","status":200}
+FAIL|create_unresolved|{"error":"Selected location is outside South Africa. Please choose a location within South Africa."}
+PASS|auth_official|{"uid":"pCMt1FvVnlhyNjiuhDnA3DRGtjT2"}
+PASS|ops_smart_queue|{"type":"object","keys":["municipalityCode","items","policy"]}
+FAIL|ops_search_case|{"error":"Query too short"}
+PASS|ops_status_acknowledged|{"resultKeys":["success","caseId","status"]}
+PASS|ops_reject_invalid_status|{"error":"Unable to complete request. Please try again."}
+FAIL|ops_internal_note|{"error":"Note must be 1–4000 characters"}
+FAIL|ops_public_update|{"error":"Update must be 1–2000 characters"}
+PASS|ops_cross_muni_denial|{"error":"Not authorised for this municipality"}
+PASS|field_list_jobs|{"keys":["municipalityCode","jobs"]}
+PASS|storage_unauth_list|{"status":403}
+PASS|firestore_unauth_case_read|{"denied":true,"error":"permission-denied"}
+SUMMARY {"total":23,"passed":17,"failed":["gis_unique_jhb","upload_reject_exe","create_unresolved","ops_search_case","ops_internal_note","ops_public_update"],"primaryCaseId":"CASE-MSIU81J7-KXEZ5R"}

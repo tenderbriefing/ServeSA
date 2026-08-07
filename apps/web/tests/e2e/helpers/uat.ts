@@ -44,10 +44,23 @@ export function decodeUatPayload(
 
 /** Dismiss first-run tutorial modal if present. */
 export async function dismissOnboardingIfPresent(page: Page) {
-  const skip = page.getByText(/skip tutorial/i).first()
-  if (await skip.isVisible().catch(() => false)) {
-    await skip.click()
-    await skip.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined)
+  const skip = page.getByRole('button', { name: /^skip$/i }).first()
+  const close = page.getByRole('button', { name: /close introduction/i }).first()
+  const dialog = page.getByRole('dialog')
+  for (let i = 0; i < 6; i++) {
+    if (await close.isVisible().catch(() => false)) {
+      await close.click({ force: true })
+      await dialog.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined)
+      continue
+    }
+    if (await skip.isVisible().catch(() => false)) {
+      await skip.click({ force: true })
+      await dialog.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => undefined)
+      continue
+    }
+    if (!(await dialog.isVisible().catch(() => false))) break
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(200)
   }
 }
 
@@ -107,6 +120,23 @@ export async function expectPageLoads(page: Page, path: string) {
   const res = await page.goto(path, { waitUntil: 'domcontentloaded' })
   expect(res?.status() ?? 0).toBeLessThan(500)
   await expect(page.locator('body')).toBeVisible()
+}
+
+/**
+ * Wait until client hydration has attached React handlers.
+ * Static Hosting can paint HTML before listeners are ready; clicking early
+ * leaves controlled UI (e.g. mobile menu) unchanged.
+ */
+export async function waitForClientHydration(page: Page) {
+  await page
+    .waitForFunction(() => {
+      const w = window as unknown as { __NEXT_DATA__?: unknown }
+      return Boolean(w.__NEXT_DATA__) || document.readyState === 'complete'
+    })
+    .catch(() => undefined)
+  await page.waitForLoadState('networkidle').catch(() => undefined)
+  // Brief settle for React commit after networkidle on static export.
+  await page.waitForTimeout(400)
 }
 
 export function skipWithoutToken(role: keyof typeof UAT_TOKENS, reason?: string) {
