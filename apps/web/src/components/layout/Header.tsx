@@ -10,7 +10,6 @@ import {
   X,
   LogOut,
   Bell,
-  HelpCircle,
   FileText,
   Search,
   User,
@@ -22,12 +21,11 @@ import { getInitials } from '@/lib/utils'
 import { useOffline } from '@/hooks/useOffline'
 import { cn } from '@/lib/utils'
 
-/** Citizen primary nav — Report / Track / My Cases / Help — no clutter */
+/** Citizen primary nav — Report / Track / My Cases — no clutter */
 const primaryLinks = [
   { href: '/report', label: 'Report', icon: FileText },
   { href: '/case', label: 'Track', icon: Search },
   { href: '/dashboard', label: 'My Cases', icon: User },
-  { href: '/help', label: 'Help', icon: HelpCircle },
 ] as const
 
 export function Header() {
