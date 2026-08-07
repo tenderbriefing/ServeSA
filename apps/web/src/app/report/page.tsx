@@ -17,7 +17,10 @@ import { AlertBanner } from '@/components/ui/AlertBanner'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { PhotoUploader } from '@/components/civic/PhotoUploader'
 import { MunicipalityIdentity } from '@/components/civic/MunicipalityIdentity'
-import { categoryOutlineIcon } from '@/components/civic/categoryIcons'
+import {
+  categoryIconTone,
+  categoryOutlineIcon,
+} from '@/components/civic/categoryIcons'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { CivicMotif } from '@/components/civic/CivicMotif'
 import { useAuth } from '@/hooks/useAuth'
@@ -310,11 +313,7 @@ export default function ReportPage() {
             >
               <div className="flex items-center gap-3">
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${
-                    selected
-                      ? 'border-primary-200 bg-primary-100 text-primary-800'
-                      : 'border-border bg-surface-muted text-ink-muted'
-                  }`}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${categoryIconTone(category.uiId)}`}
                   aria-hidden
                 >
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
