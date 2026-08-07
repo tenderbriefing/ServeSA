@@ -74,7 +74,7 @@ export default function SupervisorBoardPage() {
   return (
     <OpsShell>
       <h1 className="mb-1 text-2xl font-semibold text-white">Supervisor Operations Board</h1>
-      <p className="mb-6 text-sm text-slate-400">
+      <p className="mb-6 text-sm text-ink-muted">
         Actionable queues only — open a filtered work list from any metric.
       </p>
       {error && (
@@ -87,24 +87,24 @@ export default function SupervisorBoardPage() {
           <Link
             key={c.key}
             href={c.href}
-            className="rounded-lg border border-slate-800 bg-[#151b22] p-4 hover:border-emerald-700"
+            className="rounded-lg border border-border bg-surface p-4 hover:border-green-700"
           >
             <div className="text-3xl font-semibold text-white">{c.count}</div>
-            <div className="mt-1 text-sm text-slate-400">{c.label}</div>
+            <div className="mt-1 text-sm text-ink-muted">{c.label}</div>
           </Link>
         ))}
       </div>
-      <section className="mt-8 rounded-lg border border-slate-800 bg-[#151b22] p-4">
-        <h2 className="mb-3 text-sm font-medium text-slate-300">Open workload by assignee</h2>
-        <ul className="space-y-1 text-sm text-slate-300">
+      <section className="mt-8 rounded-lg border border-border bg-surface p-4">
+        <h2 className="mb-3 text-sm font-medium text-ink-muted">Open workload by assignee</h2>
+        <ul className="space-y-1 text-sm text-ink-muted">
           {(data?.workload || []).map((w: { uid: string; openCases: number }) => (
             <li key={w.uid} className="flex justify-between">
-              <span className="font-mono text-xs text-slate-500">{w.uid.slice(0, 12)}…</span>
+              <span className="font-mono text-xs text-ink-subtle">{w.uid.slice(0, 12)}…</span>
               <span>{w.openCases}</span>
             </li>
           ))}
           {(!data?.workload || data.workload.length === 0) && (
-            <li className="text-slate-500">No active assignments.</li>
+            <li className="text-ink-subtle">No active assignments.</li>
           )}
         </ul>
       </section>

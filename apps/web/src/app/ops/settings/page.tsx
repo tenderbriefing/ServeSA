@@ -48,7 +48,7 @@ export default function OpsSettingsPage() {
   if (!municipalityCode) {
     return (
       <OpsShell>
-        <p className="text-amber-300">
+        <p className="text-warning">
           Your account has no municipality claim. An admin must provision access.
         </p>
       </OpsShell>
@@ -58,32 +58,32 @@ export default function OpsSettingsPage() {
   return (
     <OpsShell>
       <h1 className="mb-1 text-2xl font-semibold text-white">Settings</h1>
-      <p className="mb-6 text-sm text-slate-400">
+      <p className="mb-6 text-sm text-ink-muted">
         Municipality {municipalityCode} — departments and category routing.
       </p>
       {msg && (
-        <div className="mb-4 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm">
+        <div className="mb-4 rounded-md border border-border bg-surface px-3 py-2 text-sm">
           {msg}
         </div>
       )}
 
-      <section className="mb-8 rounded-lg border border-slate-800 bg-[#151b22] p-4">
-        <h2 className="mb-3 text-sm font-medium text-slate-300">Departments</h2>
+      <section className="mb-8 rounded-lg border border-border bg-surface p-4">
+        <h2 className="mb-3 text-sm font-medium text-ink-muted">Departments</h2>
         <div className="mb-3 flex flex-wrap gap-2">
           <input
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm"
+            className="rounded-md border border-border bg-surface px-2 py-1.5 text-sm"
             value={deptId}
             onChange={(e) => setDeptId(e.target.value)}
             placeholder="department id"
           />
           <input
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm"
+            className="rounded-md border border-border bg-surface px-2 py-1.5 text-sm"
             value={deptName}
             onChange={(e) => setDeptName(e.target.value)}
             placeholder="name"
           />
           <button
-            className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm text-white"
+            className="rounded-md bg-green-600 px-3 py-1.5 text-sm text-white"
             onClick={async () => {
               await opsApi.upsertDepartment({
                 municipalityCode,
@@ -97,7 +97,7 @@ export default function OpsSettingsPage() {
             Save department
           </button>
         </div>
-        <ul className="text-sm text-slate-300">
+        <ul className="text-sm text-ink-muted">
           {departments.map((d) => (
             <li key={d.id}>
               {d.id} — {d.name}
@@ -106,16 +106,16 @@ export default function OpsSettingsPage() {
         </ul>
       </section>
 
-      <section className="mb-8 rounded-lg border border-slate-800 bg-[#151b22] p-4">
-        <h2 className="mb-3 text-sm font-medium text-slate-300">
+      <section className="mb-8 rounded-lg border border-border bg-surface p-4">
+        <h2 className="mb-3 text-sm font-medium text-ink-muted">
           Category → department
         </h2>
         <div className="space-y-2">
           {CATEGORIES.map((cat) => (
             <div key={cat} className="flex items-center gap-2 text-sm">
-              <span className="w-24 text-slate-400">{cat}</span>
+              <span className="w-24 text-ink-muted">{cat}</span>
               <select
-                className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1"
+                className="rounded-md border border-border bg-surface px-2 py-1"
                 value={maps[cat] || ''}
                 onChange={async (e) => {
                   const departmentId = e.target.value
@@ -142,19 +142,19 @@ export default function OpsSettingsPage() {
       </section>
 
       {isAdmin && (
-        <section className="rounded-lg border border-slate-800 bg-[#151b22] p-4">
-          <h2 className="mb-3 text-sm font-medium text-slate-300">
+        <section className="rounded-lg border border-border bg-surface p-4">
+          <h2 className="mb-3 text-sm font-medium text-ink-muted">
             Provision official (admin)
           </h2>
           <div className="flex flex-wrap gap-2">
             <input
-              className="min-w-[280px] rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm"
+              className="min-w-[280px] rounded-md border border-border bg-surface px-2 py-1.5 text-sm"
               value={claimUid}
               onChange={(e) => setClaimUid(e.target.value)}
               placeholder="Firebase Auth UID"
             />
             <button
-              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm text-white"
+              className="rounded-md bg-green-600 px-3 py-1.5 text-sm text-white"
               onClick={async () => {
                 await opsApi.setOfficialClaims({
                   uid: claimUid,

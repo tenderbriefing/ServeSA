@@ -4,11 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   AlertTriangle,
-  Camera,
   CheckCircle,
   Copy,
   Send,
-  Upload,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -17,6 +15,11 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { Stepper } from '@/components/ui/Stepper'
 import { AlertBanner } from '@/components/ui/AlertBanner'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
+import { PhotoUploader } from '@/components/civic/PhotoUploader'
+import { MunicipalityIdentity } from '@/components/civic/MunicipalityIdentity'
+import { categoryOutlineIcon } from '@/components/civic/categoryIcons'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { CivicMotif } from '@/components/civic/CivicMotif'
 import { useAuth } from '@/hooks/useAuth'
 import { casesAPI } from '@/lib/api/cases'
 import {
@@ -120,21 +123,6 @@ export default function ReportPage() {
       state.consent.dataProcessing &&
       photos.length >= 1
   )
-
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []).filter((f) => {
-      const okType = [
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'image/webp',
-        'image/heic',
-        'image/heif',
-      ].includes(f.type)
-      return okType && f.size > 0 && f.size <= 10 * 1024 * 1024
-    })
-    setPhotos((prev) => [...prev, ...files].slice(0, 5))
-  }
 
   const buildPayload = () => {
     const categoryDef = getCategoryDefinition(state.uiCategoryId)
@@ -299,33 +287,46 @@ export default function ReportPage() {
   const renderStep1 = () => (
     <div className="space-y-6" aria-label="Step 1: What">
       <div>
-        <h3 className="text-lg font-semibold mb-4">What type of issue are you reporting?</h3>
-        <div className="grid md:grid-cols-2 gap-4" role="listbox" aria-label="Categories">
-          {CITIZEN_CATEGORIES.map((category) => (
+        <h3 className="mb-4 font-display text-h4 text-ink">
+          What type of issue are you reporting?
+        </h3>
+        <div className="grid gap-3 md:grid-cols-2" role="listbox" aria-label="Categories">
+          {CITIZEN_CATEGORIES.map((category) => {
+            const Icon = categoryOutlineIcon(category.uiId)
+            const selected = state.uiCategoryId === category.uiId
+            return (
             <button
               key={category.uiId}
               type="button"
               role="option"
-              aria-selected={state.uiCategoryId === category.uiId}
+              aria-selected={selected}
               data-testid={`category-${category.uiId}`}
               onClick={() => update({ uiCategoryId: category.uiId })}
-              className={`p-4 border rounded-lg text-left transition-colors min-h-[44px] ${
-                state.uiCategoryId === category.uiId
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-gray-200 hover:border-gray-300'
+              className={`min-h-touch rounded-lg border p-4 text-left transition-colors duration-fast ${
+                selected
+                  ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-500'
+                  : 'border-border bg-surface hover:border-primary-300'
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="text-2xl" aria-hidden>
-                  {category.icon}
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${
+                    selected
+                      ? 'border-primary-200 bg-primary-100 text-primary-800'
+                      : 'border-border bg-surface-muted text-ink-muted'
+                  }`}
+                  aria-hidden
+                >
+                  <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
                 <div>
-                  <div className="font-medium">{category.label}</div>
-                  <div className="text-sm text-gray-500">{category.description}</div>
+                  <div className="font-medium text-ink">{category.label}</div>
+                  <div className="text-body-sm text-ink-muted">{category.description}</div>
                 </div>
               </div>
             </button>
-          ))}
+            )
+          })}
         </div>
         {/* Hidden select for e2e compatibility */}
         <select
@@ -350,14 +351,14 @@ export default function ReportPage() {
           ))}
         </select>
         {fieldErrors.category && (
-          <p className="text-sm text-red-600 mt-2" data-testid="category-error">
+          <p className="text-sm text-danger mt-2" data-testid="category-error">
             {fieldErrors.category}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="title">
+        <label className="block text-sm font-medium text-ink mb-2" htmlFor="title">
           Issue title *
         </label>
         <input
@@ -366,10 +367,10 @@ export default function ReportPage() {
           value={state.title}
           onChange={(e) => update({ title: e.target.value })}
           placeholder="Brief description of the issue"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+          className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px]"
         />
         {fieldErrors.title && (
-          <p className="text-sm text-red-600 mt-1" data-testid="title-error">
+          <p className="text-sm text-danger mt-1" data-testid="title-error">
             {fieldErrors.title}
           </p>
         )}
@@ -377,7 +378,7 @@ export default function ReportPage() {
 
       <div>
         <label
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-ink mb-2"
           htmlFor="description"
         >
           Detailed description *
@@ -389,10 +390,10 @@ export default function ReportPage() {
           onChange={(e) => update({ description: e.target.value })}
           placeholder="What happened, who is affected, and any useful landmarks…"
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+          className="w-full px-3 py-2 border border-border rounded-lg"
         />
         {fieldErrors.description && (
-          <p className="text-sm text-red-600 mt-1" data-testid="description-error">
+          <p className="text-sm text-danger mt-1" data-testid="description-error">
             {fieldErrors.description}
           </p>
         )}
@@ -400,14 +401,14 @@ export default function ReportPage() {
 
       <div>
         <fieldset>
-          <legend className="block text-sm font-medium text-gray-700 mb-2">
+          <legend className="block text-sm font-medium text-ink mb-2">
             Priority
           </legend>
           <div className="space-y-2">
             {PRIORITY_OPTIONS.map((priority) => (
               <label
                 key={priority.id}
-                className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 min-h-[44px]"
+                className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-surface-muted min-h-[44px]"
               >
                 <input
                   type="radio"
@@ -420,7 +421,7 @@ export default function ReportPage() {
                 />
                 <div>
                   <div className="font-medium">{priority.name}</div>
-                  <div className="text-sm text-gray-500">{priority.description}</div>
+                  <div className="text-sm text-ink-subtle">{priority.description}</div>
                 </div>
               </label>
             ))}
@@ -443,7 +444,7 @@ export default function ReportPage() {
         </fieldset>
         {state.priority === 'emergency' && (
           <div
-            className="mt-3 flex gap-2 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg p-3"
+            className="mt-3 flex gap-2 text-sm text-warning bg-warning-tint border border-warning-border rounded-lg p-3"
             role="status"
           >
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -462,7 +463,7 @@ export default function ReportPage() {
     <div className="space-y-6" aria-label="Step 3: Who">
       <div>
         <h3 className="text-lg font-semibold mb-2">Your contact details</h3>
-        <p className="text-gray-600 mb-4 text-sm">
+        <p className="text-ink-muted mb-4 text-sm">
           {user
             ? 'You are signed in. We will also link this case to your account.'
             : 'You can report without signing in. Provide at least an email or mobile number so we can send updates.'}
@@ -470,7 +471,7 @@ export default function ReportPage() {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
+            <label className="block text-sm font-medium text-ink mb-2" htmlFor="name">
               Full name *
             </label>
             <input
@@ -480,11 +481,11 @@ export default function ReportPage() {
               onChange={(e) =>
                 update({ reporter: { ...state.reporter, name: e.target.value } })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+              className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
+            <label className="block text-sm font-medium text-ink mb-2" htmlFor="email">
               Email
             </label>
             <input
@@ -495,11 +496,11 @@ export default function ReportPage() {
               onChange={(e) =>
                 update({ reporter: { ...state.reporter, email: e.target.value } })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+              className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px]"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="phone">
+            <label className="block text-sm font-medium text-ink mb-2" htmlFor="phone">
               Mobile number
             </label>
             <input
@@ -514,56 +515,21 @@ export default function ReportPage() {
               }
               placeholder="082 123 4567"
               aria-describedby="phone-hint"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px] text-base"
+              className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px] text-base"
             />
             <p id="phone-hint" className="mt-1 text-xs text-ink-subtle">
               Enter a South African mobile number, such as 082 123 4567.
             </p>
           </div>
           {fieldErrors.reporter && (
-            <p className="text-sm text-red-600">{fieldErrors.reporter}</p>
+            <p className="text-sm text-danger">{fieldErrors.reporter}</p>
           )}
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photos <span className="text-red-600">*</span>
-        </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-          <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-          <p className="text-sm text-gray-600 mb-2">
-            At least one clear photo is required so officials can see the issue.
-            You may add up to 5 images (JPEG, PNG, WebP or HEIC), max 10MB each.
-            Your case is saved first, then photos upload securely.
-          </p>
-          <input
-            type="file"
-            multiple
-            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
-            onChange={handlePhotoUpload}
-            className="hidden"
-            id="photo-upload"
-            data-testid="photo-upload"
-            required
-          />
-          <label htmlFor="photo-upload" className="cursor-pointer inline-block">
-            <span className="inline-flex items-center px-3 py-2 border rounded-md text-sm min-h-[44px]">
-              <Camera className="w-4 h-4 mr-2" />
-              Select photos
-            </span>
-          </label>
-        </div>
-        {photos.length > 0 ? (
-          <p className="text-sm text-gray-600 mt-2">{photos.length} photo(s) selected</p>
-        ) : (
-          <p className="text-sm text-amber-700 mt-2">
-            Add at least one clear photo of the issue to submit.
-          </p>
-        )}
-      </div>
+      <PhotoUploader photos={photos} onChange={setPhotos} />
 
-      <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
+      <div className="space-y-3 border rounded-lg p-4 bg-surface-muted">
         <label className="flex items-start gap-3 min-h-[44px]">
           <input
             type="checkbox"
@@ -576,13 +542,13 @@ export default function ReportPage() {
             }
             className="mt-1"
           />
-          <span className="text-sm text-gray-700">
-            I consent to ServeSA processing my report and contact details to route this
+          <span className="text-sm text-ink">
+            I consent to Serve SA processing my report and contact details to route this
             case to the responsible municipality. *
           </span>
         </label>
         {fieldErrors['consent.dataProcessing'] && (
-          <p className="text-sm text-red-600" data-testid="consent-error">
+          <p className="text-sm text-danger" data-testid="consent-error">
             {fieldErrors['consent.dataProcessing']}
           </p>
         )}
@@ -597,11 +563,11 @@ export default function ReportPage() {
             }
             className="mt-1"
           />
-          <span className="text-sm text-gray-700">
+          <span className="text-sm text-ink">
             Optional: send me status updates by email or push notification.
           </span>
         </label>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-ink-subtle">
           Contact details are used only for case updates and municipal routing. They are
           not shown on the public map.
         </p>
@@ -613,90 +579,102 @@ export default function ReportPage() {
     if (!result) return null
     const categoryLabel =
       getCategoryDefinition(state.uiCategoryId)?.label || result.ward?.name || state.uiCategoryId
+    const caseNumber = result.reference || result.caseId
 
     return (
-      <div className="text-center py-8" data-testid="success-message">
-        <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Report submitted</h3>
-        <p className="text-gray-600 mb-6">
-          Your case has been created. Keep your reference number for follow-up.
-        </p>
+      <div className="relative overflow-hidden py-8 text-center" data-testid="success-message">
+        <CivicMotif variant="panel" className="opacity-80" />
+        <div className="relative">
+          <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-600" aria-hidden />
+          <h3 className="mb-2 font-display text-h2 text-ink">Report submitted</h3>
+          <p className="mb-6 text-ink-muted">
+            Your case has been created. Keep your Case Number for follow-up.
+          </p>
 
-        <div className="bg-gray-50 p-4 rounded-lg text-left space-y-3 mb-6">
-          <div>
-            <p className="text-sm text-gray-600">Case reference</p>
-            <p className="text-lg font-mono font-bold" data-testid="case-reference">
-              {result.reference}
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+          <div className="mb-6 space-y-4 rounded-lg border border-green-200 bg-green-50/60 p-5 text-left">
             <div>
-              <p className="text-gray-600">Category</p>
-              <p className="font-medium">{categoryLabel}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Status</p>
-              <p className="font-medium capitalize">{result.status}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Location</p>
-              <p className="font-medium">
-                {state.location.summary ||
-                  state.location.address ||
-                  [
-                    result.ward?.name,
-                    result.municipality?.name,
-                  ]
-                    .filter(Boolean)
-                    .join(', ') ||
-                  'Captured'}
+              <p className="text-label text-green-800">Case Number</p>
+              <p
+                className="mt-1 font-mono text-2xl font-bold tracking-wide text-ink sm:text-3xl"
+                data-testid="case-reference"
+              >
+                {caseNumber}
               </p>
             </div>
-            <div>
-              <p className="text-gray-600">Target response</p>
-              <p className="font-medium">
-                {result.targetHours}h (by {new Date(result.slaTarget).toLocaleString()})
-              </p>
+            <MunicipalityIdentity
+              municipalityName={result.municipality?.name}
+              municipalityCode={result.municipality?.id}
+              wardName={result.ward?.name || result.ward?.number}
+              wardCode={result.ward?.id}
+              routingPending={result.routingPending}
+            />
+            <div className="grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <p className="text-ink-muted">Category</p>
+                <p className="font-medium text-ink">{categoryLabel}</p>
+              </div>
+              <div>
+                <p className="text-ink-muted">Status</p>
+                <StatusBadge status={result.status} />
+              </div>
+              <div>
+                <p className="text-ink-muted">Your Location</p>
+                <p className="font-medium text-ink">
+                  {state.location.summary ||
+                    state.location.address ||
+                    [result.ward?.name, result.municipality?.name]
+                      .filter(Boolean)
+                      .join(', ') ||
+                    'Captured'}
+                </p>
+              </div>
+              <div>
+                <p className="text-ink-muted">Target response</p>
+                <p className="font-medium text-ink">
+                  {result.targetHours}h (by{' '}
+                  {new Date(result.slaTarget).toLocaleString('en-ZA')})
+                </p>
+              </div>
             </div>
+            {result.routingPending && (
+              <AlertBanner variant="warning" className="text-left">
+                We are confirming which authority should receive this report. Your
+                Case Number is valid while that happens.
+              </AlertBanner>
+            )}
           </div>
-          {result.routingPending && (
-            <AlertBanner variant="warning" className="text-left">
-              We are confirming which authority should receive this report. Your
-              case reference is valid while that happens.
-            </AlertBanner>
+
+          {mediaStatus === 'uploading' && (
+            <p className="mb-3 text-sm text-info">Photo upload in progress…</p>
           )}
-        </div>
+          {(mediaStatus === 'failed' || mediaStatus === 'partial') && (
+            <div className="mb-4 rounded-lg border border-warning-border bg-warning-tint p-3 text-sm text-warning">
+              <p>{mediaError || 'Some photos could not be uploaded.'}</p>
+              <p className="mt-1 font-medium">Your case was still created successfully.</p>
+              <Button type="button" variant="outline" size="sm" className="mt-2" onClick={retryMedia}>
+                Retry photo upload
+              </Button>
+            </div>
+          )}
+          {mediaStatus === 'completed' && (
+            <p className="mb-3 text-sm text-green-700">Photos uploaded successfully.</p>
+          )}
 
-        {mediaStatus === 'uploading' && (
-          <p className="text-sm text-blue-700 mb-3">Photo upload in progress…</p>
-        )}
-        {(mediaStatus === 'failed' || mediaStatus === 'partial') && (
-          <div className="mb-4 text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <p>{mediaError || 'Some photos could not be uploaded.'}</p>
-            <p className="mt-1 font-medium">Your case was still created successfully.</p>
-            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={retryMedia}>
-              Retry photo upload
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Button type="button" variant="outline" onClick={copyReference}>
+              <Copy className="mr-2 h-4 w-4" aria-hidden />
+              {copied ? 'Copied' : 'Copy Case Number'}
+            </Button>
+            <Link href={result.shareUrl.replace(/^https?:\/\/[^/]+/, '') || `/case/${result.caseId}`}>
+              <Button data-testid="view-case">View case</Button>
+            </Link>
+            <Button type="button" variant="outline" onClick={reportAnother}>
+              Report another issue
             </Button>
           </div>
-        )}
-        {mediaStatus === 'completed' && (
-          <p className="text-sm text-green-700 mb-3">Photos uploaded successfully.</p>
-        )}
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button type="button" variant="outline" onClick={copyReference}>
-            <Copy className="w-4 h-4 mr-2" />
-            {copied ? 'Copied' : 'Copy reference'}
-          </Button>
-          <Link href={result.shareUrl.replace(/^https?:\/\/[^/]+/, '') || `/case/${result.caseId}`}>
-            <Button data-testid="view-case">View case</Button>
-          </Link>
-          <Button type="button" variant="outline" onClick={reportAnother}>
-            Report another issue
-          </Button>
+          <p className="mt-4 break-all text-xs text-ink-subtle">Share link: {result.shareUrl}</p>
         </div>
-
-        <p className="text-xs text-gray-500 mt-4 break-all">Share link: {result.shareUrl}</p>
       </div>
     )
   }
@@ -717,11 +695,19 @@ export default function ReportPage() {
           <Stepper
             className="mb-8 max-w-2xl"
             current={state.step}
-            steps={['What', 'Where', 'Who & photos']}
+            steps={['What', 'Where', 'Who', 'Done']}
           />
         )}
 
-        <div className="max-w-2xl mx-auto">
+        {state.step === 4 && (
+          <Stepper
+            className="mb-8 max-w-2xl"
+            current={4}
+            steps={['What', 'Where', 'Who', 'Done']}
+          />
+        )}
+
+        <div className="mx-auto max-w-2xl">
           <Card>
             <CardContent className="p-6">
               {state.step === 1 && renderStep1()}
@@ -737,7 +723,7 @@ export default function ReportPage() {
 
               {submitError && (
                 <div
-                  className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"
+                  className="mt-4 rounded-lg border border-danger-border bg-danger-tint p-3 text-sm text-danger"
                   role="alert"
                   data-testid="submit-error"
                 >
@@ -749,7 +735,7 @@ export default function ReportPage() {
               )}
 
               {state.step < 4 && (
-                <div className="flex justify-between mt-8 gap-3">
+                <div className="mt-8 flex justify-between gap-3">
                   <Button
                     variant="outline"
                     onClick={() =>
@@ -781,12 +767,12 @@ export default function ReportPage() {
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           Submitting…
                         </>
                       ) : (
                         <>
-                          <Send className="w-4 h-4 mr-2" />
+                          <Send className="mr-2 h-4 w-4" aria-hidden />
                           Submit report
                         </>
                       )}

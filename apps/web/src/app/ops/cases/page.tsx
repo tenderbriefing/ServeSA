@@ -17,6 +17,7 @@ import {
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { OpsShell } from '@/components/ops/OpsShell'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 
 type CaseRow = {
   id: string
@@ -134,11 +135,11 @@ function OpsCasesInner() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-white">Cases</h1>
-          <p className="text-sm text-slate-400">Filter fast. Open. Act.</p>
+          <p className="text-sm text-ink-muted">Filter fast. Open. Act.</p>
         </div>
         <div className="flex flex-wrap gap-2 text-sm">
           <select
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5"
+            className="rounded-md border border-border bg-surface px-2 py-1.5"
             value={statusFilter}
             onChange={(e) => {
               setTriage(false)
@@ -163,7 +164,7 @@ function OpsCasesInner() {
             ))}
           </select>
           <button
-            className="rounded-md border border-slate-700 px-3 py-1.5"
+            className="rounded-md border border-border px-3 py-1.5"
             onClick={() => {
               setMine(true)
               setTriage(false)
@@ -173,7 +174,7 @@ function OpsCasesInner() {
             Mine
           </button>
           <button
-            className="rounded-md border border-slate-700 px-3 py-1.5"
+            className="rounded-md border border-border px-3 py-1.5"
             onClick={() => {
               setTriage(true)
               setMine(false)
@@ -183,7 +184,7 @@ function OpsCasesInner() {
             Triage
           </button>
           <button
-            className="rounded-md border border-slate-700 px-3 py-1.5"
+            className="rounded-md border border-border px-3 py-1.5"
             onClick={() => {
               setPriorityFilter(priorityFilter === 'high' ? '' : 'high')
               setMine(false)
@@ -195,13 +196,13 @@ function OpsCasesInner() {
         </div>
       </div>
       {error && (
-        <div className="mb-3 rounded-md border border-amber-700/50 bg-amber-950/40 px-3 py-2 text-sm text-amber-200">
+        <div className="mb-3 rounded-md border border-warning-border bg-warning-tint px-3 py-2 text-sm text-warning">
           {error}
         </div>
       )}
-      <div className="overflow-hidden rounded-lg border border-slate-800">
+      <div className="overflow-hidden rounded-lg border border-border">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-900/80 text-slate-400">
+          <thead className="bg-surface-muted text-ink-muted">
             <tr>
               <th className="px-3 py-2 font-medium">Case</th>
               <th className="px-3 py-2 font-medium">Status</th>
@@ -212,17 +213,17 @@ function OpsCasesInner() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t border-slate-800 hover:bg-slate-900/50">
+              <tr key={r.id} className="border-t border-border hover:bg-surface/50">
                 <td className="px-3 py-2">
-                  <Link href={`/ops/case?id=${r.id}`} className="text-emerald-400 hover:underline">
+                  <Link href={`/ops/case?id=${r.id}`} className="text-green-400 hover:underline">
                     {r.id}
                   </Link>
-                  <div className="text-xs text-slate-500 line-clamp-1">{r.title}</div>
+                  <div className="text-xs text-ink-subtle line-clamp-1">{r.title}</div>
                 </td>
                 <td className="px-3 py-2">
-                  {r.status}
+                  <StatusBadge status={r.status} />
                   {r.routingPending ? (
-                    <span className="ml-2 text-xs text-amber-400">routing</span>
+                    <span className="ml-2 text-xs text-warning">routing</span>
                   ) : null}
                 </td>
                 <td className="px-3 py-2">{r.priority}</td>
@@ -232,7 +233,7 @@ function OpsCasesInner() {
             ))}
             {!rows.length && !loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={5} className="px-3 py-8 text-center text-ink-subtle">
                   No cases in this queue.
                 </td>
               </tr>
@@ -244,7 +245,7 @@ function OpsCasesInner() {
         <button
           disabled={loading || !cursor}
           onClick={() => load(false)}
-          className="rounded-md border border-slate-700 px-3 py-1.5 text-sm disabled:opacity-40"
+          className="rounded-md border border-border px-3 py-1.5 text-sm disabled:opacity-40"
         >
           {loading ? 'Loading…' : 'Load more'}
         </button>
@@ -256,7 +257,7 @@ function OpsCasesInner() {
 export default function OpsCasesPage() {
   return (
     <OpsShell>
-      <Suspense fallback={<div className="text-slate-400">Loading…</div>}>
+      <Suspense fallback={<div className="text-ink-muted">Loading…</div>}>
         <OpsCasesInner />
       </Suspense>
     </OpsShell>

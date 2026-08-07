@@ -161,8 +161,8 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
   return (
     <div className="space-y-6" data-testid="location-step">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Where is this issue?</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="mb-2 font-display text-h4 text-ink">Your Location</h3>
+        <p className="text-sm text-ink-muted mb-4">
           Choose one method: use your device location, enter an address with a
           pin, or place a pin yourself. We only request GPS after you tap the
           button. The map is optional — address and GPS are equally valid.
@@ -184,7 +184,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
 
         {gpsError && (
           <div
-            className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3"
+            className="text-sm text-warning bg-warning-tint border border-warning-border rounded-lg p-3"
             role="alert"
             data-testid="gps-error"
           >
@@ -203,7 +203,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
       </div>
 
       <div data-testid="manual-location">
-        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="address">
+        <label className="block text-sm font-medium text-ink mb-2" htmlFor="address">
           Search or enter an address
         </label>
         <textarea
@@ -213,7 +213,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
           onChange={(e) => setAddressInput(e.target.value)}
           placeholder="Street, suburb, landmark…"
           rows={2}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]"
+          className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]"
         />
         <Button
           type="button"
@@ -228,17 +228,17 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
         </Button>
       </div>
 
-      <div className="border rounded-lg p-4 bg-gray-50 space-y-3">
-        <div className="flex items-center gap-2 font-medium text-gray-800">
+      <div className="border rounded-lg p-4 bg-surface-muted space-y-3">
+        <div className="flex items-center gap-2 font-medium text-ink">
           <MapPin className="w-4 h-4" />
           Drop or adjust map pin
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-ink-muted">
           Adjust the pin if GPS is unavailable. Coordinates are validated to South Africa.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-gray-600 mb-1" htmlFor="pin-lat">
+            <label className="block text-xs text-ink-muted mb-1" htmlFor="pin-lat">
               Latitude
             </label>
             <input
@@ -247,11 +247,11 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
               inputMode="decimal"
               value={pinLat}
               onChange={(e) => setPinLat(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+              className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px]"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-600 mb-1" htmlFor="pin-lng">
+            <label className="block text-xs text-ink-muted mb-1" htmlFor="pin-lng">
               Longitude
             </label>
             <input
@@ -260,7 +260,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
               inputMode="decimal"
               value={pinLng}
               onChange={(e) => setPinLng(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg min-h-[44px]"
+              className="w-full px-3 py-2 border border-border rounded-lg min-h-[44px]"
             />
           </div>
         </div>
@@ -270,7 +270,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
       </div>
 
       {pinError && (
-        <div className="flex gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">
+        <div className="flex gap-2 text-sm text-danger bg-danger-tint border border-danger-border rounded-lg p-3" role="alert">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{pinError}</span>
         </div>
@@ -290,7 +290,7 @@ export function LocationStep({ value, onChange, debug = false }: LocationStepPro
           )}
         </div>
       ) : (
-        <p className="text-sm text-gray-500" data-testid="location-required-hint">
+        <p className="text-sm text-ink-subtle" data-testid="location-required-hint">
           A valid South African location is required before continuing.
         </p>
       )}

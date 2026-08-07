@@ -21,6 +21,8 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 interface LoginFormProps {
   onSuccess?: () => void
   onSwitchToSignup?: () => void
+  /** When true, omit the card title/description (page already provides heading). */
+  hideHeader?: boolean
 }
 
 function friendlyAuthError(code?: string): string {
@@ -44,7 +46,7 @@ function friendlyAuthError(code?: string): string {
   }
 }
 
-export function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProps) {
+export function LoginForm({ onSuccess, onSwitchToSignup, hideHeader }: LoginFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -91,12 +93,14 @@ export function LoginForm({ onSuccess, onSwitchToSignup }: LoginFormProps) {
 
   return (
     <Card className="mx-auto w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-        <CardDescription>
-          Welcome back. Sign in to view your cases and notifications.
-        </CardDescription>
-      </CardHeader>
+      {!hideHeader && (
+        <CardHeader className="text-center">
+          <CardTitle className="font-display text-2xl font-bold">Sign in</CardTitle>
+          <CardDescription>
+            Welcome back. Sign in to view your cases and notifications.
+          </CardDescription>
+        </CardHeader>
+      )}
       <CardContent className="space-y-4">
         {error && (
           <Alert variant="destructive" role="alert">

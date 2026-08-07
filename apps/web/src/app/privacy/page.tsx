@@ -8,7 +8,7 @@ export default function PrivacyPage() {
       <div className="prose prose-gray max-w-none">
         <h2>1. Information We Collect</h2>
         <p>
-          ServeSA collects information necessary to provide service delivery reporting and communication services. 
+          Serve SA collects information necessary to provide service delivery reporting and communication services. 
           This includes:
         </p>
         <ul>
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
 
         <h2>3. Data Protection</h2>
         <p>
-          ServeSA complies with the Protection of Personal Information Act (POPIA) and implements 
+          Serve SA complies with the Protection of Personal Information Act (POPIA) and implements 
           appropriate security measures to protect your data. We use industry-standard encryption 
           and secure cloud infrastructure.
         </p>

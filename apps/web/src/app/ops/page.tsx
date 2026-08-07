@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { OpsShell } from '@/components/ops/OpsShell'
 import { opsApi } from '@/lib/opsApi'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 
 type QueueItem = {
   caseId: string
@@ -84,20 +85,20 @@ function SmartQueueInner() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-white">Smart Work Queue</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-ink-muted">
             Deterministic next actions for {municipalityCode || 'your municipality'}.
           </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/ops/supervisor"
-            className="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-ink-muted hover:bg-surface-muted"
           >
             Supervisor board
           </Link>
           <Link
             href="/ops/map"
-            className="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-ink-muted hover:bg-surface-muted"
           >
             Map
           </Link>
@@ -120,12 +121,12 @@ function SmartQueueInner() {
             }
           }}
           placeholder="Search cases (/) — reference, ward, category…"
-          className="min-w-[240px] flex-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="min-w-[240px] flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm"
         />
         <button
           type="button"
           onClick={load}
-          className="rounded-md bg-slate-800 px-3 py-2 text-sm text-slate-200"
+          className="rounded-md bg-surface-muted px-3 py-2 text-sm text-ink"
         >
           Refresh
         </button>
@@ -142,8 +143,8 @@ function SmartQueueInner() {
             }}
             className={`rounded-md px-2.5 py-1 text-xs ${
               bucket === b.id
-                ? 'bg-emerald-700 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-green-700 text-white'
+                : 'bg-surface-muted text-ink-muted hover:bg-surface-muted'
             }`}
           >
             {b.label}
@@ -158,8 +159,8 @@ function SmartQueueInner() {
       )}
 
       {searchResults && (
-        <div className="mb-4 rounded-lg border border-slate-800 bg-[#151b22] p-3">
-          <div className="mb-2 flex justify-between text-xs text-slate-400">
+        <div className="mb-4 rounded-lg border border-border bg-surface p-3">
+          <div className="mb-2 flex justify-between text-xs text-ink-muted">
             <span>Search results</span>
             <button type="button" onClick={() => setSearchResults(null)}>
               Clear
@@ -170,60 +171,62 @@ function SmartQueueInner() {
               <li key={r.caseId}>
                 <Link
                   href={`/ops/case?id=${encodeURIComponent(r.caseId)}`}
-                  className="text-sm text-emerald-400 hover:underline"
+                  className="text-sm text-green-400 hover:underline"
                 >
                   {r.caseId} · {r.title} · {r.status}
                 </Link>
               </li>
             ))}
             {searchResults.length === 0 && (
-              <li className="text-sm text-slate-500">No matches in municipality scope.</li>
+              <li className="text-sm text-ink-subtle">No matches in municipality scope.</li>
             )}
           </ul>
         </div>
       )}
 
       {loading ? (
-        <p className="text-slate-400">Loading queue…</p>
+        <p className="text-ink-muted">Loading queue…</p>
       ) : (
         <ul className="space-y-2">
           {items.map((item) => (
             <li
               key={item.caseId}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800 bg-[#151b22] px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-4 py-3"
             >
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-subtle">
                   <span>{item.reference}</span>
                   <span>·</span>
                   <span>{item.bucket.replace(/_/g, ' ')}</span>
                   {item.duplicateBadge && (
-                    <span className="rounded bg-amber-900/60 px-1.5 py-0.5 text-amber-200">
+                    <span className="rounded bg-warning-tint px-1.5 py-0.5 text-warning">
                       duplicate {item.duplicateBadge}
                     </span>
                   )}
                 </div>
                 <Link
                   href={`/ops/case?id=${encodeURIComponent(item.caseId)}`}
-                  className="mt-0.5 block truncate font-medium text-white hover:text-emerald-300"
+                  className="mt-0.5 block truncate font-medium text-white hover:text-green-300"
                 >
                   {item.title}
                 </Link>
-                <div className="mt-1 text-xs text-slate-400">
-                  {item.category} · {item.status} · ward {item.wardId || '—'} ·{' '}
-                  {item.department || 'unassigned dept'}
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+                  <span>{item.category}</span>
+                  <StatusBadge status={item.status} />
+                  <span>ward {item.wardId || '—'}</span>
+                  <span>{item.department || 'unassigned dept'}</span>
                 </div>
               </div>
               <Link
                 href={`/ops/case?id=${encodeURIComponent(item.caseId)}`}
-                className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+                className="rounded-md bg-green-700 px-3 py-2 text-sm font-medium text-white hover:bg-green-600"
               >
                 {item.nextAction}
               </Link>
             </li>
           ))}
           {items.length === 0 && (
-            <li className="text-sm text-slate-500">No actionable items in this bucket.</li>
+            <li className="text-sm text-ink-subtle">No actionable items in this bucket.</li>
           )}
         </ul>
       )}
@@ -234,7 +237,7 @@ function SmartQueueInner() {
 export default function OpsDashboardPage() {
   return (
     <OpsShell>
-      <Suspense fallback={<p className="text-slate-400">Loading queue…</p>}>
+      <Suspense fallback={<p className="text-ink-muted">Loading queue…</p>}>
         <SmartQueueInner />
       </Suspense>
     </OpsShell>

@@ -1,4 +1,4 @@
-// Seed data for ServeSA platform
+// Seed data for Serve SA platform
 export const seedDepartments = [
   {
     id: 'dept-water-jhb',
@@ -235,7 +235,7 @@ export const seedForumTopics = [
   {
     id: 'topic-003',
     title: 'Community cleanup initiative - join us!',
-    content: 'We are organizing a community cleanup this Saturday. All volunteers welcome. Let\'s make our neighborhood beautiful!',
+    content: 'We are organizing a community cleanup this Saturday. All volunteers welcome. Let\'s make our neighbourhood beautiful!',
     author: 'Nomsa Dlamini',
     authorAvatar: 'ND',
     createdAt: new Date('2024-01-13T09:20:00Z'),

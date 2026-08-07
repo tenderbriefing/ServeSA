@@ -65,13 +65,13 @@ export default function OpsMapPage() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-white">Operations Map</h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-ink-muted">
             Authoritative case coordinates only · municipality scoped · no contact PII
           </p>
         </div>
         <div className="flex gap-2">
           <select
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm"
+            className="rounded-md border border-border bg-surface px-2 py-1.5 text-sm"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
@@ -83,7 +83,7 @@ export default function OpsMapPage() {
             <option value="resolved">resolved</option>
           </select>
           <select
-            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1.5 text-sm"
+            className="rounded-md border border-border bg-surface px-2 py-1.5 text-sm"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
@@ -103,7 +103,7 @@ export default function OpsMapPage() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="relative h-[480px] overflow-hidden rounded-lg border border-slate-800 bg-[#0b1016] lg:col-span-2">
+        <div className="relative h-[480px] overflow-hidden rounded-lg border border-border bg-canvas lg:col-span-2">
           <div
             className="absolute inset-0 opacity-40"
             style={{
@@ -126,43 +126,43 @@ export default function OpsMapPage() {
                     ? 'bg-amber-400'
                     : f.priority === 'emergency' || f.priority === 'high'
                       ? 'bg-rose-500'
-                      : 'bg-emerald-500'
+                      : 'bg-green-500'
                 }`}
                 style={{ left: `${x}%`, top: `${y}%` }}
               />
             )
           })}
           {features.length === 0 && (
-            <p className="absolute inset-0 flex items-center justify-center text-sm text-slate-500">
+            <p className="absolute inset-0 flex items-center justify-center text-sm text-ink-subtle">
               No mappable cases for current filters.
             </p>
           )}
         </div>
-        <aside className="rounded-lg border border-slate-800 bg-[#151b22] p-4">
-          <h2 className="mb-2 text-sm font-medium text-slate-300">
+        <aside className="rounded-lg border border-border bg-surface p-4">
+          <h2 className="mb-2 text-sm font-medium text-ink-muted">
             {features.length} cases · markers use shape+label (colour secondary)
           </h2>
           {selected ? (
-            <div className="space-y-2 text-sm text-slate-200">
-              <div className="font-mono text-xs text-slate-500">{selected.label}</div>
+            <div className="space-y-2 text-sm text-ink">
+              <div className="font-mono text-xs text-ink-subtle">{selected.label}</div>
               <div>
                 {selected.category} · {selected.status} · {selected.priority}
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-ink-muted">
                 Ward {selected.wardId || '—'} · {selected.lat.toFixed(5)},{' '}
                 {selected.lng.toFixed(5)}
               </div>
               {selected.duplicatePending && (
-                <div className="text-amber-300">Duplicate review pending</div>
+                <div className="text-warning">Duplicate review pending</div>
               )}
               <Link
                 href={`/ops/case?id=${encodeURIComponent(selected.id)}`}
-                className="inline-block text-emerald-400 hover:underline"
+                className="inline-block text-green-400 hover:underline"
               >
                 Open case
               </Link>
               <a
-                className="ml-3 inline-block text-slate-400 hover:underline"
+                className="ml-3 inline-block text-ink-muted hover:underline"
                 href={`https://www.openstreetmap.org/?mlat=${selected.lat}&mlon=${selected.lng}#map=17/${selected.lat}/${selected.lng}`}
                 target="_blank"
                 rel="noreferrer"
@@ -171,14 +171,14 @@ export default function OpsMapPage() {
               </a>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">Select a marker for details.</p>
+            <p className="text-sm text-ink-subtle">Select a marker for details.</p>
           )}
-          <ul className="mt-4 max-h-64 space-y-1 overflow-auto text-xs text-slate-400">
+          <ul className="mt-4 max-h-64 space-y-1 overflow-auto text-xs text-ink-muted">
             {features.slice(0, 40).map((f) => (
               <li key={f.id}>
                 <button
                   type="button"
-                  className="text-left hover:text-emerald-300"
+                  className="text-left hover:text-green-300"
                   onClick={() => setSelected(f)}
                 >
                   ● {f.label} · {f.category}

@@ -156,7 +156,7 @@ export class NotificationsAPI {
         
         // Show notification
         if (payload.notification) {
-          const notification = new Notification(payload.notification.title || 'ServeSA', {
+          const notification = new Notification(payload.notification.title || 'Serve SA', {
             body: payload.notification.body,
             icon: '/icon-192x192.png',
             badge: '/icon-192x192.png',

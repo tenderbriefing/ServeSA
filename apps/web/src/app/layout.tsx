@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Manrope } from 'next/font/google'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { AccessibilityProvider } from '@/components/AccessibilityProvider'
@@ -17,13 +17,19 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const manrope = Manrope({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-display',
+})
+
 export const metadata: Metadata = {
   title: {
-    default: 'Serve SA — Report local service issues',
+    default: 'Serve SA — Building Better Communities Together',
     template: '%s | Serve SA',
   },
   description:
-    'Report local service issues and track progress with your municipality across South Africa.',
+    'Built for South Africa. Built for every community. Report local service issues and track progress with your municipality.',
   keywords: [
     'South Africa',
     'service delivery',
@@ -31,6 +37,7 @@ export const metadata: Metadata = {
     'report issues',
     'public services',
     'civic reporting',
+    'Serve SA',
   ],
   authors: [{ name: 'Serve SA' }],
   creator: 'Serve SA',
@@ -48,16 +55,16 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_ZA',
     url: 'https://servesa.co.za',
-    title: 'Serve SA — Report local service issues',
+    title: 'Serve SA — Building Better Communities Together',
     description:
-      'Report local service issues and track progress with your municipality.',
+      'Built for South Africa. Built for every community. Report local service issues and track progress.',
     siteName: 'Serve SA',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Serve SA — Report local service issues',
+    title: 'Serve SA — Building Better Communities Together',
     description:
-      'Report local service issues and track progress with your municipality.',
+      'Built for South Africa. Built for every community. Report local service issues and track progress.',
   },
   manifest: '/manifest.json',
   icons: {
@@ -78,7 +85,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#0e4c7e',
+  themeColor: '#002395',
 }
 
 export default function RootLayout({
@@ -87,8 +94,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en-ZA" className={inter.variable} suppressHydrationWarning>
-      <body className={inter.className}>
+    <html
+      lang="en-ZA"
+      className={`${inter.variable} ${manrope.variable}`}
+      suppressHydrationWarning
+    >
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

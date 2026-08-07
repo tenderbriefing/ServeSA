@@ -56,49 +56,49 @@ export default function OpsTeamPage() {
   return (
     <OpsShell>
       <h1 className="mb-1 text-2xl font-semibold text-white">Team</h1>
-      <p className="mb-6 text-sm text-slate-400">
+      <p className="mb-6 text-sm text-ink-muted">
         Officials, departments, and open workload.
       </p>
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-slate-800 bg-[#151b22] p-4">
-          <h2 className="mb-3 text-sm font-medium text-slate-300">Officials</h2>
+        <section className="rounded-lg border border-border bg-surface p-4">
+          <h2 className="mb-3 text-sm font-medium text-ink-muted">Officials</h2>
           <ul className="space-y-2 text-sm">
             {officials.map((o) => (
               <li
                 key={o.id}
-                className="flex items-center justify-between border-b border-slate-800 pb-2"
+                className="flex items-center justify-between border-b border-border pb-2"
               >
                 <div>
-                  <div className="text-slate-100">
+                  <div className="text-ink">
                     {o.displayName || o.email || o.id}
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-ink-subtle">
                     {(o.roles || []).join(', ') || o.role || 'official'}
                   </div>
                 </div>
-                <div className="tabular-nums text-slate-300">
+                <div className="tabular-nums text-ink-muted">
                   {workload[o.id] || 0} open
                 </div>
               </li>
             ))}
             {!officials.length && (
-              <li className="text-slate-500">No officials listed yet.</li>
+              <li className="text-ink-subtle">No officials listed yet.</li>
             )}
           </ul>
         </section>
-        <section className="rounded-lg border border-slate-800 bg-[#151b22] p-4">
-          <h2 className="mb-3 text-sm font-medium text-slate-300">Departments</h2>
+        <section className="rounded-lg border border-border bg-surface p-4">
+          <h2 className="mb-3 text-sm font-medium text-ink-muted">Departments</h2>
           <ul className="space-y-2 text-sm">
             {departments.map((d) => (
-              <li key={d.id} className="border-b border-slate-800 pb-2 text-slate-200">
+              <li key={d.id} className="border-b border-border pb-2 text-ink">
                 {d.name || d.id}
                 {d.active === false ? (
-                  <span className="ml-2 text-xs text-slate-500">inactive</span>
+                  <span className="ml-2 text-xs text-ink-subtle">inactive</span>
                 ) : null}
               </li>
             ))}
             {!departments.length && (
-              <li className="text-slate-500">
+              <li className="text-ink-subtle">
                 Add departments in Settings.
               </li>
             )}

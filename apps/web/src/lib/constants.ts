@@ -1,7 +1,8 @@
 // Application Constants
 export const APP_CONFIG = {
-  name: 'ServeSA',
-  description: 'South African Service Platform',
+  name: 'Serve SA',
+  description: 'South African civic reporting platform',
+
   version: '1.0.0',
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://servesa-aad53.web.app',
 } as const

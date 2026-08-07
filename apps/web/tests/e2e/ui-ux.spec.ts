@@ -11,7 +11,7 @@ test.describe('UI/UX transformation @uiux', () => {
     await expectPageLoads(page, '/')
     await expect(
       page.getByRole('heading', {
-        name: /report local service issues and track progress/i,
+        name: /building better communities together/i,
       })
     ).toBeVisible({ timeout: 20_000 })
 
@@ -53,8 +53,8 @@ test.describe('UI/UX transformation @uiux', () => {
     })
     const menu = page.getByTestId('mobile-menu')
     await expect(menu).toBeVisible()
-    await expect(menu.getByRole('link', { name: 'Report an Issue' })).toBeVisible()
-    await expect(menu.getByRole('link', { name: 'Track a Case' })).toBeVisible()
+    await expect(menu.getByRole('link', { name: 'Report' })).toBeVisible()
+    await expect(menu.getByRole('link', { name: 'Track' })).toBeVisible()
     await expect(menu.getByRole('link', { name: 'My Cases' })).toBeVisible()
     await expect(menu.getByRole('link', { name: 'Help' })).toBeVisible()
     await expect(menu.getByText('🇺🇸')).toHaveCount(0)

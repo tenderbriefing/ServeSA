@@ -24,9 +24,11 @@ export function Stepper({ steps, current, className }: StepperProps) {
                 <span
                   className={cn(
                     'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
-                    complete || active
-                      ? 'bg-primary-700 text-white'
-                      : 'bg-surface-muted text-ink-subtle'
+                    complete
+                      ? 'bg-green-600 text-white'
+                      : active
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-surface-muted text-ink-subtle'
                   )}
                   aria-current={active ? 'step' : undefined}
                 >
@@ -36,7 +38,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
                   <span
                     className={cn(
                       'mx-2 h-1 flex-1 rounded-full',
-                      complete ? 'bg-primary-700' : 'bg-border'
+                      complete ? 'bg-green-600' : 'bg-border'
                     )}
                     aria-hidden
                   />
