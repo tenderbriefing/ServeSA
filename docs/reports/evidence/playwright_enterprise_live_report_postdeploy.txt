@@ -1,0 +1,14 @@
+(node:52233) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:65479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65479) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:65479) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ENTERPRISE_LIVE_CASE_ID=CASE-MSIVK442-H8WDTG
+  ✓  1 [chromium] › apps/web/tests/e2e/enterprise_report_live.spec.ts:35:7 › Enterprise live citizen report @enterprise › authenticated homepage → report → submit yields Case ID (14.6s)
+
+  1 passed (16.3s)
