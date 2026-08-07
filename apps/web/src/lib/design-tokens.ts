@@ -1,47 +1,122 @@
 /**
  * Serve SA design tokens — TypeScript mirror of apps/web/src/app/globals.css.
- * Use these values in JS (charts, maps, canvas) so colour never drifts from CSS.
+ * Use in JS (charts, maps, canvas) so colour never drifts from CSS.
+ *
+ * Anchors: Blue #002395 · Green #007A4D · Gold #FFB81C · Red #DE3831
+ * Charcoal #1F2933 · Warm Off-White #FAF8F3 · White #FFFFFF
  */
 export const colour = {
-  primary: {
-    50: '#f2f7fb',
-    100: '#e1edf6',
-    200: '#bbd6ea',
-    300: '#7fb1d8',
-    400: '#3b84bf',
-    500: '#14639f',
-    600: '#0e4c7e',
-    700: '#0a3b63',
-    800: '#072b4a',
-    900: '#04182b',
+  blue: {
+    50: '#eef1fa',
+    100: '#d5dbf3',
+    200: '#aab7e7',
+    300: '#7a8fd6',
+    400: '#4a66c4',
+    500: '#1e44b0',
+    600: '#002395',
+    700: '#001c78',
+    800: '#00155a',
+    900: '#000e3d',
+    950: '#000829',
   },
-  secondary: {
-    50: '#effaf7',
-    100: '#dcf2ec',
-    200: '#a7ded0',
-    300: '#5fc2ab',
-    400: '#12907a',
-    500: '#0e7361',
-    600: '#0b5c4e',
-    700: '#08453a',
+  green: {
+    50: '#eef8f3',
+    100: '#d5efe3',
+    200: '#a8dfc6',
+    300: '#6fc5a0',
+    400: '#2ea574',
+    500: '#008c58',
+    600: '#007A4D',
+    700: '#005c3a',
+    800: '#00432b',
+    900: '#002c1c',
+    950: '#001910',
   },
   gold: {
-    50: '#fffbeb',
-    100: '#fdf3d7',
-    200: '#f2dfa0',
-    300: '#d9a93c',
-    400: '#c08a18',
-    500: '#a16207',
-    600: '#7c4a05',
+    50: '#fff8e8',
+    100: '#ffefc4',
+    200: '#ffe08a',
+    300: '#ffd04d',
+    400: '#ffc229',
+    500: '#FFB81C',
+    600: '#d99700',
+    700: '#a67400',
+    800: '#735100',
+    900: '#473200',
+    950: '#2a1d00',
   },
-  ink: '#16202a',
+  red: {
+    50: '#fef2f1',
+    100: '#fce3e1',
+    200: '#f7c0bc',
+    300: '#ef9089',
+    400: '#e65d54',
+    500: '#DE3831',
+    600: '#b92a24',
+    700: '#8f1f1b',
+    800: '#681715',
+    900: '#45100e',
+    950: '#2a0908',
+  },
+  neutral: {
+    50: '#FAF8F3',
+    100: '#f3f1ec',
+    200: '#e5e2db',
+    300: '#d0cdc5',
+    400: '#a8a59c',
+    500: '#7a7770',
+    600: '#56544e',
+    700: '#3d3b37',
+    800: '#2a2926',
+    900: '#1F2933',
+    950: '#121820',
+  },
+  /** @deprecated Prefer colour.blue — kept for chart callers during migration */
+  primary: {
+    50: '#eef1fa',
+    100: '#d5dbf3',
+    200: '#aab7e7',
+    300: '#7a8fd6',
+    400: '#4a66c4',
+    500: '#1e44b0',
+    600: '#002395',
+    700: '#001c78',
+    800: '#00155a',
+    900: '#000e3d',
+  },
+  /** @deprecated Prefer colour.green */
+  secondary: {
+    50: '#eef8f3',
+    100: '#d5efe3',
+    200: '#a8dfc6',
+    300: '#6fc5a0',
+    400: '#2ea574',
+    500: '#008c58',
+    600: '#007A4D',
+    700: '#005c3a',
+  },
+  white: '#FFFFFF',
+  ink: '#1F2933',
   inkMuted: '#46535f',
-  canvas: '#f7f8fa',
-  surface: '#ffffff',
-  success: '#146c43',
-  warning: '#a16207',
-  danger: '#b3261e',
-  info: '#0e4c7e',
+  canvas: '#FAF8F3',
+  surface: '#FFFFFF',
+  success: '#005c3a',
+  warning: '#735100',
+  danger: '#b92a24',
+  info: '#001c78',
+} as const
+
+export const typography = {
+  display: 'var(--text-display)',
+  h1: 'var(--text-h1)',
+  h2: 'var(--text-h2)',
+  h3: 'var(--text-h3)',
+  h4: 'var(--text-h4)',
+  bodyLg: 'var(--text-body-lg)',
+  body: 'var(--text-body)',
+  bodySm: 'var(--text-body-sm)',
+  label: 'var(--text-label)',
+  caption: 'var(--text-caption)',
 } as const
 
 export const spacing = {
@@ -82,3 +157,11 @@ export const breakpoints = {
 
 export const touchTargetMinPx = 44
 export const bodyFontMinPx = 16
+
+/** Motto / identity copy — product voice */
+export const brandCopy = {
+  name: 'Serve SA',
+  motto: 'Building Better Communities Together',
+  tagline: 'Built for South Africa. Built for every community.',
+  motifCaption: 'Many communities. One country.',
+} as const

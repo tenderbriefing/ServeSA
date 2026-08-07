@@ -66,9 +66,11 @@ test('citizen navigation labels are present in Header', () => {
     path.join(webRoot, 'src/components/layout/Header.tsx'),
     'utf8'
   )
-  assert.match(header, /Report an Issue/)
-  assert.match(header, /My Cases/)
-  assert.match(header, /Track a Case/)
+  assert.match(header, /label:\s*'Report'/)
+  assert.match(header, /label:\s*'Track'/)
+  assert.match(header, /label:\s*'My Cases'/)
+  assert.match(header, /label:\s*'Help'/)
   assert.doesNotMatch(header, /LanguageSwitcher/)
   assert.doesNotMatch(header, /GIS|georesolution/i)
 })
+

@@ -27,32 +27,32 @@ export function NotificationCenter() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'case_update':
-        return <FileText className="h-4 w-4 text-blue-500" />
+        return <FileText className="h-4 w-4 text-primary-600" />
       case 'message':
-        return <MessageSquare className="h-4 w-4 text-green-500" />
+        return <MessageSquare className="h-4 w-4 text-green-600" />
       case 'community':
-        return <Users className="h-4 w-4 text-purple-500" />
+        return <Users className="h-4 w-4 text-primary-500" />
       case 'system':
-        return <AlertCircle className="h-4 w-4 text-orange-500" />
+        return <AlertCircle className="h-4 w-4 text-gold-600" />
       case 'reminder':
-        return <Clock className="h-4 w-4 text-yellow-500" />
+        return <Clock className="h-4 w-4 text-warning" />
       default:
-        return <Bell className="h-4 w-4 text-gray-500" />
+        return <Bell className="h-4 w-4 text-ink-subtle" />
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-danger-tint text-danger border-danger-border'
       case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200'
+        return 'bg-warning-tint text-warning border-warning-border'
       case 'medium':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-info-tint text-info border-info-border'
       case 'low':
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-surface-muted text-ink border-border'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-surface-muted text-ink border-border'
     }
   }
 
@@ -119,7 +119,7 @@ export function NotificationCenter() {
                   key={notification.id}
                   className={`p-4 border rounded-lg transition-colors ${
                     notification.read 
-                      ? 'bg-gray-50 border-gray-200' 
+                      ? 'bg-surface-muted border-border' 
                       : 'bg-white border-blue-200 shadow-sm'
                   }`}
                 >
@@ -131,7 +131,7 @@ export function NotificationCenter() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className={`text-sm font-medium ${
-                          notification.read ? 'text-gray-700' : 'text-gray-900'
+                          notification.read ? 'text-ink' : 'text-ink'
                         }`}>
                           {notification.title}
                         </h4>
@@ -147,7 +147,7 @@ export function NotificationCenter() {
                       </div>
                       
                       <p className={`text-sm ${
-                        notification.read ? 'text-gray-600' : 'text-gray-700'
+                        notification.read ? 'text-ink-muted' : 'text-ink'
                       }`}>
                         {notification.message}
                       </p>
@@ -185,7 +185,7 @@ export function NotificationCenter() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 px-2 text-xs text-red-600 hover:text-red-700"
+                            className="h-6 px-2 text-xs text-danger hover:text-danger"
                             onClick={() => deleteNotification(notification.id)}
                           >
                             <Trash2 className="h-3 w-3" />

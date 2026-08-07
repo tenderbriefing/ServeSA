@@ -9,7 +9,6 @@ import {
   Menu,
   X,
   LogOut,
-  MapPin,
   Bell,
   HelpCircle,
   FileText,
@@ -23,14 +22,11 @@ import { getInitials } from '@/lib/utils'
 import { useOffline } from '@/hooks/useOffline'
 import { cn } from '@/lib/utils'
 
+/** Citizen primary nav — Report / Track / My Cases / Help — no clutter */
 const primaryLinks = [
-  { href: '/report', label: 'Report an Issue', icon: FileText },
-  { href: '/case', label: 'Track a Case', icon: Search },
+  { href: '/report', label: 'Report', icon: FileText },
+  { href: '/case', label: 'Track', icon: Search },
   { href: '/dashboard', label: 'My Cases', icon: User },
-] as const
-
-const utilityLinks = [
-  { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/help', label: 'Help', icon: HelpCircle },
 ] as const
 
@@ -78,7 +74,7 @@ export function Header() {
 
   const linkClass = (href: string) =>
     cn(
-      'inline-flex min-h-touch items-center rounded-md px-2 text-sm font-medium transition-colors duration-fast',
+      'inline-flex min-h-touch items-center rounded-md px-2.5 text-sm font-medium transition-colors duration-fast',
       isActive(href)
         ? 'text-primary-700 bg-primary-50'
         : 'text-ink-muted hover:text-ink hover:bg-surface-muted'
@@ -90,13 +86,32 @@ export function Header() {
         <div className="flex h-16 items-center justify-between gap-3">
           <Link
             href="/"
-            className="flex min-h-touch shrink-0 items-center gap-2 rounded-md"
+            className="flex min-h-touch shrink-0 items-center gap-2.5 rounded-md"
             aria-label="Serve SA home"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary-700 text-white">
-              <MapPin className="h-5 w-5" aria-hidden />
+            <span
+              className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-md bg-primary-600 text-white"
+              aria-hidden
+            >
+              <svg viewBox="0 0 36 36" className="h-9 w-9" aria-hidden>
+                <path
+                  d="M8 8 L18 18 L8 28"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  opacity="0.85"
+                />
+                <path
+                  d="M28 8 L18 18 L28 28"
+                  fill="none"
+                  stroke="rgb(0 122 77)"
+                  strokeWidth="2"
+                  opacity="0.9"
+                />
+                <circle cx="18" cy="18" r="2.5" fill="rgb(255 184 28)" />
+              </svg>
             </span>
-            <span className="text-lg font-semibold tracking-tight text-ink">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink">
               Serve SA
             </span>
           </Link>
@@ -122,24 +137,21 @@ export function Header() {
               </Badge>
             )}
 
-            {utilityLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted hover:text-ink"
-                aria-label={link.label}
-              >
-                <link.icon className="h-5 w-5" aria-hidden />
-              </Link>
-            ))}
+            <Link
+              href="/notifications"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-ink-muted hover:bg-surface-muted hover:text-ink"
+              aria-label="Notifications"
+            >
+              <Bell className="h-5 w-5" aria-hidden />
+            </Link>
 
             {user ? (
               <div className="flex items-center gap-2 pl-1">
                 {isOfficial && (
-                  <Badge className="bg-secondary-100 text-secondary-700">Staff</Badge>
+                  <Badge className="bg-green-100 text-green-800">Staff</Badge>
                 )}
                 {isAdmin && (
-                  <Badge className="bg-gold-100 text-gold-600">Admin</Badge>
+                  <Badge className="bg-gold-100 text-gold-800">Admin</Badge>
                 )}
                 <div className="flex items-center gap-2 rounded-md px-2 py-1">
                   <span
@@ -177,7 +189,9 @@ export function Header() {
                   </Button>
                 </Link>
                 <Link href="/auth">
-                  <Button size="sm">Create account</Button>
+                  <Button variant="brand" size="sm">
+                    Create account
+                  </Button>
                 </Link>
               </div>
             )}
@@ -220,17 +234,14 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-              {utilityLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(linkClass(link.href), 'w-full justify-start gap-2 px-3')}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <link.icon className="h-4 w-4" aria-hidden />
-                  {link.label}
-                </Link>
-              ))}
+              <Link
+                href="/notifications"
+                className={cn(linkClass('/notifications'), 'w-full justify-start gap-2 px-3')}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Bell className="h-4 w-4" aria-hidden />
+                Notifications
+              </Link>
             </nav>
 
             <div className="mt-4 space-y-3 border-t border-border pt-4">
@@ -278,7 +289,9 @@ export function Header() {
                     </Button>
                   </Link>
                   <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Create account</Button>
+                    <Button variant="brand" className="w-full">
+                      Create account
+                    </Button>
                   </Link>
                 </div>
               )}

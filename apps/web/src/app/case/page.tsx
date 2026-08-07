@@ -4,9 +4,15 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { ProgressTimeline } from '@/components/civic/ProgressTimeline'
+import { MunicipalityIdentity } from '@/components/civic/MunicipalityIdentity'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { useAuth } from '@/hooks/useAuth'
 import { casesAPI } from '@/lib/api/cases'
-import { CITIZEN_STATUS_LABEL } from '@servesa/case-contract'
+import { Search } from 'lucide-react'
 
 /**
  * Citizen progress timeline — safe milestones only.
@@ -15,6 +21,7 @@ import { CITIZEN_STATUS_LABEL } from '@servesa/case-contract'
 export default function CasePage() {
   const { user, loading: authLoading } = useAuth()
   const [caseId, setCaseId] = useState('')
+  const [lookupId, setLookupId] = useState('')
   const [ready, setReady] = useState(false)
   const [timeline, setTimeline] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
@@ -26,12 +33,15 @@ export default function CasePage() {
     const path = window.location.pathname.replace(/\/$/, '')
     const fromPath = path.startsWith('/case/') ? path.slice('/case/'.length) : ''
     const fromQuery = new URLSearchParams(window.location.search).get('id') || ''
-    setCaseId(decodeURIComponent(fromPath || fromQuery))
+    const id = decodeURIComponent(fromPath || fromQuery)
+    setCaseId(id)
+    setLookupId(id)
     setReady(true)
   }, [])
 
   useEffect(() => {
     if (!caseId || !user) return
+    setError(null)
     casesAPI
       .getCitizenTimeline(caseId)
       .then(setTimeline)
@@ -39,73 +49,134 @@ export default function CasePage() {
   }, [caseId, user])
 
   if (!ready || authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600" />
-      </div>
-    )
+    return <Spinner label="Loading case tracking…" />
   }
 
-  const statusLabel =
-    timeline?.status &&
-    (CITIZEN_STATUS_LABEL[timeline.status as keyof typeof CITIZEN_STATUS_LABEL] ||
-      timeline.status)
-
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-2xl space-y-4">
+    <div className="bg-canvas px-4 py-10">
+      <div className="container mx-auto max-w-2xl space-y-6">
+        <PageHeader
+          title="Track a Case"
+          description="Enter your Case Number to follow progress. Sign in with the account used to submit the report to view the full timeline."
+          breadcrumbs={[
+            { href: '/', label: 'Home' },
+            { label: 'Track a Case' },
+          ]}
+        />
+
         <Card>
           <CardHeader>
-            <CardTitle>Case {caseId || '(missing id)'}</CardTitle>
+            <CardTitle className="font-display text-h4">Case Number</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm text-slate-700">
+          <CardContent className="space-y-4">
+            <form
+              className="flex flex-col gap-3 sm:flex-row"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const next = lookupId.trim()
+                if (!next) return
+                setCaseId(next)
+                const url = new URL(window.location.href)
+                url.searchParams.set('id', next)
+                window.history.replaceState({}, '', url.toString())
+              }}
+            >
+              <label className="sr-only" htmlFor="case-number">
+                Case Number
+              </label>
+              <input
+                id="case-number"
+                value={lookupId}
+                onChange={(e) => setLookupId(e.target.value)}
+                placeholder="CASE-…"
+                className="min-h-touch w-full flex-1 rounded-md border border-border bg-surface px-3 text-base text-ink"
+                autoComplete="off"
+              />
+              <Button type="submit" variant="brand" className="min-h-touch">
+                <Search className="mr-2 h-4 w-4" aria-hidden />
+                Look up
+              </Button>
+            </form>
+
             {!user && (
-              <p>
-                Sign in with the account used to submit this report to view your progress
-                timeline. Contact details are never shown on public share pages.
+              <p className="text-body-sm text-ink-muted">
+                Sign in with the account used to submit this report to view your
+                progress timeline. Contact details are never shown on public share
+                pages.
               </p>
             )}
-            {error && <p className="text-red-600">{error}</p>}
-            {msg && <p className="text-emerald-700">{msg}</p>}
+            {error && (
+              <p className="rounded-md border border-danger-border bg-danger-tint p-3 text-body-sm text-danger" role="alert">
+                {error}
+              </p>
+            )}
+            {msg && (
+              <p className="rounded-md border border-success-border bg-success-tint p-3 text-body-sm text-success" role="status">
+                {msg}
+              </p>
+            )}
+
+            {user && caseId && !timeline && !error && (
+              <Spinner label="Loading timeline…" />
+            )}
+
+            {user && !caseId && (
+              <EmptyState
+                title="Enter a Case Number"
+                description="Use the Case Number from your submission confirmation to track progress."
+                icon={<Search className="h-6 w-6" aria-hidden />}
+              />
+            )}
 
             {timeline && (
-              <>
+              <div className="space-y-6">
                 <div>
-                  <div className="text-xs uppercase tracking-wide text-slate-500">Status</div>
-                  <div className="text-lg font-medium text-slate-900">{statusLabel}</div>
-                  <div className="text-slate-600">{timeline.title}</div>
+                  <p className="text-caption uppercase tracking-wide text-ink-subtle">
+                    Status
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <StatusBadge status={timeline.status} />
+                    <h2 className="font-display text-h3 text-ink">
+                      {timeline.title || caseId}
+                    </h2>
+                  </div>
+                  <p className="mt-1 text-body-sm text-ink-muted">
+                    Case Number:{' '}
+                    <span className="font-mono font-semibold text-ink">
+                      {timeline.reference || caseId}
+                    </span>
+                  </p>
                   {timeline.linkedPrimary && (
-                    <p className="mt-2 rounded-md bg-sky-50 p-2 text-sky-900">
-                      Your report appears to relate to an existing incident. It has been
-                      linked so that you can receive progress updates.
+                    <p className="mt-3 rounded-md border border-info-border bg-info-tint p-3 text-body-sm text-info">
+                      Your report appears to relate to an existing incident. It has
+                      been linked so that you can receive progress updates.
                     </p>
                   )}
                 </div>
 
-                <div>
-                  <h3 className="mb-2 font-medium text-slate-900">Progress</h3>
-                  <ol className="space-y-3 border-l-2 border-slate-200 pl-4">
-                    {(timeline.milestones || []).map((m: any, i: number) => (
-                      <li key={i}>
-                        <div className="font-medium text-slate-800">{m.description}</div>
-                        <div className="text-xs text-slate-500">
-                          {m.actor === 'you'
-                            ? 'You'
-                            : m.actor === 'municipality'
-                              ? 'Municipality'
-                              : 'System'}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+                <MunicipalityIdentity
+                  municipalityName={timeline.municipality?.name || timeline.municipalityName}
+                  municipalityCode={timeline.municipality?.code || timeline.municipalityCode}
+                  wardName={timeline.ward?.name || timeline.wardName}
+                  wardCode={timeline.ward?.code || timeline.wardCode}
+                  department={timeline.department || timeline.departmentName}
+                  routingPending={timeline.routingPending}
+                />
+
+                <ProgressTimeline
+                  currentStatus={timeline.status}
+                  milestones={timeline.milestones || []}
+                />
 
                 {(timeline.publicUpdates || []).length > 0 && (
                   <div>
-                    <h3 className="mb-2 font-medium text-slate-900">Updates</h3>
+                    <h3 className="mb-2 font-display text-h4 text-ink">Updates</h3>
                     <ul className="space-y-2">
                       {timeline.publicUpdates.map((u: any, i: number) => (
-                        <li key={i} className="rounded-md bg-white p-3 border border-slate-200">
+                        <li
+                          key={i}
+                          className="rounded-md border border-border bg-surface p-3 text-body-sm text-ink"
+                        >
                           {u.body}
                         </li>
                       ))}
@@ -114,10 +185,12 @@ export default function CasePage() {
                 )}
 
                 {timeline.canConfirm && (
-                  <div className="space-y-2 rounded-md border border-slate-200 bg-white p-4">
-                    <h3 className="font-medium">Is the issue resolved?</h3>
+                  <div className="space-y-2 rounded-md border border-border bg-surface p-4">
+                    <h3 className="font-display text-h4 text-ink">
+                      Is the issue resolved?
+                    </h3>
                     <textarea
-                      className="w-full rounded border border-slate-300 p-2 text-sm"
+                      className="w-full rounded-md border border-border bg-surface p-2 text-base text-ink"
                       rows={2}
                       placeholder="Optional comment"
                       value={reason}
@@ -168,18 +241,20 @@ export default function CasePage() {
                     </div>
                   </div>
                 )}
-              </>
+              </div>
             )}
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               <Link href="/report">
                 <Button variant="outline">Report another issue</Button>
               </Link>
               <Link href="/">
-                <Button>Home</Button>
+                <Button variant="brand">Home</Button>
               </Link>
               {!user && (
-                <Link href={`/auth/signin?next=${encodeURIComponent(`/case?id=${caseId}`)}`}>
+                <Link
+                  href={`/auth/signin?next=${encodeURIComponent(`/case?id=${caseId || ''}`)}`}
+                >
                   <Button variant="outline">Sign in</Button>
                 </Link>
               )}

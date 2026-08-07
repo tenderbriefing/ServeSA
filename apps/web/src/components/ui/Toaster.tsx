@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Toaster as ToastPrimitive } from "react-hot-toast"
 
+/** CSS vars are RGB channel triples — use rgb(), never hsl(). */
 export function Toaster() {
   return (
     <ToastPrimitive
@@ -8,20 +9,20 @@ export function Toaster() {
       toastOptions={{
         duration: 4000,
         style: {
-          background: 'hsl(var(--background))',
-          color: 'hsl(var(--foreground))',
-          border: '1px solid hsl(var(--border))',
+          background: 'rgb(var(--surface))',
+          color: 'rgb(var(--ink))',
+          border: '1px solid rgb(var(--border))',
         },
         success: {
           iconTheme: {
-            primary: 'hsl(var(--success))',
-            secondary: 'hsl(var(--success-foreground))',
+            primary: 'rgb(var(--success))',
+            secondary: 'rgb(var(--surface))',
           },
         },
         error: {
           iconTheme: {
-            primary: 'hsl(var(--destructive))',
-            secondary: 'hsl(var(--destructive-foreground))',
+            primary: 'rgb(var(--danger))',
+            secondary: 'rgb(var(--surface))',
           },
         },
       }}

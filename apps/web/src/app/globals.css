@@ -3,68 +3,146 @@
 @tailwind utilities;
 
 /*
- * Serve SA design tokens — single source of truth.
- * Colour channels are stored as space separated RGB so Tailwind can apply
- * opacity modifiers (bg-primary/10) via rgb(var(--token) / <alpha-value>).
+ * Serve SA — South African civic design tokens (single source of truth).
+ * Channels are space-separated RGB so Tailwind opacity modifiers work:
+ * bg-primary/10 → rgb(var(--blue-600) / 0.1)
+ *
+ * Palette anchors (SA identity, WCAG AA+):
+ * Blue #002395 · Green #007A4D · Gold #FFB81C · Red #DE3831
+ * Charcoal #1F2933 · Warm Off-White #FAF8F3 · White #FFFFFF
+ *
+ * ~80–90% neutral surfaces. Flag colours used for trust, action, emphasis,
+ * and urgent status only — never as a rainbow chrome.
  */
 @layer base {
   :root {
-    /* Brand — deep navy */
-    --primary-50: 242 247 251;
-    --primary-100: 225 237 246;
-    --primary-200: 187 214 234;
-    --primary-300: 127 177 216;
-    --primary-400: 59 132 191;
-    --primary-500: 20 99 159;
-    --primary-600: 14 76 126;
-    --primary-700: 10 59 99;
-    --primary-800: 7 43 74;
-    --primary-900: 4 24 43;
+    /* Blue — trust / navigation (anchor #002395 = 600) */
+    --blue-50: 238 241 250;
+    --blue-100: 213 219 243;
+    --blue-200: 170 183 231;
+    --blue-300: 122 143 214;
+    --blue-400: 74 102 196;
+    --blue-500: 30 68 176;
+    --blue-600: 0 35 149;
+    --blue-700: 0 28 120;
+    --blue-800: 0 21 90;
+    --blue-900: 0 14 61;
+    --blue-950: 0 8 41;
 
-    /* Brand — civic teal */
-    --secondary-50: 239 250 247;
-    --secondary-100: 220 242 236;
-    --secondary-200: 167 222 208;
-    --secondary-300: 95 194 171;
-    --secondary-400: 18 144 122;
-    --secondary-500: 14 115 97;
-    --secondary-600: 11 92 78;
-    --secondary-700: 8 69 58;
+    /* Green — action / progress (anchor #007A4D = 600) */
+    --green-50: 238 248 243;
+    --green-100: 213 239 227;
+    --green-200: 168 223 198;
+    --green-300: 111 197 160;
+    --green-400: 46 165 116;
+    --green-500: 0 140 88;
+    --green-600: 0 122 77;
+    --green-700: 0 92 58;
+    --green-800: 0 67 43;
+    --green-900: 0 44 28;
+    --green-950: 0 25 16;
 
-    /* Accent — restrained gold, used sparingly for emphasis and focus */
-    --accent-50: 255 251 235;
-    --accent-100: 253 243 215;
-    --accent-200: 242 223 160;
-    --accent-300: 217 169 60;
-    --accent-400: 192 138 24;
-    --accent-500: 161 98 7;
-    --accent-600: 124 74 5;
+    /* Gold — emphasis only (anchor #FFB81C = 500) */
+    --gold-50: 255 248 232;
+    --gold-100: 255 239 196;
+    --gold-200: 255 224 138;
+    --gold-300: 255 208 77;
+    --gold-400: 255 194 41;
+    --gold-500: 255 184 28;
+    --gold-600: 217 151 0;
+    --gold-700: 166 116 0;
+    --gold-800: 115 81 0;
+    --gold-900: 71 50 0;
+    --gold-950: 42 29 0;
+
+    /* Red — errors / urgent only (anchor #DE3831 = 500) */
+    --red-50: 254 242 241;
+    --red-100: 252 227 225;
+    --red-200: 247 192 188;
+    --red-300: 239 144 137;
+    --red-400: 230 93 84;
+    --red-500: 222 56 49;
+    --red-600: 185 42 36;
+    --red-700: 143 31 27;
+    --red-800: 104 23 21;
+    --red-900: 69 16 14;
+    --red-950: 42 9 8;
+
+    /* Neutral — warm civic surfaces (charcoal #1F2933 = 900; canvas #FAF8F3 = 50) */
+    --neutral-50: 250 248 243;
+    --neutral-100: 243 241 236;
+    --neutral-200: 229 226 219;
+    --neutral-300: 208 205 197;
+    --neutral-400: 168 165 156;
+    --neutral-500: 122 119 112;
+    --neutral-600: 86 84 78;
+    --neutral-700: 61 59 55;
+    --neutral-800: 42 41 38;
+    --neutral-900: 31 41 51;
+    --neutral-950: 18 24 32;
+
+    /* Semantic aliases — primary = blue trust */
+    --primary-50: var(--blue-50);
+    --primary-100: var(--blue-100);
+    --primary-200: var(--blue-200);
+    --primary-300: var(--blue-300);
+    --primary-400: var(--blue-400);
+    --primary-500: var(--blue-500);
+    --primary-600: var(--blue-600);
+    --primary-700: var(--blue-700);
+    --primary-800: var(--blue-800);
+    --primary-900: var(--blue-900);
+    --primary-950: var(--blue-950);
+
+    /* Secondary = green action */
+    --secondary-50: var(--green-50);
+    --secondary-100: var(--green-100);
+    --secondary-200: var(--green-200);
+    --secondary-300: var(--green-300);
+    --secondary-400: var(--green-400);
+    --secondary-500: var(--green-500);
+    --secondary-600: var(--green-600);
+    --secondary-700: var(--green-700);
+    --secondary-800: var(--green-800);
+    --secondary-900: var(--green-900);
+
+    /* Accent = gold (CSS channel aliases for Tailwind gold.*) */
+    --accent-50: var(--gold-50);
+    --accent-100: var(--gold-100);
+    --accent-200: var(--gold-200);
+    --accent-300: var(--gold-300);
+    --accent-400: var(--gold-400);
+    --accent-500: var(--gold-500);
+    --accent-600: var(--gold-600);
+    --accent-700: var(--gold-700);
+    --accent-800: var(--gold-800);
+    --accent-900: var(--gold-900);
 
     /* Surfaces and ink */
-    --canvas: 247 248 250;
+    --canvas: var(--neutral-50);
     --surface: 255 255 255;
-    --surface-muted: 244 246 248;
-    --surface-inverse: 7 43 74;
-    --ink: 22 32 42;
+    --surface-muted: var(--neutral-100);
+    --surface-inverse: var(--blue-900);
+    --ink: var(--neutral-900);
     --ink-muted: 70 83 95;
     --ink-subtle: 94 107 120;
     --ink-inverse: 255 255 255;
-    --border: 217 222 228;
-    --border-strong: 185 193 202;
+    --border: var(--neutral-200);
+    --border-strong: var(--neutral-300);
 
-    /* Semantic states — each has an accessible text colour on its own tint */
-    --success: 20 108 67;
-    --success-tint: 231 245 236;
-    --success-border: 169 214 188;
-    --warning: 161 98 7;
-    --warning-tint: 253 246 227;
-    --warning-border: 235 208 138;
-    --danger: 179 38 30;
-    --danger-tint: 253 236 234;
-    --danger-border: 240 180 175;
-    --info: 14 76 126;
-    --info-tint: 233 242 249;
-    --info-border: 169 200 224;
+    /* Semantic states */
+    --success: var(--green-700);
+    --success-tint: var(--green-50);
+    --success-border: var(--green-200);
+    --warning: var(--gold-800);
+    --warning-tint: var(--gold-50);
+    --warning-border: var(--gold-200);
+    --danger: var(--red-600);
+    --danger-tint: var(--red-50);
+    --danger-border: var(--red-200);
+    --info: var(--blue-700);
+    --info-tint: var(--blue-50);
+    --info-border: var(--blue-200);
 
     /* Shape */
     --radius-sm: 0.25rem;
@@ -73,8 +151,8 @@
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
 
-    /* Focus */
-    --focus: 14 76 126;
+    /* Focus — blue trust ring */
+    --focus: var(--blue-600);
     --focus-width: 3px;
     --focus-offset: 2px;
 
@@ -84,14 +162,33 @@
     --motion-slow: 280ms;
     --motion-ease: cubic-bezier(0.2, 0, 0.13, 1);
 
-    /* Aliases kept for existing shadcn-style primitives */
+    /* Typography scale */
+    --text-display: 2.75rem;
+    --text-h1: 2.25rem;
+    --text-h2: 1.875rem;
+    --text-h3: 1.5rem;
+    --text-h4: 1.25rem;
+    --text-body-lg: 1.125rem;
+    --text-body: 1rem;
+    --text-body-sm: 0.875rem;
+    --text-label: 0.875rem;
+    --text-caption: 0.75rem;
+
+    /* Motif — subtle Y-convergence (Many communities. One country.) */
+    --motif-blue: var(--blue-600);
+    --motif-green: var(--green-600);
+    --motif-gold: var(--gold-500);
+    --motif-red: var(--red-500);
+    --motif-opacity: 0.08;
+
+    /* Aliases for shadcn-style primitives */
     --background: var(--canvas);
     --foreground: var(--ink);
     --card: var(--surface);
     --card-foreground: var(--ink);
     --popover: var(--surface);
     --popover-foreground: var(--ink);
-    --primary: var(--primary-600);
+    --primary: var(--blue-600);
     --primary-foreground: 255 255 255;
     --secondary: var(--surface-muted);
     --secondary-foreground: var(--ink);
@@ -106,39 +203,39 @@
   }
 
   /*
-   * Ops consoles run on a dark chrome. Tokens are re-pointed rather than
-   * hard-coded so staff surfaces inherit the same scale and contrast rules.
+   * Ops consoles: cool charcoal chrome, same brand scales.
+   * Ops-efficient — not citizen-warm.
    */
   .theme-ops {
-    --canvas: 7 20 32;
-    --surface: 15 28 42;
-    --surface-muted: 22 38 54;
+    --canvas: 18 24 32;
+    --surface: 28 36 48;
+    --surface-muted: 36 46 60;
     --ink: 240 244 248;
     --ink-muted: 186 197 209;
     --ink-subtle: 154 168 181;
-    --border: 38 55 72;
-    --border-strong: 61 82 102;
-    --focus: 217 169 60;
-    --success-tint: 12 48 34;
-    --success-border: 24 90 62;
+    --border: 48 60 76;
+    --border-strong: 68 84 104;
+    --focus: var(--gold-400);
+    --success-tint: 12 40 30;
+    --success-border: 24 80 55;
     --success: 126 214 168;
-    --warning-tint: 54 38 8;
+    --warning-tint: 48 36 8;
     --warning-border: 108 76 16;
-    --warning: 240 198 116;
-    --danger-tint: 58 20 17;
+    --warning: 255 208 77;
+    --danger-tint: 52 18 16;
     --danger-border: 112 40 34;
     --danger: 248 165 158;
-    --info-tint: 12 38 60;
-    --info-border: 26 74 112;
-    --info: 148 197 233;
+    --info-tint: 12 28 56;
+    --info-border: 30 68 140;
+    --info: 148 170 233;
     --background: var(--canvas);
     --foreground: var(--ink);
     --card: var(--surface);
     --card-foreground: var(--ink);
     --popover: var(--surface);
     --popover-foreground: var(--ink);
-    --primary: 59 132 191;
-    --primary-foreground: 4 24 43;
+    --primary: var(--blue-400);
+    --primary-foreground: var(--blue-950);
     --secondary: var(--surface-muted);
     --secondary-foreground: var(--ink);
     --muted: var(--surface-muted);
@@ -156,15 +253,14 @@
   }
 
   html {
-    /* Never below 16px: smaller base text triggers zoom on mobile Safari. */
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-canvas text-ink;
-    font-size: 1rem;
+    @apply bg-canvas text-ink font-sans;
+    font-size: var(--text-body);
     line-height: 1.6;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     text-rendering: optimizeLegibility;
@@ -176,15 +272,31 @@
   h4,
   h5,
   h6 {
-    @apply text-ink;
+    @apply font-display text-ink;
     line-height: 1.25;
     text-wrap: balance;
   }
 
-  /*
-   * iOS zooms the viewport when a focused control renders below 16px, so the
-   * floor is enforced on the control itself rather than left to utilities.
-   */
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: var(--text-h3);
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: var(--text-h4);
+    font-weight: 600;
+  }
+
   input,
   select,
   textarea {
@@ -198,8 +310,8 @@
   }
 
   ::selection {
-    background-color: rgb(var(--primary-100));
-    color: rgb(var(--primary-900));
+    background-color: rgb(var(--blue-100));
+    color: rgb(var(--blue-900));
   }
 }
 
@@ -216,9 +328,63 @@
     @apply not-sr-only fixed left-4 top-4 z-skiplink rounded-md bg-primary-700 px-4 py-3 text-base font-semibold text-white shadow-md;
   }
 
-  /* Status dots carry a shape as well as a colour so meaning never relies on hue alone. */
   .status-dot {
     @apply inline-block h-2 w-2 shrink-0 rounded-full;
+  }
+
+  /* Typography utilities */
+  .text-display {
+    font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+    font-size: var(--text-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .text-label {
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .text-caption {
+    font-size: var(--text-caption);
+    line-height: 1.4;
+  }
+
+  /* Subtle Y-convergence motif — decorative only */
+  .civic-motif {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .civic-y-divider {
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      rgb(var(--blue-600) / 0.55) 0%,
+      rgb(var(--green-600) / 0.55) 42%,
+      rgb(var(--gold-500) / 0.7) 50%,
+      rgb(var(--red-500) / 0.45) 58%,
+      rgb(var(--blue-600) / 0.35) 100%
+    );
+    opacity: 0.55;
+  }
+
+  .civic-topo {
+    background-image: radial-gradient(
+        circle at 20% 30%,
+        rgb(var(--blue-600) / 0.04) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 80% 70%,
+        rgb(var(--green-600) / 0.035) 0%,
+        transparent 40%
+      );
   }
 }
 

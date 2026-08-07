@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { Menu, X } from 'lucide-react'
 
 const NAV = [
-  { href: '/ops', label: 'Queue' },
+  { href: '/ops', label: 'Dashboard' },
   { href: '/ops/cases', label: 'Cases' },
   { href: '/ops/map', label: 'Map' },
   { href: '/ops/supervisor', label: 'Supervisor' },

@@ -65,16 +65,16 @@ export default function FieldWorkerPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
         Checking access…
       </div>
     )
   }
   if (!user || !isOfficial) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-slate-100 px-4">
-        <p className="text-slate-700">Sign in with a field or official account.</p>
-        <Link href="/auth/signin?next=/field" className="text-emerald-700 underline">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-canvas px-4">
+        <p className="text-ink-muted">Sign in with a field or official account.</p>
+        <Link href="/auth/signin?next=/field" className="text-green-700 underline">
           Sign in
         </Link>
       </div>
@@ -86,11 +86,11 @@ export default function FieldWorkerPage() {
   const list = tab === 'done' ? done : active
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg bg-slate-50 pb-24 text-slate-900">
+    <div className="mx-auto min-h-screen max-w-lg bg-canvas pb-24 text-ink">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Field</h1>
-          <span className="text-xs text-slate-500">{municipalityCode}</span>
+          <span className="text-xs text-ink-subtle">{municipalityCode}</span>
         </div>
         {offline && (
           <p className="mt-1 text-xs font-medium text-amber-700">
@@ -112,7 +112,7 @@ export default function FieldWorkerPage() {
             type="button"
             onClick={() => setTab(id)}
             className={`flex-1 py-3 text-sm font-medium ${
-              tab === id ? 'border-b-2 border-emerald-600 text-emerald-800' : 'text-slate-500'
+              tab === id ? 'border-b-2 border-green-600 text-green-800' : 'text-ink-subtle'
             }`}
           >
             {label}
@@ -120,8 +120,8 @@ export default function FieldWorkerPage() {
         ))}
       </nav>
 
-      {error && <p className="px-4 py-2 text-sm text-red-600">{error}</p>}
-      {msg && <p className="px-4 py-2 text-sm text-emerald-700">{msg}</p>}
+      {error && <p className="px-4 py-2 text-sm text-danger">{error}</p>}
+      {msg && <p className="px-4 py-2 text-sm text-green-700">{msg}</p>}
 
       {tab === 'map' ? (
         <div className="space-y-2 p-4">
@@ -143,18 +143,18 @@ export default function FieldWorkerPage() {
         <ul className="space-y-3 p-4">
           {list.map((j) => (
             <li key={j.caseId} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="text-xs text-slate-500">{j.reference}</div>
+              <div className="text-xs text-ink-subtle">{j.reference}</div>
               <div className="mt-1 text-lg font-medium">{j.title}</div>
-              <div className="mt-1 text-sm text-slate-600">
+              <div className="mt-1 text-sm text-ink-muted">
                 {j.category} · {j.status} · {j.priority}
               </div>
               {j.location.address && (
-                <div className="mt-2 text-sm text-slate-500">{j.location.address}</div>
+                <div className="mt-2 text-sm text-ink-subtle">{j.location.address}</div>
               )}
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {j.location.lat != null && (
                   <a
-                    className="rounded-lg bg-slate-900 px-3 py-3 text-center text-sm font-medium text-white"
+                    className="rounded-lg bg-primary-900 px-3 py-3 text-center text-sm font-medium text-white"
                     href={`https://www.openstreetmap.org/?mlat=${j.location.lat}&mlon=${j.location.lng}#map=18/${j.location.lat}/${j.location.lng}`}
                     target="_blank"
                     rel="noreferrer"
@@ -165,7 +165,7 @@ export default function FieldWorkerPage() {
                 <button
                   type="button"
                   disabled={offline || busyId === j.caseId}
-                  className="rounded-lg bg-emerald-600 px-3 py-3 text-sm font-medium text-white disabled:opacity-40"
+                  className="rounded-lg bg-green-600 px-3 py-3 text-sm font-medium text-white disabled:opacity-40"
                   onClick={async () => {
                     setBusyId(j.caseId)
                     setMsg(null)
@@ -210,13 +210,13 @@ export default function FieldWorkerPage() {
             </li>
           ))}
           {list.length === 0 && (
-            <li className="text-center text-sm text-slate-500">No jobs in this view.</li>
+            <li className="text-center text-sm text-ink-subtle">No jobs in this view.</li>
           )}
         </ul>
       )}
 
       <div className="fixed bottom-0 left-0 right-0 border-t border-slate-200 bg-white p-3">
-        <label className="block text-xs text-slate-500">Draft note (offline-safe)</label>
+        <label className="block text-xs text-ink-subtle">Draft note (offline-safe)</label>
         <textarea
           className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm"
           rows={2}

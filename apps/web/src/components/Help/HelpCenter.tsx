@@ -41,13 +41,13 @@ const helpSections: HelpSection[] = [
   {
     id: 'getting-started',
     title: 'Getting Started',
-    description: 'Learn the basics of using ServeSA',
-    icon: <BookOpen className="h-5 w-5 text-blue-500" />,
+    description: 'Learn the basics of using Serve SA',
+    icon: <BookOpen className="h-5 w-5 text-primary-600" />,
     articles: [
       {
         id: 'create-account',
         title: 'How to Create an Account',
-        content: 'Creating an account on ServeSA is simple and free. Click the "Sign Up" button, enter your email address, create a password, and verify your email. You can also sign up using your Google account for faster registration.',
+        content: 'Creating an account on Serve SA is simple and free. Click the "Sign Up" button, enter your email address, create a password, and verify your email. You can also sign up using your Google account for faster registration.',
         tags: ['account', 'registration', 'signup'],
         difficulty: 'beginner',
         lastUpdated: '2024-01-15'
@@ -74,12 +74,12 @@ const helpSections: HelpSection[] = [
     id: 'reporting',
     title: 'Reporting Issues',
     description: 'Everything about reporting service delivery problems',
-    icon: <FileText className="h-5 w-5 text-green-500" />,
+    icon: <FileText className="h-5 w-5 text-green-600" />,
     articles: [
       {
         id: 'report-categories',
         title: 'Understanding Report Categories',
-        content: 'ServeSA organizes reports into categories: Water & Sewage, Electricity, Roads & Infrastructure, Waste Management, Digital Services, and Emergency Services. Choose the most appropriate category to ensure your report reaches the right department quickly.',
+        content: 'Serve SA organises reports into categories: Water & Sewage, Electricity, Roads & Infrastructure, Waste Management, Digital Services, and Emergency Services. Choose the most appropriate category to ensure your report reaches the right department quickly.',
         tags: ['categories', 'departments', 'routing'],
         difficulty: 'beginner',
         lastUpdated: '2024-01-15'
@@ -87,7 +87,7 @@ const helpSections: HelpSection[] = [
       {
         id: 'photo-guidelines',
         title: 'Photo and Video Guidelines',
-        content: 'Good photos help departments understand and prioritize issues. Take clear, well-lit photos from multiple angles. Include landmarks or street signs for location context. Videos should be short (under 2 minutes) and show the problem clearly.',
+        content: 'Good photos help departments understand and prioritise issues. Take clear, well-lit photos from multiple angles. Include landmarks or street signs for location context. Videos should be short (under 2 minutes) and show the problem clearly.',
         tags: ['photos', 'videos', 'evidence'],
         difficulty: 'intermediate',
         lastUpdated: '2024-01-15'
@@ -106,7 +106,7 @@ const helpSections: HelpSection[] = [
     id: 'communication',
     title: 'Communication',
     description: 'How to communicate with departments and community',
-    icon: <MessageCircle className="h-5 w-5 text-purple-500" />,
+    icon: <MessageCircle className="h-5 w-5 text-primary-600" />,
     articles: [
       {
         id: 'messaging-departments',
@@ -119,7 +119,7 @@ const helpSections: HelpSection[] = [
       {
         id: 'community-forums',
         title: 'Participating in Community Forums',
-        content: 'Join community discussions about local issues. You can start new topics, reply to existing discussions, and connect with neighbors. Forums are moderated to ensure respectful communication.',
+        content: 'Join community discussions about local issues. You can start new topics, reply to existing discussions, and connect with neighbours. Forums are moderated to ensure respectful communication.',
         tags: ['forums', 'community', 'discussions'],
         difficulty: 'beginner',
         lastUpdated: '2024-01-15'
@@ -127,7 +127,7 @@ const helpSections: HelpSection[] = [
       {
         id: 'voting-system',
         title: 'Voting on Community Issues',
-        content: 'Help prioritize community issues by voting on reported problems. Upvote issues that affect you or your neighborhood. This helps departments understand which issues are most important to the community.',
+        content: 'Help prioritise community issues by voting on reported problems. Upvote issues that affect you or your neighbourhood. This helps departments understand which issues are most important to the community.',
         tags: ['voting', 'prioritization', 'community'],
         difficulty: 'beginner',
         lastUpdated: '2024-01-15'
@@ -138,7 +138,7 @@ const helpSections: HelpSection[] = [
     id: 'account-settings',
     title: 'Account & Settings',
     description: 'Managing your account and preferences',
-    icon: <HelpCircle className="h-5 w-5 text-orange-500" />,
+    icon: <HelpCircle className="h-5 w-5 text-gold-600" />,
     articles: [
       {
         id: 'profile-settings',
@@ -185,13 +185,13 @@ export function HelpCenter() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner':
-        return 'bg-green-100 text-green-800'
+        return 'bg-success-tint text-success'
       case 'intermediate':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-warning-tint text-warning'
       case 'advanced':
-        return 'bg-red-100 text-red-800'
+        return 'bg-danger-tint text-danger'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-surface-muted text-ink'
     }
   }
 
@@ -204,7 +204,7 @@ export function HelpCenter() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Help Center</h1>
         <p className="text-muted-foreground">
-          Find answers to common questions and learn how to use ServeSA effectively
+          Find answers to common questions and learn how to use Serve SA effectively
         </p>
       </div>
 
@@ -300,7 +300,7 @@ export function HelpCenter() {
               </CardHeader>
               <CardContent>
                 <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-ink leading-relaxed">
                     {selectedArticleData.content}
                   </p>
                 </div>
@@ -333,7 +333,7 @@ export function HelpCenter() {
                       {section.articles.map((article) => (
                         <div
                           key={article.id}
-                          className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                          className="p-4 border rounded-lg hover:bg-surface-muted cursor-pointer transition-colors"
                           onClick={() => setSelectedArticle(article.id)}
                         >
                           <div className="flex items-center justify-between">

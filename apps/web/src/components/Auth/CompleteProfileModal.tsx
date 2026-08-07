@@ -84,7 +84,7 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
             <div className="text-center py-6">
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-green-700 mb-2">Profile Updated!</h3>
-              <p className="text-gray-600">Your profile has been successfully updated.</p>
+              <p className="text-ink-muted">Your profile has been successfully updated.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -100,7 +100,7 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
                   Mobile number <span className="text-ink-subtle">(optional)</span>
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
                   <Input
                     type="tel"
                     inputMode="tel"
@@ -118,7 +118,7 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
                   Province <span className="text-ink-subtle">(optional)</span>
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
                   <Select value={formData.province} onValueChange={(value) => handleInputChange('province', value)}>
                     <SelectTrigger className="pl-10">
                       <SelectValue placeholder="Select your province" />
@@ -139,7 +139,7 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
                   Municipality <span className="text-ink-subtle">(optional)</span>
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
                   <Select 
                     value={formData.municipalityCode} 
                     onValueChange={(value) => handleInputChange('municipalityCode', value)}

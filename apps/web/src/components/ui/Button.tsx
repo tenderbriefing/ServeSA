@@ -7,13 +7,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary-700 text-white hover:bg-primary-800",
+        /** Green = primary citizen action */
+        default: "bg-green-600 text-white hover:bg-green-700",
+        /** Blue = trust / navigation emphasis */
+        brand: "bg-primary-600 text-white hover:bg-primary-700",
         destructive:
           "bg-danger text-white hover:bg-danger/90",
         outline:
           "border border-input bg-surface hover:bg-surface-muted hover:text-ink",
         secondary:
-          "bg-secondary-100 text-secondary-700 hover:bg-secondary-200",
+          "bg-green-50 text-green-800 hover:bg-green-100 border border-green-200",
         ghost: "hover:bg-surface-muted hover:text-ink",
         link: "text-primary-700 underline-offset-4 hover:underline",
       },

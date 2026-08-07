@@ -8,19 +8,19 @@ export default function TermsPage() {
       <div className="prose prose-gray max-w-none">
         <h2>1. Acceptance of Terms</h2>
         <p>
-          By using ServeSA, you agree to be bound by these Terms of Service. 
+          By using Serve SA, you agree to be bound by these Terms of Service. 
           If you do not agree to these terms, please do not use our service.
         </p>
 
         <h2>2. Description of Service</h2>
         <p>
-          ServeSA is a digital platform that enables citizens to report service delivery 
+          Serve SA is a digital platform that enables citizens to report service delivery 
           issues and communicate directly with government departments. The platform 
           facilitates transparency and accountability in public service delivery.
         </p>
 
         <h2>3. User Responsibilities</h2>
-        <p>As a user of ServeSA, you agree to:</p>
+        <p>As a user of Serve SA, you agree to:</p>
         <ul>
           <li>Provide accurate and truthful information</li>
           <li>Use the platform for legitimate service delivery reporting</li>
@@ -41,7 +41,7 @@ export default function TermsPage() {
 
         <h2>5. Government Department Responsibilities</h2>
         <p>
-          Government departments using ServeSA agree to:
+          Government departments using Serve SA agree to:
         </p>
         <ul>
           <li>Respond to citizen reports in a timely manner</li>
@@ -52,7 +52,7 @@ export default function TermsPage() {
 
         <h2>6. Limitation of Liability</h2>
         <p>
-          ServeSA is provided &quot;as is&quot; without warranties. We are not liable for 
+          Serve SA is provided &quot;as is&quot; without warranties. We are not liable for 
           any damages arising from the use of the platform, including but not 
           limited to service delivery issues or communication problems.
         </p>

@@ -29,6 +29,7 @@ import { AlertBanner } from '@/components/ui/AlertBanner'
 interface SignupFormProps {
   onSuccess?: () => void
   onSwitchToLogin?: () => void
+  hideHeader?: boolean
 }
 
 function isValidSaMobile(value: string): boolean {
@@ -37,7 +38,7 @@ function isValidSaMobile(value: string): boolean {
   return /^(0\d{9}|27\d{9})$/.test(digits)
 }
 
-export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
+export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFormProps) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -140,13 +141,15 @@ export function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
 
   return (
     <Card className="mx-auto w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold">Create account</CardTitle>
-        <CardDescription>
-          Create an account to save your cases and receive updates. You can also
-          report without signing in.
-        </CardDescription>
-      </CardHeader>
+      {!hideHeader && (
+        <CardHeader className="text-center">
+          <CardTitle className="font-display text-2xl font-bold">Create account</CardTitle>
+          <CardDescription>
+            Create an account to save your cases and receive updates. You can also
+            report without signing in.
+          </CardDescription>
+        </CardHeader>
+      )}
       <CardContent className="space-y-4">
         <AlertBanner variant="info">
           Province and municipality are optional now — you can add them later in
