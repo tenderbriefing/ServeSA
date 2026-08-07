@@ -80,6 +80,10 @@
         "destination": "/auth/signin.html"
       },
       {
+        "source": "/help",
+        "destination": "/help.html"
+      },
+      {
         "source": "/notifications",
         "destination": "/notifications.html"
       },

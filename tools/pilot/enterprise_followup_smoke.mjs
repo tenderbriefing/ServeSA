@@ -118,7 +118,7 @@ const tl = (await timeline({ caseId })).data
 rec('timeline_after_ack', tl.status==='acknowledged' || tl.status==='submitted', { status: tl.status, milestones: (tl.milestones||[]).slice(0,5), publicUpdates: (tl.publicUpdates||[]).length })
 
 // Notifications page HTTP
-for (const p of ['/notifications','/dashboard','/field','/ops','/report','/privacy','/terms']) {
+for (const p of ['/notifications','/dashboard','/field','/ops','/report','/help','/privacy','/terms']) {
   const r = await fetch('https://servesa-aad53.web.app'+p)
   rec(`route_${p}`, r.status===200, { status: r.status })
 }
