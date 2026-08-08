@@ -110,16 +110,20 @@ export const FEATURE_FLAGS = {
   enableCommunityEngagement:
     process.env.NEXT_PUBLIC_ENABLE_COMMUNITY !== 'false',
   /**
-   * Visual IDP / Our Municipality — global OFF by default.
-   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true and include muni in allow-list.
+   * Visual IDP / Our Municipality — ON by default (non-staged).
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to hide.
+   * Optional allow-list via NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST (* = all).
    */
   enableMunicipalPlanning:
-    process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING === 'true',
+    process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING !== 'false',
 } as const
 
-/** Municipality allow-list for municipal planning (comma-separated codes). Default pilot: JHB */
+/**
+ * Municipality allow-list for municipal planning (comma-separated codes).
+ * Default `*` = all municipalities (empty states when no published plan).
+ */
 export const MUNICIPAL_PLANNING_ALLOWLIST: readonly string[] = (
-  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST || 'JHB'
+  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST || '*'
 )
   .split(',')
   .map((s) => s.trim().toUpperCase())
@@ -131,6 +135,7 @@ export function isMunicipalPlanningEnabledFor(
   if (!FEATURE_FLAGS.enableMunicipalPlanning) return false
   const code = (municipalityCode || '').trim().toUpperCase()
   if (!code) return false
+  if (MUNICIPAL_PLANNING_ALLOWLIST.includes('*')) return true
   return MUNICIPAL_PLANNING_ALLOWLIST.includes(code)
 }
 

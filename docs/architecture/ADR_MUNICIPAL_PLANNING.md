@@ -18,7 +18,7 @@ Citizens should understand municipal plans without knowing IDP jargon: what is p
 6. **GIS:** Unchanged. Planning does not invent municipalities or call nearest-centroid assignment. Case routing remains `georesolveSafe`.
 7. **Participation:** CTAs deep-link to existing Community Ideas (`/ideas/new`). No competing ideas system.
 8. **Updates:** Project detail relates published Municipal Updates by `relatedUpdateIds` / type filters — does not duplicate Updates.
-9. **Feature flag:** `municipal_planning` global OFF (`NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true` to enable) + municipality allow-list.
+9. **Feature flag:** `municipal_planning` ON by default (`NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` to hide). Optional allow-list (`*` = all).
 10. **Ops:** `/ops/planning` for review/correct/approve/verify/unpublish. Claims municipality isolation (C3).
 11. **Pilot:** City of Johannesburg (`JHB`). No fake demo numbers in production paths; fixtures for tests/dev only.
 12. **Future layers:** PROMISED / BUDGETED / SPENT / DELIVERED / CITIZEN_EXPERIENCE as metadata enums only — no speculative accountability scoring.

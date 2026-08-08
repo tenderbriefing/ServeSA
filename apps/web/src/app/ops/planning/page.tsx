@@ -112,8 +112,8 @@ export default function OpsPlanningPage() {
             <p className="mt-2 rounded-md border border-border bg-surface-muted px-3 py-2 text-xs text-ink-muted">
               Citizen flag is OFF. Ops may still prepare drafts; citizens will not
               see published content until{' '}
-              <code>NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true</code> and the
-              municipality is allow-listed.
+              <code>NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING</code> is left enabled
+              (default) or explicitly set to <code>true</code>.
             </p>
           ) : null}
         </header>

@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 
 /**
  * Municipal planning citizen surfaces — structural smoke.
- * When feature flag is OFF (default in production), expects disabled copy.
- * When built with NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true, expects heading.
+ * Feature is ON by default (non-staged); expects heading, empty, or load error.
+ * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to expect disabled copy.
  * Uses .html paths so local static `out/` servers work without Firebase cleanUrls.
  */
 test.describe('municipal planning @planning', () => {

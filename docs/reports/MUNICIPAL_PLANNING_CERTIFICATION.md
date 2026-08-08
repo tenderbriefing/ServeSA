@@ -34,7 +34,7 @@ Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK calla
 | 12 | Document kinds (IDP/Budget/Adjusted/SDBIP/Annual/AFS/S71/S52/performance) + ingestion pipeline | **PASS** — contract + ops copy; draft→verify→publish |
 | 13 | Admin `/ops/planning` review/correct/approve/verify/unpublish | **PASS** |
 | 14 | Participation reuses Community Ideas; Updates related not duplicated | **PASS** — CTAs to `/ideas/new`; `relatedUpdateIds` |
-| 15 | Feature flag `municipal_planning` global OFF + municipality allow-list | **PASS** — `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING` + allow-list |
+| 15 | Feature flag `municipal_planning` ON by default (non-staged); optional allow-list (`*` = all) | **PASS** — enabled for production rollout; empty states when unpublished |
 | 16 | Security C1–C3 patterns; rules tests; municipality isolation; citizens cannot write planning | **PASS** — Admin SDK writes; security intent tests |
 | 17 | Docs + tests + production build/typecheck/lint; no fake production numbers; no auto-deploy | **PASS WITH CONDITIONS** — local gates green; deploy/index/smoke pending |
 
@@ -63,15 +63,15 @@ Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK calla
 
 ## Conditions before pilot GA
 
-1. WIF `workflow_dispatch` deploy of Hosting + Functions + rules + indexes.
-2. Enable `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true` with allow-list `JHB` for pilot only.
+1. WIF `workflow_dispatch` deploy of Hosting + Functions + rules + indexes (indexes included in Deploy Production when `deploy_rules=true`).
+2. Feature is **ON by default** (non-staged; allow-list `*`). Hide with `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` if needed.
 3. Human-verify and publish real official documents — **no fixture numbers in production**.
 4. Live callable smoke for summary + project detail.
 5. Confirm composite indexes built in GCP.
 
 ## Rollback
 
-1. Hide UI: unset / set `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` and redeploy Hosting.
+1. Hide UI: set `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` and redeploy Hosting.
 2. Redeploy prior Functions/rules SHA via WIF if needed.
 3. Leave collections in place (additive); do not weaken GIS.
 
