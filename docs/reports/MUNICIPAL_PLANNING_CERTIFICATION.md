@@ -6,6 +6,7 @@
 | Feature | Our Municipality — Visual IDP Summary |
 | Branch | `feat/municipal-planning-idp` |
 | Base | `feat/community-engagement-upgrade` @ `42fea0d` |
+| Feature SHA | `b9016a468f71016841bec16b5a56880dcd41696b` |
 | Date | 2026-08-08 |
 | Deployment | **Not deployed** — production remains manual WIF `workflow_dispatch` only |
 
