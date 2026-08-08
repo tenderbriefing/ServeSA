@@ -6,8 +6,10 @@
 | Upgrade | Municipal Updates + Community Ideas + Community Insights |
 | Branch | `feat/community-engagement-upgrade` |
 | Starting SHA | `fbf902c7b10d579aad428cc74c6d92089a3c366f` |
-| Final SHA | _(filled after commit)_ |
+| Final SHA | `01daaa3010d45695a5c1f39dfdaa93edd93823c3` |
 | Date | 2026-08-08 |
+| Commits | `dea8bb8` — feat: add civic community engagement with security hardening |
+| Files changed | 49 files (+4284 / −227) |
 | Deployment | **Not deployed** — production remains `workflow_dispatch` only |
 
 ## Verdict
