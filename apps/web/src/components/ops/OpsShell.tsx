@@ -11,6 +11,7 @@ const NAV = [
   { href: '/ops', label: 'Dashboard' },
   { href: '/ops/cases', label: 'Cases' },
   { href: '/ops/community', label: 'Community' },
+  { href: '/ops/planning', label: 'Planning' },
   { href: '/ops/map', label: 'Map' },
   { href: '/ops/supervisor', label: 'Supervisor' },
   { href: '/ops/team', label: 'Team' },

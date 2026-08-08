@@ -76,6 +76,16 @@ import {
   listCommunityIdeasOps,
   getCommunityInsightsOps,
 } from './community/communityIdeas'
+import {
+  upsertPlanDocumentOps,
+  upsertPriorityOps,
+  upsertMunicipalProjectOps,
+  upsertBudgetLineOps,
+  transitionPlanningStatusOps,
+  listPlanningEntitiesOps,
+  getMunicipalPlanningSummaryOps,
+  getMunicipalProjectOps,
+} from './planning/municipalPlanning'
 import { assertOfficial } from './cases/municipalityOpsShared'
 
 setGlobalOptions({
@@ -634,6 +644,96 @@ export const listCommunityIdeasFunction = onCall(async (request) => {
 export const getCommunityInsightsFunction = onCall(async (request) => {
   try {
     return await getCommunityInsightsOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+// —— Municipal Planning (Visual IDP Summary) ——
+
+export const upsertPlanDocumentFunction = onCall(async (request) => {
+  try {
+    return await upsertPlanDocumentOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const upsertPriorityFunction = onCall(async (request) => {
+  try {
+    return await upsertPriorityOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const upsertMunicipalProjectFunction = onCall(async (request) => {
+  try {
+    return await upsertMunicipalProjectOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const upsertBudgetLineFunction = onCall(async (request) => {
+  try {
+    return await upsertBudgetLineOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const transitionPlanningStatusFunction = onCall(async (request) => {
+  try {
+    return await transitionPlanningStatusOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listPlanningEntitiesFunction = onCall(async (request) => {
+  try {
+    return await listPlanningEntitiesOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getMunicipalPlanningSummaryFunction = onCall(async (request) => {
+  try {
+    return await getMunicipalPlanningSummaryOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getMunicipalProjectFunction = onCall(async (request) => {
+  try {
+    return await getMunicipalProjectOps(request.data, {
       uid: request.auth?.uid || '',
       token: (request.auth?.token || null) as Record<string, unknown> | null,
     })

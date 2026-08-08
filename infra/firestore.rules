@@ -196,6 +196,42 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // Municipal Planning — Admin SDK writes; citizens read published only
+    match /municipal_plans/{planId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_plan_documents/{documentId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_priorities/{priorityId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_projects/{projectId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_budget_lines/{budgetLineId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_plan_reviews/{reviewId} {
+      allow read: if isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode);
+      allow create, update, delete: if false;
+    }
+
     match /case_idempotency/{id} {
       allow read, write: if false;
     }

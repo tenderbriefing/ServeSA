@@ -109,9 +109,41 @@ export const FEATURE_FLAGS = {
   /** Municipal Updates + Community Ideas (default on; set NEXT_PUBLIC_ENABLE_COMMUNITY=false to hide) */
   enableCommunityEngagement:
     process.env.NEXT_PUBLIC_ENABLE_COMMUNITY !== 'false',
+  /**
+   * Visual IDP / Our Municipality — global OFF by default.
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=true and include muni in allow-list.
+   */
+  enableMunicipalPlanning:
+    process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING === 'true',
 } as const
+
+/** Municipality allow-list for municipal planning (comma-separated codes). Default pilot: JHB */
+export const MUNICIPAL_PLANNING_ALLOWLIST: readonly string[] = (
+  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST || 'JHB'
+)
+  .split(',')
+  .map((s) => s.trim().toUpperCase())
+  .filter(Boolean)
+
+export function isMunicipalPlanningEnabledFor(
+  municipalityCode: string | null | undefined
+): boolean {
+  if (!FEATURE_FLAGS.enableMunicipalPlanning) return false
+  const code = (municipalityCode || '').trim().toUpperCase()
+  if (!code) return false
+  return MUNICIPAL_PLANNING_ALLOWLIST.includes(code)
+}
 
 export const COLLECTIONS_COMMUNITY = {
   municipalUpdates: 'municipal_updates',
   communityIdeas: 'community_ideas',
+} as const
+
+export const COLLECTIONS_PLANNING = {
+  plans: 'municipal_plans',
+  documents: 'municipal_plan_documents',
+  priorities: 'municipal_priorities',
+  projects: 'municipal_projects',
+  budgetLines: 'municipal_budget_lines',
+  reviews: 'municipal_plan_reviews',
 } as const

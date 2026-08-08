@@ -15,7 +15,9 @@ import {
   User,
   Megaphone,
   Lightbulb,
+  Building2,
 } from 'lucide-react'
+import { FEATURE_FLAGS } from '@/lib/constants'
 import { useEffect, useId, useRef, useState } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
@@ -23,11 +25,12 @@ import { getInitials } from '@/lib/utils'
 import { useOffline } from '@/hooks/useOffline'
 import { cn } from '@/lib/utils'
 
-/** Citizen primary nav — Report / Updates / Ideas / Track / My Cases */
-const primaryLinks = [
+/** Citizen primary nav — Report / Updates / Ideas / Municipality / Track / My Cases */
+const basePrimaryLinks = [
   { href: '/report', label: 'Report', icon: FileText },
   { href: '/updates', label: 'Updates', icon: Megaphone },
   { href: '/ideas', label: 'Ideas', icon: Lightbulb },
+  { href: '/municipality', label: 'Our Municipality', icon: Building2 },
   { href: '/case', label: 'Track', icon: Search },
   { href: '/dashboard', label: 'My Cases', icon: User },
 ] as const
@@ -53,6 +56,16 @@ export function Header() {
     userProfile?.firstName && userProfile?.lastName
       ? `${userProfile.firstName} ${userProfile.lastName}`
       : user?.email || 'Account'
+
+  const primaryLinks = basePrimaryLinks.filter((link) => {
+    if (link.href === '/municipality') {
+      return FEATURE_FLAGS.enableMunicipalPlanning
+    }
+    if (link.href === '/updates' || link.href === '/ideas') {
+      return FEATURE_FLAGS.enableCommunityEngagement
+    }
+    return true
+  })
 
   useEffect(() => {
     setMobileMenuOpen(false)

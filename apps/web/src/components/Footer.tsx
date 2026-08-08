@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
 import { brandCopy } from '@/lib/design-tokens'
+import { FEATURE_FLAGS } from '@/lib/constants'
 
-const navLinks = [
+const baseNavLinks = [
   { href: '/report', label: 'Report an Issue' },
   { href: '/updates', label: 'Municipal Updates' },
   { href: '/ideas', label: 'Share an Idea' },
+  { href: '/municipality', label: 'Our Municipality' },
   { href: '/case', label: 'Track a Case' },
   { href: '/dashboard', label: 'My Cases' },
   { href: '/privacy', label: 'Privacy Policy' },
@@ -18,6 +20,15 @@ const footerLinkClass =
 
 export function Footer() {
   const year = new Date().getFullYear()
+  const navLinks = baseNavLinks.filter((link) => {
+    if (link.href === '/municipality') {
+      return FEATURE_FLAGS.enableMunicipalPlanning
+    }
+    if (link.href === '/updates' || link.href === '/ideas') {
+      return FEATURE_FLAGS.enableCommunityEngagement
+    }
+    return true
+  })
 
   return (
     <footer className="no-print bg-surface-inverse text-ink-inverse">

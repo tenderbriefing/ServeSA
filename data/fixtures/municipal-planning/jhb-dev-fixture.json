@@ -1,0 +1,24 @@
+[
+  {
+    "_comment": "DEV/TEST FIXTURE ONLY — never load into production as live KPIs",
+    "municipalityCode": "JHB",
+    "priorities": [
+      {
+        "priorityId": "PRI-FIXTURE-WATER",
+        "title": "Reliable water for every ward",
+        "plainLanguageSummary": "Reduce long outages by fixing ageing pipes and improving reservoir maintenance.",
+        "isServeSaSummary": true,
+        "publicationStatus": "draft",
+        "sources": [
+          {
+            "documentKind": "idp",
+            "title": "Fixture IDP excerpt (test only)",
+            "isServeSaSummary": true
+          }
+        ]
+      }
+    ],
+    "projects": [],
+    "budgetLines": []
+  }
+]
