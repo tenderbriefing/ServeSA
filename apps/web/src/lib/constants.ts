@@ -106,4 +106,49 @@ export const FEATURE_FLAGS = {
   enableVoiceNotes: process.env.NEXT_PUBLIC_ENABLE_VOICE_NOTES === 'true',
   enableFaceBlur: process.env.NEXT_PUBLIC_ENABLE_FACE_BLUR === 'true',
   enablePlateBlur: process.env.NEXT_PUBLIC_ENABLE_PLATE_BLUR === 'true',
+  /** Municipal Updates + Community Ideas (default on; set NEXT_PUBLIC_ENABLE_COMMUNITY=false to hide) */
+  enableCommunityEngagement:
+    process.env.NEXT_PUBLIC_ENABLE_COMMUNITY !== 'false',
+  /**
+   * Visual IDP / Our Municipality — ON by default (non-staged).
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to hide.
+   * Optional allow-list via NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST (* = all).
+   */
+  enableMunicipalPlanning:
+    process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING !== 'false',
+} as const
+
+/**
+ * Municipality allow-list for municipal planning (comma-separated codes).
+ * Default `*` = all municipalities (empty states when no published plan).
+ */
+export const MUNICIPAL_PLANNING_ALLOWLIST: readonly string[] = (
+  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST || '*'
+)
+  .split(',')
+  .map((s) => s.trim().toUpperCase())
+  .filter(Boolean)
+
+export function isMunicipalPlanningEnabledFor(
+  municipalityCode: string | null | undefined
+): boolean {
+  if (!FEATURE_FLAGS.enableMunicipalPlanning) return false
+  const code = (municipalityCode || '').trim().toUpperCase()
+  if (!code) return false
+  if (MUNICIPAL_PLANNING_ALLOWLIST.includes('*')) return true
+  return MUNICIPAL_PLANNING_ALLOWLIST.includes(code)
+}
+
+export const COLLECTIONS_COMMUNITY = {
+  municipalUpdates: 'municipal_updates',
+  communityIdeas: 'community_ideas',
+} as const
+
+export const COLLECTIONS_PLANNING = {
+  plans: 'municipal_plans',
+  documents: 'municipal_plan_documents',
+  priorities: 'municipal_priorities',
+  projects: 'municipal_projects',
+  budgetLines: 'municipal_budget_lines',
+  reviews: 'municipal_plan_reviews',
 } as const

@@ -5,7 +5,9 @@ import {
   Camera,
   CheckCircle2,
   FileSearch,
+  Lightbulb,
   MapPin,
+  Megaphone,
   Shield,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -40,6 +42,33 @@ const categories = [
   },
 ]
 
+const civicIntents = [
+  {
+    href: '/report',
+    title: 'Report an Issue',
+    description: 'Something is broken or needs municipal attention.',
+    icon: Camera,
+  },
+  {
+    href: '/updates',
+    title: 'Municipal Updates',
+    description: 'Read verified alerts and notices from your municipality.',
+    icon: Megaphone,
+  },
+  {
+    href: '/ideas',
+    title: 'Share an Idea',
+    description: 'Suggest a constructive improvement for your community.',
+    icon: Lightbulb,
+  },
+  {
+    href: '/case',
+    title: 'Track a Case',
+    description: 'Follow progress with your case number.',
+    icon: FileSearch,
+  },
+]
+
 export default function HomePage() {
   const { user, loading } = useAuth()
 
@@ -57,7 +86,30 @@ export default function HomePage() {
       <section className="border-b border-border bg-surface py-14">
         <div className="container">
           <div className="mx-auto mb-8 max-w-2xl text-center">
-            <h2 className="font-display text-h2 text-ink">How it works</h2>
+            <h2 className="font-display text-h2 text-ink">How you can engage</h2>
+            <p className="mt-3 text-body-lg text-ink-muted">
+              Four clear civic actions — reporting, updates, ideas, and tracking.
+              Not a social network.
+            </p>
+          </div>
+          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2">
+            {civicIntents.map((intent) => (
+              <ActionCard
+                key={intent.href}
+                href={intent.href}
+                title={intent.title}
+                description={intent.description}
+                icon={intent.icon}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-border bg-surface-muted/40 py-14">
+        <div className="container">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
+            <h2 className="font-display text-h2 text-ink">How reporting works</h2>
             <p className="mt-3 text-body-lg text-ink-muted">
               Three clear steps. One case number. Progress you can follow.
             </p>
@@ -147,9 +199,9 @@ export default function HomePage() {
               </span>
             </li>
             <li className="flex items-start gap-3 rounded-md border border-border bg-canvas p-4">
-              <FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-green-600" aria-hidden />
+              <Megaphone className="mt-0.5 h-5 w-5 shrink-0 text-green-600" aria-hidden />
               <span className="text-body-sm text-ink-muted">
-                Track progress with your case number
+                Municipal updates and community ideas — civic, not social
               </span>
             </li>
           </ul>

@@ -79,43 +79,34 @@ export class NotificationsAPI {
   }
 
   /**
-   * Send push notification
+   * Push/email senders are admin-gated server-side.
+   * Ordinary clients must not invoke these — use in-app notifications instead.
    */
-  async sendPushNotification(notificationData: {
+  async sendPushNotification(_notificationData: {
     userId: string;
     title: string;
     body: string;
     type: 'case_acknowledgment' | 'status_update' | 'new_case' | 'sla_breach' | 'general';
     data?: Record<string, any>;
   }) {
-    try {
-      const sendNotificationFunction = httpsCallable(functions, 'sendPushNotificationFunction');
-      const result = await sendNotificationFunction(notificationData);
-      return result.data;
-    } catch (error) {
-      console.error('Error sending push notification:', error);
-      throw new Error('Failed to send notification.');
-    }
+    throw new Error(
+      'Direct push send is privileged. Notifications are event-driven by the platform.'
+    );
   }
 
   /**
-   * Send email notification
+   * Email senders are admin-gated server-side.
    */
-  async sendEmailNotification(emailData: {
+  async sendEmailNotification(_emailData: {
     to: string;
     subject: string;
     htmlContent: string;
     textContent?: string;
     type: 'case_acknowledgment' | 'status_update' | 'sla_breach' | 'general';
   }) {
-    try {
-      const sendEmailFunction = httpsCallable(functions, 'sendEmailNotificationFunction');
-      const result = await sendEmailFunction(emailData);
-      return result.data;
-    } catch (error) {
-      console.error('Error sending email notification:', error);
-      throw new Error('Failed to send email notification.');
-    }
+    throw new Error(
+      'Direct email send is privileged. Notifications are event-driven by the platform.'
+    );
   }
 
   /**

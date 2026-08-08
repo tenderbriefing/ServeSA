@@ -39,4 +39,20 @@ export const opsApi = {
     callOps('proposeFieldCompletionFunction', data),
   search: (data: Record<string, unknown>) =>
     callOps('searchOpsCasesFunction', data),
+  upsertMunicipalUpdate: (data: Record<string, unknown>) =>
+    callOps('upsertMunicipalUpdateFunction', data),
+  publishMunicipalUpdate: (data: Record<string, unknown>) =>
+    callOps('publishMunicipalUpdateFunction', data),
+  archiveMunicipalUpdate: (data: Record<string, unknown>) =>
+    callOps('archiveMunicipalUpdateFunction', data),
+  listMunicipalUpdates: (data: Record<string, unknown>) =>
+    callOps('listMunicipalUpdatesFunction', data),
+  listCommunityIdeas: (data: Record<string, unknown>) =>
+    callOps('listCommunityIdeasFunction', data),
+  transitionCommunityIdea: (data: Record<string, unknown>) =>
+    callOps('transitionCommunityIdeaFunction', data),
+  respondToCommunityIdea: (data: Record<string, unknown>) =>
+    callOps('respondToCommunityIdeaFunction', data),
+  communityInsights: (data: Record<string, unknown>) =>
+    callOps('getCommunityInsightsFunction', data),
 }

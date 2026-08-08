@@ -60,6 +60,42 @@
         "destination": "/ops/supervisor.html"
       },
       {
+        "source": "/ops/community",
+        "destination": "/ops/community.html"
+      },
+      {
+        "source": "/ops/planning",
+        "destination": "/ops/planning.html"
+      },
+      {
+        "source": "/municipality",
+        "destination": "/municipality.html"
+      },
+      {
+        "source": "/municipality/projects/**",
+        "destination": "/municipality/projects/_.html"
+      },
+      {
+        "source": "/updates",
+        "destination": "/updates.html"
+      },
+      {
+        "source": "/updates/**",
+        "destination": "/updates/_.html"
+      },
+      {
+        "source": "/ideas",
+        "destination": "/ideas.html"
+      },
+      {
+        "source": "/ideas/new",
+        "destination": "/ideas/new.html"
+      },
+      {
+        "source": "/ideas/**",
+        "destination": "/ideas/_.html"
+      },
+      {
         "source": "/field",
         "destination": "/field.html"
       },

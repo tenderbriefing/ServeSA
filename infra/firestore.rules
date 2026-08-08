@@ -15,7 +15,7 @@ service cloud.firestore {
     }
 
     function isOfficial() {
-      return hasRole(['official', 'moderator', 'admin', 'field_worker']);
+      return hasRole(['official', 'moderator', 'admin', 'field_worker', 'comms_editor', 'comms_publisher']);
     }
 
     function isAdmin() {
@@ -32,12 +32,29 @@ service cloud.firestore {
              (isOfficial() && request.auth.token.wardId == wardId);
     }
 
+    /** Privileged identity fields — never client-writable */
+    function deniesPrivilegedUserFields() {
+      return !request.resource.data.keys().hasAny([
+        'roles', 'role', 'departmentId', 'municipalityId'
+      ]);
+    }
+
     match /users/{userId} {
-      allow read: if isAuthenticated() && (isOwner(userId) || isOfficial());
-      allow create: if isAuthenticated() && isOwner(userId);
+      // Owner, admin, or official scoped to same municipality claim as profile
+      allow read: if isAuthenticated() && (
+        isOwner(userId) ||
+        isAdmin() ||
+        (
+          hasRole(['official', 'moderator', 'admin', 'comms_editor', 'comms_publisher']) &&
+          resource.data.keys().hasAny(['municipalityCode']) &&
+          resource.data.municipalityCode == request.auth.token.municipalityCode
+        )
+      );
+      // Citizens may create own profile without forging privileged roles
+      allow create: if isAuthenticated() && isOwner(userId) && deniesPrivilegedUserFields();
       allow update: if isAuthenticated() && isOwner(userId) &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          'roles', 'municipalityCode', 'municipalityId', 'departmentId', 'role'
+          'roles', 'municipalityId', 'departmentId', 'role'
         ]);
       allow delete: if isAuthenticated() && isAdmin();
     }
@@ -61,7 +78,7 @@ service cloud.firestore {
         allow create, update, delete: if false;
       }
 
-      // Municipal staff only — never citizen-readable (field workers may read own muni notes if official-scoped)
+      // Municipal staff only — never citizen-readable
       match /internal_notes/{noteId} {
         allow read: if isAuthenticated() && hasRole(['official', 'moderator', 'admin']) && canAccessMunicipality(
           get(/databases/$(database)/documents/cases/$(caseId)).data.muniCode
@@ -132,7 +149,93 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Municipal Updates — Admin SDK writes only
+    match /municipal_updates/{updateId} {
+      allow read: if resource.data.status in ['published', 'updated', 'resolved'] ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_update_events/{eventId} {
+      allow read: if isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode);
+      allow create, update, delete: if false;
+    }
+
+    // Community Ideas — Admin SDK writes; citizens may read non-private statuses
+    match /community_ideas/{ideaId} {
+      allow read: if resource.data.status in [
+          'submitted', 'under_review', 'community_support', 'feasibility_review',
+          'planned', 'in_progress', 'implemented', 'declined'
+        ] ||
+        (isAuthenticated() && resource.data.authorUid == request.auth.uid) ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+
+      match /supports/{uid} {
+        allow read: if isAuthenticated() && (
+          request.auth.uid == uid ||
+          canAccessMunicipality(
+            get(/databases/$(database)/documents/community_ideas/$(ideaId)).data.municipalityCode
+          )
+        );
+        allow create, update, delete: if false;
+      }
+
+      // Internal notes never leak to citizens
+      match /internal_notes/{noteId} {
+        allow read: if isAuthenticated() && hasRole(['official', 'moderator', 'admin']) &&
+          canAccessMunicipality(
+            get(/databases/$(database)/documents/community_ideas/$(ideaId)).data.municipalityCode
+          );
+        allow create, update, delete: if false;
+      }
+    }
+
+    match /community_idea_events/{eventId} {
+      allow read: if isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode);
+      allow create, update, delete: if false;
+    }
+
+    // Municipal Planning — Admin SDK writes; citizens read published only
+    match /municipal_plans/{planId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_plan_documents/{documentId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_priorities/{priorityId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_projects/{projectId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_budget_lines/{budgetLineId} {
+      allow read: if resource.data.publicationStatus == 'published' ||
+        (isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode));
+      allow create, update, delete: if false;
+    }
+
+    match /municipal_plan_reviews/{reviewId} {
+      allow read: if isAuthenticated() && canAccessMunicipality(resource.data.municipalityCode);
+      allow create, update, delete: if false;
+    }
+
     match /case_idempotency/{id} {
+      allow read, write: if false;
+    }
+    match /idea_idempotency/{id} {
       allow read, write: if false;
     }
     match /case_media/{id} {

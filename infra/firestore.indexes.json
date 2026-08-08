@@ -102,6 +102,78 @@
         { "fieldPath": "contentHash", "order": "ASCENDING" },
         { "fieldPath": "uploadedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "municipal_updates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_updates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "community_ideas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "community_ideas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_priorities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "publicationStatus", "order": "ASCENDING" },
+        { "fieldPath": "sortOrder", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "publicationStatus", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_budget_lines",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "publicationStatus", "order": "ASCENDING" },
+        { "fieldPath": "sortOrder", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_plan_documents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "publicationStatus", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
