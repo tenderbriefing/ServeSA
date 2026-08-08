@@ -13,6 +13,8 @@ import {
   FileText,
   Search,
   User,
+  Megaphone,
+  Lightbulb,
 } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { signOut } from 'firebase/auth'
@@ -21,9 +23,11 @@ import { getInitials } from '@/lib/utils'
 import { useOffline } from '@/hooks/useOffline'
 import { cn } from '@/lib/utils'
 
-/** Citizen primary nav — Report / Track / My Cases — no clutter */
+/** Citizen primary nav — Report / Updates / Ideas / Track / My Cases */
 const primaryLinks = [
   { href: '/report', label: 'Report', icon: FileText },
+  { href: '/updates', label: 'Updates', icon: Megaphone },
+  { href: '/ideas', label: 'Ideas', icon: Lightbulb },
   { href: '/case', label: 'Track', icon: Search },
   { href: '/dashboard', label: 'My Cases', icon: User },
 ] as const

@@ -106,4 +106,12 @@ export const FEATURE_FLAGS = {
   enableVoiceNotes: process.env.NEXT_PUBLIC_ENABLE_VOICE_NOTES === 'true',
   enableFaceBlur: process.env.NEXT_PUBLIC_ENABLE_FACE_BLUR === 'true',
   enablePlateBlur: process.env.NEXT_PUBLIC_ENABLE_PLATE_BLUR === 'true',
+  /** Municipal Updates + Community Ideas (default on; set NEXT_PUBLIC_ENABLE_COMMUNITY=false to hide) */
+  enableCommunityEngagement:
+    process.env.NEXT_PUBLIC_ENABLE_COMMUNITY !== 'false',
+} as const
+
+export const COLLECTIONS_COMMUNITY = {
+  municipalUpdates: 'municipal_updates',
+  communityIdeas: 'community_ideas',
 } as const

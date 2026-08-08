@@ -313,6 +313,8 @@ export async function setOfficialClaimsOps(
     'moderator',
     'admin',
     'field_worker',
+    'comms_editor',
+    'comms_publisher',
   ])
   const roles = Array.from(
     new Set(

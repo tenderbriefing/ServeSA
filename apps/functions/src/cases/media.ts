@@ -35,7 +35,7 @@ interface MediaUploadData {
     data: string
     contentHash?: string
   }>
-  userId?: string
+  userId: string
 }
 
 interface MediaProcessingResult {
@@ -88,14 +88,17 @@ function validateFile(file: {
 
 async function assertCaseOwnership(
   caseId: string,
-  userId?: string
+  userId: string
 ): Promise<Record<string, any>> {
+  if (!userId) {
+    throw new Error('Authentication required to attach media')
+  }
   const caseDoc = await db.collection('cases').doc(caseId).get()
   if (!caseDoc.exists) {
     throw new Error('Case not found')
   }
   const data = caseDoc.data()!
-  if (userId && data.reporterUid && data.reporterUid !== userId) {
+  if (!data.reporterUid || data.reporterUid !== userId) {
     throw new Error('Not authorised to attach media to this case')
   }
   return data

@@ -4,6 +4,8 @@ import { brandCopy } from '@/lib/design-tokens'
 
 const navLinks = [
   { href: '/report', label: 'Report an Issue' },
+  { href: '/updates', label: 'Municipal Updates' },
+  { href: '/ideas', label: 'Share an Idea' },
   { href: '/case', label: 'Track a Case' },
   { href: '/dashboard', label: 'My Cases' },
   { href: '/privacy', label: 'Privacy Policy' },

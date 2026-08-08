@@ -89,17 +89,20 @@ function preprocessCreateCaseInput(raw) {
             }
         }
     }
-    // Normalise empty optional strings
-    if (input.address === '')
+    // Normalise empty/null optional strings (JSON/Firestore often emit null)
+    if (input.address === '' || input.address === null)
         input.address = undefined;
-    if (input.subcategory === '')
+    if (input.subcategory === '' || input.subcategory === null) {
         input.subcategory = undefined;
+    }
     if (input.reporter && typeof input.reporter === 'object') {
         const reporter = { ...input.reporter };
-        if (reporter.email === '')
+        if (reporter.email === '' || reporter.email === null)
             reporter.email = undefined;
-        if (reporter.phone === '')
+        if (reporter.phone === '' || reporter.phone === null)
             reporter.phone = undefined;
+        if (reporter.name === null)
+            reporter.name = '';
         input.reporter = reporter;
     }
     return input;

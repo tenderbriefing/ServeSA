@@ -59,6 +59,24 @@ import { getCAPAlerts } from './cap/getAlerts'
 
 import { publicAnalytics } from './analytics/public'
 import { wardAnalytics } from './analytics/ward'
+import {
+  upsertMunicipalUpdateOps,
+  publishMunicipalUpdateOps,
+  archiveMunicipalUpdateOps,
+  getMunicipalUpdateOps,
+  listMunicipalUpdatesOps,
+} from './community/municipalUpdates'
+import {
+  submitCommunityIdeaOps,
+  supportCommunityIdeaOps,
+  transitionCommunityIdeaOps,
+  respondToCommunityIdeaOps,
+  addIdeaInternalNoteOps,
+  getCommunityIdeaOps,
+  listCommunityIdeasOps,
+  getCommunityInsightsOps,
+} from './community/communityIdeas'
+import { assertOfficial } from './cases/municipalityOpsShared'
 
 setGlobalOptions({
   region: 'africa-south1',
@@ -325,25 +343,70 @@ export const runImageIntelligenceFunction = onCall(
 )
 
 export const getCaseAnalyticsFunction = onCall(async (request) => {
-  return await getCaseAnalytics(request.data)
+  try {
+    const official = assertOfficial({
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+    const municipalityId =
+      request.data?.municipalityId || request.data?.municipalityCode
+    if (
+      !official.isAdmin &&
+      municipalityId &&
+      official.muniCode !== municipalityId
+    ) {
+      throw new OpsError(
+        'Cross-municipality analytics denied',
+        'permission_denied',
+        403
+      )
+    }
+    return await getCaseAnalytics({
+      ...request.data,
+      municipalityId: official.isAdmin
+        ? municipalityId
+        : official.muniCode || municipalityId,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 export const dedupeCaseFunction = onCall(async (request) => {
-  return await dedupeCase(request.data)
+  try {
+    assertOfficial({
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+    return await dedupeCase(request.data)
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 export const getDuplicateCasesFunction = onCall(async (request) => {
-  return await getDuplicateCases(request.data.caseId)
+  try {
+    assertOfficial({
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+    return await getDuplicateCases(request.data.caseId)
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 /** Client callable for base64 media upload after durable case creation */
 export const uploadMediaFunction = onCall(
   { memory: '1GiB', timeoutSeconds: 180 },
   async (request) => {
+    if (!request.auth?.uid) {
+      throw new HttpsError('unauthenticated', 'Authentication required')
+    }
     return await processMediaUpload({
       caseId: request.data.caseId,
       files: request.data.files || [],
-      userId: request.auth?.uid,
+      userId: request.auth.uid,
     })
   }
 )
@@ -360,7 +423,21 @@ export const processMediaUploadFunction = onObjectFinalized(
 )
 
 export const generateCasePDFFunction = onCall(async (request) => {
-  return await generateCasePDF(request.data)
+  if (!request.auth?.uid) {
+    throw new HttpsError('unauthenticated', 'Authentication required')
+  }
+  const token = (request.auth.token || {}) as Record<string, unknown>
+  const roles = Array.isArray(token.roles) ? (token.roles as string[]) : []
+  return await generateCasePDF({
+    caseId: request.data?.caseId,
+    includeMedia: request.data?.includeMedia,
+    includeHistory: request.data?.includeHistory,
+    authUid: request.auth.uid,
+    authRoles: roles,
+    authMunicipalityCode: token.municipalityCode
+      ? String(token.municipalityCode)
+      : null,
+  })
 })
 
 export const georesolveFunction = onCall(async (request) => {
@@ -386,12 +463,183 @@ export const getServiceCategoriesFunction = onCall(async (request) => {
   return await getServiceCategories(request.data)
 })
 
+/**
+ * Privileged only — ordinary users must never invoke notification senders.
+ * Event-driven orchestrators call sendEmailNotification / sendPushNotification internally.
+ */
 export const sendEmailNotificationFunction = onCall(async (request) => {
-  return await sendEmailNotification(request.data)
+  try {
+    const official = assertOfficial({
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+    if (!official.isAdmin) {
+      throw new OpsError('Admin role required', 'permission_denied', 403)
+    }
+    return await sendEmailNotification(request.data)
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 export const sendPushNotificationFunction = onCall(async (request) => {
-  return await sendPushNotification(request.data)
+  try {
+    const official = assertOfficial({
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+    if (!official.isAdmin) {
+      throw new OpsError('Admin role required', 'permission_denied', 403)
+    }
+    return await sendPushNotification(request.data)
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+// —— Community engagement (Municipal Updates + Ideas + Insights) ——
+
+export const upsertMunicipalUpdateFunction = onCall(async (request) => {
+  try {
+    return await upsertMunicipalUpdateOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const publishMunicipalUpdateFunction = onCall(async (request) => {
+  try {
+    return await publishMunicipalUpdateOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const archiveMunicipalUpdateFunction = onCall(async (request) => {
+  try {
+    return await archiveMunicipalUpdateOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getMunicipalUpdateFunction = onCall(async (request) => {
+  try {
+    return await getMunicipalUpdateOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listMunicipalUpdatesFunction = onCall(async (request) => {
+  try {
+    return await listMunicipalUpdatesOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const submitCommunityIdeaFunction = onCall(async (request) => {
+  try {
+    return await submitCommunityIdeaOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const supportCommunityIdeaFunction = onCall(async (request) => {
+  try {
+    return await supportCommunityIdeaOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const transitionCommunityIdeaFunction = onCall(async (request) => {
+  try {
+    return await transitionCommunityIdeaOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const respondToCommunityIdeaFunction = onCall(async (request) => {
+  try {
+    return await respondToCommunityIdeaOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const addIdeaInternalNoteFunction = onCall(async (request) => {
+  try {
+    return await addIdeaInternalNoteOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getCommunityIdeaFunction = onCall(async (request) => {
+  try {
+    return await getCommunityIdeaOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const listCommunityIdeasFunction = onCall(async (request) => {
+  try {
+    return await listCommunityIdeasOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getCommunityInsightsFunction = onCall(async (request) => {
+  try {
+    return await getCommunityInsightsOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
 })
 
 // SLA breach engine intentionally NOT deployed until case-creation receives PASS.

@@ -1,63 +1,50 @@
-# ServeSA - Phase 1 Implementation
+# ServeSA
 
 ## Overview
 
-ServeSA is a national "report-and-resolve" platform for South African service delivery, built as a mobile-first Progressive Web App (PWA). This repository contains the Phase-1 implementation with core functionality for case reporting, geospatial resolution, and municipal service management.
+ServeSA is a civic **report-and-resolve** Progressive Web App for South African municipalities — plus two-way engagement via **Municipal Updates** and **Community Ideas**. It is intentionally **not** a social network.
 
-## 🚀 Phase-1 Features
+## Features (implemented)
 
-### Core Functionality
-- ✅ **Case Creation Flow**: Multi-step wizard for reporting service delivery issues
-- ✅ **Geospatial Resolution**: BigQuery GIS integration for ward/municipality resolution
-- ✅ **SLA Management**: Automated SLA calculation and breach monitoring
-- ✅ **Real-time Notifications**: FCM push notifications and email alerts
-- ✅ **Public Map**: Interactive map with case visualization and filtering
-- ✅ **User Dashboard**: Case tracking and management interface
+### Civic reporting loop
+- Case creation wizard with photos and SA location bounds
+- Authoritative GIS ward/municipality resolution (BigQuery)
+- Municipal ops workspace (`/ops`) — queues, assign, notes, public case updates
+- Field worker mode and citizen case tracking
 
-### Technical Stack
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui
-- **Backend**: Firebase Cloud Functions v2 + Node.js 20
-- **Database**: Firestore (operational) + BigQuery (analytics)
-- **Authentication**: Firebase Auth with Google OAuth
-- **Storage**: Firebase Storage with image processing
-- **Maps**: Google Maps Platform integration
-- **Notifications**: Firebase Cloud Messaging (FCM)
-- **Infrastructure**: Google Cloud Platform (africa-south1 region)
+### Community engagement
+- **Municipal Updates** (`/updates`) — verified municipal communications with typed update kinds and lifecycle
+- **Community Ideas** (`/ideas`) — constructive suggestions, one support per citizen, official responses only
+- **Community Insights** (`/ops/community`) — deterministic aggregates with metric provenance (no predictive AI)
+- Ops Communications workspace under `/ops/community`
 
-## 📁 Repository Structure
+### Security posture
+- Privileged mutations via Cloud Functions + Admin SDK only
+- JWT custom claims for municipality isolation
+- Notification send callables are **admin-gated** (event-driven delivery preferred)
+
+### Technical stack
+- **Frontend**: Next.js + TypeScript + Tailwind (SA civic design system)
+- **Backend**: Firebase Cloud Functions v2 + **Node.js 22**
+- **Database**: Firestore (operational) + BigQuery (GIS / analytics)
+- **Auth**: Firebase Auth + custom claims
+- **Region**: africa-south1 (primary)
+
+> **Note:** Automated SLA breach engine and full multi-channel push/email/WhatsApp fan-out are architected but not marketed as generally available until separately certified. Production deploy is **manual** (`workflow_dispatch` only).
+
+## Repository structure
 
 ```
 servesa/
-├── apps/
-│   ├── web/                    # Next.js 15 PWA frontend
-│   │   ├── src/
-│   │   │   ├── app/           # App Router pages
-│   │   │   ├── components/    # React components
-│   │   │   ├── lib/          # Utilities and configurations
-│   │   │   └── types/        # TypeScript type definitions
-│   │   └── public/           # Static assets
-│   └── functions/            # Firebase Cloud Functions
-│       ├── src/
-│       │   ├── cases/        # Case management functions
-│       │   ├── notifications/ # Notification system
-│       │   ├── routing/      # Geospatial resolution
-│       │   └── utils/        # Utility functions
-│       └── package.json
-├── infra/
-│   ├── scripts/              # Infrastructure setup scripts
-│   ├── github/workflows/     # CI/CD pipelines
-│   ├── firestore.rules      # Firestore security rules
-│   └── storage.rules        # Storage security rules
-├── data/
-│   └── seeds/               # Seed data files
-├── tools/
-│   └── seed/                # Data seeding scripts
-├── docs/                    # Documentation
-├── package.json            # Monorepo configuration
-└── turbo.json             # Turbo build configuration
+├── apps/web/                 # Citizen + ops PWA
+├── apps/functions/           # Callables, triggers, community modules
+├── packages/case-contract/   # Shared Zod contracts (cases, updates, ideas)
+├── infra/                    # Rules, indexes, scripts, CI helpers
+├── docs/                     # ADRs, runbooks, certifications
+└── tools/                    # Seed, pilot, loadtest
 ```
 
-## 🛠️ Quick Start
+## Quick start
 
 ### Prerequisites
 

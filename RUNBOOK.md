@@ -10,6 +10,13 @@ This runbook provides operational procedures for ServeSA Phase-1, including depl
 4. [Maintenance Tasks](#maintenance-tasks)
 5. [Emergency Procedures](#emergency-procedures)
 6. [Performance Optimization](#performance-optimization)
+7. [Community Engagement](#community-engagement)
+
+## Community Engagement
+
+See `docs/runbooks/COMMUNITY_ENGAGEMENT.md` and `docs/architecture/ADR_COMMUNITY_ENGAGEMENT.md`.
+
+Citizen routes: `/updates`, `/ideas`. Ops: `/ops/community`. Deploy Firestore indexes for `municipal_updates` / `community_ideas` before enabling production traffic. Do not expose push/email send callables to ordinary users.
 
 ## Deployment Procedures
 
@@ -24,7 +31,7 @@ gcloud version
 firebase --version
 
 # Verify Node.js version
-node --version  # Should be 20+
+node --version  # Should be 22+
 
 # Verify project access
 gcloud auth list

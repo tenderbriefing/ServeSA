@@ -47,6 +47,7 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
     category: string;
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -60,13 +61,13 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
         dataProcessing: true;
         communications?: boolean | undefined;
     };
-    clientRequestId: string;
     subcategory?: string | undefined;
     address?: string | undefined;
 }, {
     category: string;
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -80,13 +81,13 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
         dataProcessing: true;
         communications?: boolean | undefined;
     };
-    clientRequestId: string;
     subcategory?: string | undefined;
     address?: string | undefined;
 }>, {
     category: string;
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -100,13 +101,13 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
         dataProcessing: true;
         communications?: boolean | undefined;
     };
-    clientRequestId: string;
     subcategory?: string | undefined;
     address?: string | undefined;
 }, {
     category: string;
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -120,47 +121,6 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
         dataProcessing: true;
         communications?: boolean | undefined;
     };
-    clientRequestId: string;
-    subcategory?: string | undefined;
-    address?: string | undefined;
-}>, {
-    category: "water" | "electricity" | "roads" | "waste" | "internet" | "emergency";
-    subcategory: string | undefined;
-    address: string | undefined;
-    reporter: {
-        name: string;
-        email: string | undefined;
-        phone: string | undefined;
-    };
-    title: string;
-    description: string;
-    priority: "emergency" | "high" | "medium" | "low";
-    latitude: number;
-    longitude: number;
-    locationSource: "device_gps" | "map_pin" | "address_search";
-    consent: {
-        dataProcessing: true;
-        communications?: boolean | undefined;
-    };
-    clientRequestId: string;
-}, {
-    category: string;
-    title: string;
-    description: string;
-    priority: "emergency" | "high" | "medium" | "low";
-    latitude: number;
-    longitude: number;
-    locationSource: "device_gps" | "map_pin" | "address_search";
-    reporter: {
-        name: string;
-        email?: string | undefined;
-        phone?: string | undefined;
-    };
-    consent: {
-        dataProcessing: true;
-        communications?: boolean | undefined;
-    };
-    clientRequestId: string;
     subcategory?: string | undefined;
     address?: string | undefined;
 }>, {
@@ -174,6 +134,7 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
     };
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -182,7 +143,46 @@ export declare const CreateCaseInputSchema: z.ZodEffects<z.ZodEffects<z.ZodEffec
         dataProcessing: true;
         communications?: boolean | undefined;
     };
+}, {
+    category: string;
+    title: string;
+    description: string;
     clientRequestId: string;
+    priority: "emergency" | "high" | "medium" | "low";
+    latitude: number;
+    longitude: number;
+    locationSource: "device_gps" | "map_pin" | "address_search";
+    reporter: {
+        name: string;
+        email?: string | undefined;
+        phone?: string | undefined;
+    };
+    consent: {
+        dataProcessing: true;
+        communications?: boolean | undefined;
+    };
+    subcategory?: string | undefined;
+    address?: string | undefined;
+}>, {
+    category: "water" | "electricity" | "roads" | "waste" | "internet" | "emergency";
+    subcategory: string | undefined;
+    address: string | undefined;
+    reporter: {
+        name: string;
+        email: string | undefined;
+        phone: string | undefined;
+    };
+    title: string;
+    description: string;
+    clientRequestId: string;
+    priority: "emergency" | "high" | "medium" | "low";
+    latitude: number;
+    longitude: number;
+    locationSource: "device_gps" | "map_pin" | "address_search";
+    consent: {
+        dataProcessing: true;
+        communications?: boolean | undefined;
+    };
 }, unknown>;
 export type CreateCaseInput = z.infer<typeof CreateCaseInputSchema>;
 export type CanonicalCategory = z.infer<typeof CanonicalCategorySchema>;
@@ -292,6 +292,7 @@ export declare function safeParseCreateCaseInput(input: unknown): z.SafeParseRet
     };
     title: string;
     description: string;
+    clientRequestId: string;
     priority: "emergency" | "high" | "medium" | "low";
     latitude: number;
     longitude: number;
@@ -300,6 +301,5 @@ export declare function safeParseCreateCaseInput(input: unknown): z.SafeParseRet
         dataProcessing: true;
         communications?: boolean | undefined;
     };
-    clientRequestId: string;
 }>;
 export { CANONICAL_CATEGORIES } from './categories';

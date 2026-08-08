@@ -102,6 +102,42 @@
         { "fieldPath": "contentHash", "order": "ASCENDING" },
         { "fieldPath": "uploadedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "municipal_updates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "municipal_updates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "community_ideas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "community_ideas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "municipalityCode", "order": "ASCENDING" },
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

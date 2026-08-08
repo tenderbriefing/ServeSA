@@ -7,7 +7,10 @@ const storage = getStorage();
 
 interface PDFGenerationRequest {
   caseId: string;
-  userId: string;
+  /** Authenticated caller uid — never trust client-supplied identity */
+  authUid: string;
+  authRoles?: string[];
+  authMunicipalityCode?: string | null;
   includeMedia?: boolean;
   includeHistory?: boolean;
 }
@@ -23,7 +26,18 @@ interface PDFGenerationResult {
  */
 export const generateCasePDF = async (data: PDFGenerationRequest): Promise<PDFGenerationResult> => {
   try {
-    const { caseId, userId, includeMedia = true, includeHistory = true } = data;
+    const {
+      caseId,
+      authUid,
+      authRoles = [],
+      authMunicipalityCode = null,
+      includeMedia = true,
+      includeHistory = true,
+    } = data;
+
+    if (!authUid) {
+      throw new Error('Authentication required');
+    }
 
     const caseDoc = await db.collection('cases').doc(caseId).get();
     
@@ -32,10 +46,14 @@ export const generateCasePDF = async (data: PDFGenerationRequest): Promise<PDFGe
     }
 
     const caseData = caseDoc.data();
-    await validatePDFPermissions(caseData, userId);
+    validatePDFPermissions(caseData, {
+      authUid,
+      authRoles,
+      authMunicipalityCode,
+    });
     const pdfContent = await generatePDFContent(caseData, includeMedia, includeHistory);
-    const pdfUrl = await uploadPDFToStorage(caseId, pdfContent, userId);
-    await logPDFGeneration(caseId, userId, pdfUrl);
+    const pdfUrl = await uploadPDFToStorage(caseId, pdfContent, authUid);
+    await logPDFGeneration(caseId, authUid, pdfUrl);
 
     return {
       success: true,
@@ -51,25 +69,33 @@ export const generateCasePDF = async (data: PDFGenerationRequest): Promise<PDFGe
   }
 };
 
-async function validatePDFPermissions(caseData: any, userId: string): Promise<void> {
-  if (caseData.userId === userId) {
-    return;
+function validatePDFPermissions(
+  caseData: any,
+  auth: { authUid: string; authRoles: string[]; authMunicipalityCode: string | null }
+): void {
+  const reporterUid = caseData?.reporterUid || caseData?.userId
+  if (reporterUid && reporterUid === auth.authUid) {
+    return
   }
 
-  const userDoc = await db.collection('users').doc(userId).get();
-  
-  if (!userDoc.exists) {
-    throw new Error('User not found');
+  const isAdmin = auth.authRoles.includes('admin')
+  const isOfficial =
+    isAdmin ||
+    auth.authRoles.includes('official') ||
+    auth.authRoles.includes('moderator')
+  if (!isOfficial) {
+    throw new Error('Insufficient permissions to generate PDF')
   }
 
-  const userData = userDoc.data();
+  if (isAdmin) return
 
-  if (userData?.role !== 'official' && userData?.role !== 'admin') {
-    throw new Error('Insufficient permissions to generate PDF');
-  }
-
-  if (userData.municipalityId !== caseData.location.municipalityId) {
-    throw new Error('User not authorized for this municipality');
+  const caseMuni =
+    caseData?.muniCode ||
+    caseData?.municipalityCode ||
+    caseData?.location?.municipalityId ||
+    null
+  if (!auth.authMunicipalityCode || !caseMuni || auth.authMunicipalityCode !== caseMuni) {
+    throw new Error('User not authorized for this municipality')
   }
 }
 

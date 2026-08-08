@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
-import { UserProfile } from '@/types'
+import type { UserProfile as CitizenProfile } from '@/types/auth'
 
 declare global {
   interface Window {
@@ -22,9 +22,15 @@ declare global {
   }
 }
 
+/** Profile may include citizen fields and ops claim-adjacent metadata */
+type AppUserProfile = CitizenProfile & {
+  roles?: string[]
+  displayName?: string
+}
+
 interface AuthContextType {
   user: User | null
-  userProfile: UserProfile | null
+  userProfile: AppUserProfile | null
   loading: boolean
   isOfficial: boolean
   isAdmin: boolean
@@ -46,7 +52,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [userProfile, setUserProfile] = useState<AppUserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [claimsRoles, setClaimsRoles] = useState<string[]>([])
   const [municipalityCode, setMunicipalityCode] = useState<string | null>(null)
@@ -79,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const userDoc = await getDoc(doc(db, 'users', next.uid))
           if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile)
+            setUserProfile(userDoc.data() as AppUserProfile)
           }
           const token = await next.getIdTokenResult(true)
           const roles = Array.isArray(token.claims.roles)
@@ -166,14 +172,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const profileRoles = userProfile?.roles || []
-  const mergedRoles = Array.from(new Set([...claimsRoles, ...profileRoles]))
+  // Privileges come from JWT custom claims only — never trust Firestore profile roles.
   const isOfficial =
-    mergedRoles.includes('official') ||
-    mergedRoles.includes('admin') ||
-    mergedRoles.includes('moderator') ||
-    mergedRoles.includes('field_worker')
-  const isAdmin = mergedRoles.includes('admin')
+    claimsRoles.includes('official') ||
+    claimsRoles.includes('admin') ||
+    claimsRoles.includes('moderator') ||
+    claimsRoles.includes('field_worker') ||
+    claimsRoles.includes('comms_editor') ||
+    claimsRoles.includes('comms_publisher')
+  const isAdmin = claimsRoles.includes('admin')
 
   return (
     <AuthContext.Provider
@@ -186,9 +193,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         municipalityCode:
           municipalityCode ||
           (userProfile as any)?.municipalityCode ||
-          (userProfile as any)?.municipalityId ||
           null,
-        claimsRoles: mergedRoles,
+        claimsRoles,
         refreshClaims,
       }}
     >

@@ -78,12 +78,28 @@ service firebase.storage {
       allow delete: if isAuthenticated() && isAdmin();
     }
 
-    // KNOWN CONDITION: derived thumbnails remain publicly readable (allow read: if true).
-    // Do not broaden further. Original case media above stays auth-scoped.
+    // Derived thumbnails — authenticated read only (reporter or same-muni official).
+    // Original case media above stays auth-scoped; do not reintroduce public thumbnail read.
     match /cases/{caseId}/thumbnails/{fileName} {
-      allow read: if true;
+      allow read: if isAuthenticated() &&
+        caseExists(caseId) &&
+        (
+          caseReporterUid(caseId) == request.auth.uid ||
+          (isOfficial() && canAccessMunicipality(caseMuniCode(caseId)))
+        );
       allow create, update: if false;
       allow delete: if isAuthenticated() && isAdmin();
+    }
+
+    // Municipal update / idea media — Admin SDK or authenticated owner upload via temp then callable
+    match /municipal_updates/{updateId}/media/{fileName} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if false;
+    }
+
+    match /community_ideas/{ideaId}/media/{fileName} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if false;
     }
 
     /**
