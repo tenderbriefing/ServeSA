@@ -66,9 +66,9 @@ CI gates unchanged (`ci.yml`: lint advisory, type-check, unit/functions/contract
 
 | Surface | Status |
 |---------|--------|
-| Production Hosting | **Not deployed** this upgrade |
-| Production Functions | **Not deployed** this upgrade |
-| Firestore / Storage rules | **Not deployed** this upgrade |
+| Production Hosting | **Deployed** `1de69f7` via WIF `31294948245` |
+| Production Functions | **Deployed** via same run |
+| Firestore / Storage rules | **Deployed** via same run |
 | Firestore indexes | Defined in `infra/firestore.indexes.json` — **must deploy before GA traffic** |
 | GIS `georesolveFunction` | **Unchanged** (not touched) |
 
@@ -113,4 +113,4 @@ CI gates unchanged (`ci.yml`: lint advisory, type-check, unit/functions/contract
 
 ## Final verdict
 
-**PASS WITH CONDITIONS** — ready for PR review and controlled production certification deploy; not production-live until WIF deploy + index + smoke conditions clear.
+**PASS WITH CONDITIONS** — production-live via PR #16 / WIF `31294948245`; remaining live authenticated smoke + index build confirmation.
