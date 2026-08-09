@@ -7,14 +7,15 @@
 | Branch | `feat/municipal-planning-idp` |
 | Base | `feat/community-engagement-upgrade` @ `42fea0d` |
 | Feature SHA | `b9016a468f71016841bec16b5a56880dcd41696b` |
-| Date | 2026-08-08 |
-| Deployment | **Not deployed** — production remains manual WIF `workflow_dispatch` only |
+| Production SHA | `1de69f76b7d083f94011e2c527747782ec191d03` (PR #16 squash) |
+| Date | 2026-08-09 |
+| Deployment | **Deployed** — WIF [`31294948245`](https://github.com/tenderbriefing/ServeSA/actions/runs/31294948245) SUCCESS (Hosting + Functions + rules + indexes) |
 
 ## Verdict
 
 **PASS WITH CONDITIONS**
 
-Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK callables, Firestore rules/indexes, citizen `/municipality` + project detail, ops `/ops/planning`, feature flag (global OFF + allow-list), tests, ADR, and feature docs. Production Hosting/Functions/Rules deploy was **not** performed. Live callable smoke and composite index build remain conditions before pilot GA.
+Municipal planning is live in production (non-staged: flag ON by default, allow-list `*`). Remaining condition: human-verified official IDP/budget documents must be published via `/ops/planning` — no fixture numbers in production. Live `/municipality` returns HTTP 200 with citizen heading copy.
 
 ## Certification checklist (17 items)
 
@@ -36,7 +37,7 @@ Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK calla
 | 14 | Participation reuses Community Ideas; Updates related not duplicated | **PASS** — CTAs to `/ideas/new`; `relatedUpdateIds` |
 | 15 | Feature flag `municipal_planning` ON by default (non-staged); optional allow-list (`*` = all) | **PASS** — enabled for production rollout; empty states when unpublished |
 | 16 | Security C1–C3 patterns; rules tests; municipality isolation; citizens cannot write planning | **PASS** — Admin SDK writes; security intent tests |
-| 17 | Docs + tests + production build/typecheck/lint; no fake production numbers; no auto-deploy | **PASS WITH CONDITIONS** — local gates green; deploy/index/smoke pending |
+| 17 | Docs + tests + production build/typecheck/lint; WIF deploy; no fake production numbers | **PASS WITH CONDITIONS** — deployed; verified official content still pending publish |
 
 ## Tests (local)
 
@@ -56,18 +57,18 @@ Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK calla
 
 | Surface | Status |
 |---------|--------|
-| Production Hosting | **Not deployed** |
-| Production Functions | **Not deployed** |
-| Firestore rules / indexes | Defined; **must deploy before GA** |
+| Production Hosting | **Deployed** `1de69f7` via WIF `31294948245` |
+| Production Functions | **Deployed** via same run |
+| Firestore rules / indexes | **Deployed** (indexes with rules) |
 | GIS | **Unchanged** |
 
-## Conditions before pilot GA
+## Remaining conditions
 
-1. WIF `workflow_dispatch` deploy of Hosting + Functions + rules + indexes (indexes included in Deploy Production when `deploy_rules=true`).
+1. ~~WIF deploy~~ **DONE** (`31294948245`).
 2. Feature is **ON by default** (non-staged; allow-list `*`). Hide with `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` if needed.
 3. Human-verify and publish real official documents — **no fixture numbers in production**.
-4. Live callable smoke for summary + project detail.
-5. Confirm composite indexes built in GCP.
+4. Live authenticated callable smoke for summary + project detail after first publish.
+5. Confirm composite indexes finished building in GCP console.
 
 ## Rollback
 
@@ -77,4 +78,4 @@ Municipal planning is implemented end-to-end in-repo: contracts, Admin SDK calla
 
 ## Final verdict
 
-**PASS WITH CONDITIONS** — ready for PR review and controlled pilot enablement after WIF deploy + index + verified content; not production-live.
+**PASS WITH CONDITIONS** — production-live (non-staged UI); awaiting verified municipal document publication before citizens see sourced plan/budget numbers.

@@ -10,13 +10,14 @@
 | Date | 2026-08-08 |
 | Commits | `dea8bb8` feature; subsequent docs certification commits on same branch |
 | Files changed | 49 files in feature commit (+4284 / −227) |
-| Deployment | **Not deployed** — production remains `workflow_dispatch` only |
+| Production SHA | `1de69f76b7d083f94011e2c527747782ec191d03` (PR #16) |
+| Deployment | **Deployed** — WIF [`31294948245`](https://github.com/tenderbriefing/ServeSA/actions/runs/31294948245) SUCCESS |
 
 ## Verdict
 
 **PASS WITH CONDITIONS**
 
-Community engagement is implemented end-to-end in-repo with security hardening prerequisites, shared contracts, callables, rules, citizen/ops UX, tests, and documentation. Production Hosting/Functions/Rules deploy was **not** performed (release policy: manual WIF `workflow_dispatch` only). Live callable smoke against `servesa-aad53` and composite index build completion remain conditions before marking production GA.
+Community engagement is live in production with security hardening prerequisites, shared contracts, callables, rules, citizen/ops UX, tests, and documentation. Remaining conditions: live authenticated smoke for Updates/Ideas support flows and confirmation that composite indexes finished building.
 
 ## Features delivered
 
