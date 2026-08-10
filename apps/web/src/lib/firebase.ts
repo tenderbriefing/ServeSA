@@ -22,7 +22,17 @@ export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
 export const functions = getFunctions(app, 'africa-south1')
-export const messaging = typeof window !== 'undefined' ? getMessaging(app) : null
+/** Messaging is optional — unsupported browsers must not break app boot. */
+export const messaging =
+  typeof window !== 'undefined'
+    ? (() => {
+        try {
+          return getMessaging(app)
+        } catch {
+          return null
+        }
+      })()
+    : null
 
 // Connect to emulators in development
 if (process.env.NODE_ENV === 'development') {
