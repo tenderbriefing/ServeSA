@@ -16,7 +16,6 @@ import { ActionCard } from '@/components/civic/ActionCard'
 import { CivicYDivider } from '@/components/civic/CivicMotif'
 import { categoryOutlineIcon } from '@/components/civic/categoryIcons'
 import { useAuth } from '@/hooks/useAuth'
-import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { brandCopy } from '@/lib/design-tokens'
 
 const categories = [
@@ -70,11 +69,9 @@ const civicIntents = [
 ]
 
 export default function HomePage() {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return <Spinner label="Loading Serve SA…" />
-  }
+  // Do not gate the entire homepage on auth loading — Firebase session restore
+  // can take seconds and left citizens staring at an empty "Loading Serve SA…" shell.
+  const { user } = useAuth()
 
   return (
     <div className="bg-canvas">

@@ -78,37 +78,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false
     let uatBootstrapDone = !window.__PILOT_UAT_ID_TOKEN?.trim()
+    let authStateSeen = false
 
+    const clearLoadingIfReady = () => {
+      if (uatBootstrapDone && authStateSeen && !cancelled) {
+        setLoading(false)
+      }
+    }
+
+    /**
+     * Resolve identity immediately so citizen surfaces are not blocked on
+     * Firestore profile / forced token refresh (those can take seconds).
+     */
     const applyUser = async (next: User | null) => {
+      authStateSeen = true
       setUser(next)
-      if (next) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', next.uid))
-          if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as AppUserProfile)
-          }
-          const token = await next.getIdTokenResult(true)
-          const roles = Array.isArray(token.claims.roles)
-            ? (token.claims.roles as string[])
-            : []
-          setClaimsRoles(roles)
-          setMunicipalityCode(
-            token.claims.municipalityCode
-              ? String(token.claims.municipalityCode)
-              : null
-          )
-        } catch (error) {
-          console.error('Error fetching user profile/claims:', error)
-        }
-      } else {
+      if (!next) {
         setUserProfile(null)
         setClaimsRoles([])
         setMunicipalityCode(null)
+        clearLoadingIfReady()
+        return
       }
-      // Do not clear loading until optional UAT sign-in has been attempted,
-      // otherwise OpsShell redirects to /auth/signin before bootstrap finishes.
-      if (uatBootstrapDone && !cancelled) {
-        setLoading(false)
+
+      // Unblock UI as soon as Firebase Auth knows the session.
+      clearLoadingIfReady()
+
+      try {
+        const [userDoc, token] = await Promise.all([
+          getDoc(doc(db, 'users', next.uid)),
+          // Avoid force-refresh on every cold start — it delays first paint.
+          next.getIdTokenResult(),
+        ])
+        if (cancelled) return
+        if (userDoc.exists()) {
+          setUserProfile(userDoc.data() as AppUserProfile)
+        } else {
+          setUserProfile(null)
+        }
+        const roles = Array.isArray(token.claims.roles)
+          ? (token.claims.roles as string[])
+          : []
+        setClaimsRoles(roles)
+        setMunicipalityCode(
+          token.claims.municipalityCode
+            ? String(token.claims.municipalityCode)
+            : null
+        )
+      } catch (error) {
+        console.error('Error fetching user profile/claims:', error)
       }
     }
 
@@ -121,9 +139,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const raw = window.__PILOT_UAT_ID_TOKEN?.trim()
       if (!raw) {
         // No UAT payload — rely solely on onAuthStateChanged (incl. persistence).
-        // Do NOT clear loading here: auth.currentUser is often still null before
-        // IndexedDB restore, and OpsShell would redirect to /auth/signin.
         uatBootstrapDone = true
+        clearLoadingIfReady()
         return
       }
       try {
@@ -154,20 +171,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } finally {
         uatBootstrapDone = true
         if (!cancelled) {
-          // If auth state already applied before the flag flipped, re-apply so
-          // loading clears; if sign-in failed, clear loading for the gate UI.
           if (auth.currentUser) {
             void applyUser(auth.currentUser)
           } else {
-            setLoading(false)
+            clearLoadingIfReady()
+            // Auth may still be restoring; if onAuthStateChanged already fired
+            // with null before UAT finished, clearLoadingIfReady handles it.
+            if (authStateSeen) setLoading(false)
           }
         }
       }
     }
     void bootstrapUat()
 
+    // Safety net: never leave the citizen shell on an infinite spinner.
+    const safety = window.setTimeout(() => {
+      if (!cancelled) setLoading(false)
+    }, 4_000)
+
     return () => {
       cancelled = true
+      window.clearTimeout(safety)
       unsubscribe()
     }
   }, [])
