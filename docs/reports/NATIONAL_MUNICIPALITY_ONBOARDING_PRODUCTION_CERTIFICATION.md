@@ -18,7 +18,7 @@ National citizen onboarding is production-stable: required province + municipali
 | Close-out starting SHA | `1f5dd33f9bb8ad0a9375bb0c6c0ba0ddf6e9c6ed` (PR #23 merge tip when close-out began) |
 | Prior national merges | PR [#22](https://github.com/tenderbriefing/ServeSA/pull/22) `bc955969…` · PR [#23](https://github.com/tenderbriefing/ServeSA/pull/23) `1f5dd33…` · docs PR [#24](https://github.com/tenderbriefing/ServeSA/pull/24) `fd1a4a1…` |
 | Release close-out branch | `cert/national-release-closeout` |
-| Final SHA | _(filled after this close-out PR merges)_ |
+| Final SHA | `2c0a5532081e09413b000bf43bd61d421742b3ac` (PR #26 merge) |
 
 ## National onboarding
 
