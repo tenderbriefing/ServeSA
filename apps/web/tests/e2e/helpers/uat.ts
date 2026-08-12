@@ -114,6 +114,36 @@ export async function signInAndGoto(
   if (page.url().includes('/auth/signin')) {
     throw new Error(`UAT auth failed for path ${path}`)
   }
+
+  // OpsShell may briefly see auth before JWT claims and bounce staff to /dashboard.
+  // Wait for staff chrome, then re-enter the target path once claims are ready.
+  const needsStaffClaims =
+    path === '/ops' ||
+    path.startsWith('/ops/') ||
+    path === '/field' ||
+    path.startsWith('/field/')
+  if (needsStaffClaims) {
+    await page
+      .getByRole('link', { name: /staff console/i })
+      .or(page.getByText(/^Staff$/))
+      .or(page.getByText(/Serve SA Ops/i))
+      .first()
+      .waitFor({ state: 'visible', timeout: 30_000 })
+      .catch(() => undefined)
+    await dismissOnboardingIfPresent(page)
+    const onTarget =
+      page.url().includes(path.split('?')[0]) &&
+      !(await page.getByText(/checking staff access/i).isVisible().catch(() => false))
+    if (!onTarget || page.url().includes('/dashboard')) {
+      await page.goto(path, { waitUntil: 'domcontentloaded' })
+      await page
+        .getByText(/checking staff access/i)
+        .first()
+        .waitFor({ state: 'hidden', timeout: 30_000 })
+        .catch(() => undefined)
+      await dismissOnboardingIfPresent(page)
+    }
+  }
 }
 
 export async function expectPageLoads(page: Page, path: string) {
