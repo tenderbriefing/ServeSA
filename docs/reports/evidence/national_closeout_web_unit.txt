@@ -1,0 +1,58 @@
+
+> @servesa/web@1.0.0 test:unit
+> node --test tests/unit/**/*.test.mjs
+
+✔ design-tokens anchors match SA civic palette (0.763334ms)
+✔ brandCopy carries mandated Serve SA identity lines (0.1225ms)
+✔ globals.css defines the same SA anchors as RGB channels (0.616084ms)
+✔ citizen primary nav includes Report, Updates, Ideas, Track, My Cases (0.227291ms)
+✔ homepage composes cinematic landing sections (0.745625ms)
+✔ landing components exist as modular files (1.03075ms)
+✔ root metadata positions Serve SA as civic connection (0.068875ms)
+✔ landing CTAs preserve citizen routes (0.325458ms)
+✔ no LanguageSwitcher component files remain (0.680917ms)
+✔ no US flag emoji in source (15.382708ms)
+✔ no react-i18next / i18next imports in source (3.746417ms)
+✔ citizen navigation labels are present in Header (0.369291ms)
+✔ document processing requires review before approval path (0.330125ms)
+✔ cannot publish directly from draft_generated processing status (0.051625ms)
+✔ module completeness is count-based not percentage invented (0.052875ms)
+✔ AI draft schema rejects invented budget without provenance fields optional (1.28025ms)
+✔ municipal planning global OFF blocks all munis (0.866334ms)
+✔ allow-list gates municipality when flag ON (0.169292ms)
+✔ homepage does not render Our Municipality / planning preview (0.871084ms)
+✔ FinalCTA only links Our Municipality when signed in (0.072916ms)
+✔ Header Our Municipality requires authenticated user (0.086125ms)
+✔ municipality page requires AuthGate and has no JHB default (0.087375ms)
+✔ planning empty copy no longer promises pilot-area substitute (0.1535ms)
+✔ AuthProvider exposes refreshProfile and claimsMunicipalityCode (1.840125ms)
+✔ useCitizenMunicipality uses claimsMunicipalityCode not merged convenience field (0.225167ms)
+✔ ConfirmMunicipalityPanel refreshes profile after save (0.255792ms)
+✔ account page provides municipality change with confirmation (0.323834ms)
+✔ signup persists province with municipalityCode (0.466875ms)
+✔ municipality page has no local savedCode override (0.11325ms)
+✔ landing demo cases are labelled DEMO not live JHB fallbacks (0.137541ms)
+✔ citizen municipality write paths never set roles or staff claims (0.283667ms)
+✔ province/municipality pairs validate nationally without inventing (1.782166ms)
+✔ optional ward blank accepted; overlong rejected (0.1325ms)
+✔ signup requires province and municipality; ward optional (0.382458ms)
+✔ southAfricaData exports national validators (0.415583ms)
+✔ shared CitizenMunicipalityGate used by updates, ideas, and new idea (0.251167ms)
+✔ CompleteProfileModal requires province and municipality when saving (0.078959ms)
+✔ UserSchema includes province with municipalityCode and wardId (0.345875ms)
+✔ Header surfaces Your Municipality context when resolved (0.084958ms)
+✔ canonical municipality codes cover national samples (0.144916ms)
+✔ ops planning has no JHB fallback (0.628084ms)
+✔ municipality page empty state is national-honest (0.31275ms)
+✔ publishing allowlist empty means national when flag on (0.252667ms)
+✔ normalizeMunicipalityCode uppercases and trims (0.344083ms)
+✔ resolveCitizenMunicipality prefers claims then profile (0.664958ms)
+✔ resolveCitizenMunicipality never invents a municipality (0.199708ms)
+ℹ tests 46
+ℹ suites 0
+ℹ pass 46
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98.569125

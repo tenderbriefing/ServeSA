@@ -1,0 +1,34 @@
+(node:24743) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 12 tests using 2 workers
+
+(node:24755) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24755) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:24756) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:24755) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:24:7 › smoke public /report.html @smoke (857ms)
+  ✓   2 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:24:7 › smoke public / @smoke (1.4s)
+  ✓   3 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:24:7 › smoke public /track.html @smoke (1.3s)
+  ✓   4 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:24:7 › smoke public /login.html @smoke (840ms)
+  ✓   5 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:24:7 › smoke public /signup.html @smoke (766ms)
+  ✓   6 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:33:7 › smoke auth-gated /account.html redirects or gates @smoke (1.2s)
+  ✓   7 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:33:7 › smoke auth-gated /municipality.html redirects or gates @smoke (1.8s)
+  ✓   9 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:33:7 › smoke auth-gated /ideas.html redirects or gates @smoke (1.5s)
+  ✓   8 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:33:7 › smoke auth-gated /updates.html redirects or gates @smoke (2.8s)
+  ✓  10 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:41:7 › smoke ops /ops.html @smoke (1.3s)
+  ✓  11 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:41:7 › smoke ops /ops/planning.html @smoke (2.4s)
+  ✓  12 [chromium] › apps/web/tests/e2e/productionSmoke.spec.ts:47:5 › publishing documents route exists when flag off shows disabled copy @smoke (1.8s)
+
+  12 passed (10.2s)
+
+To open last HTML report run:
+
+  npx playwright show-report
+

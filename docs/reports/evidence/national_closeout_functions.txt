@@ -1,0 +1,21 @@
+
+> @servesa/functions@1.0.0 test
+> jest
+
+PASS src/__tests__/reconcileUnresolved.test.ts
+PASS src/__tests__/georesolve.test.ts
+PASS src/__tests__/lifecycle.test.ts
+PASS src/__tests__/createCase.contract.test.ts
+PASS src/__tests__/imageDuplicate.score.test.ts
+PASS src/__tests__/municipalPlanning.test.ts
+PASS src/__tests__/communityEngagement.test.ts
+PASS src/__tests__/slaCalculator.test.ts
+PASS src/__tests__/municipalPublishing.test.ts
+PASS src/__tests__/departmentRouting.test.ts
+PASS src/__tests__/imageDuplicate.phash.fixture.test.ts
+
+Test Suites: 11 passed, 11 total
+Tests:       50 passed, 50 total
+Snapshots:   0 total
+Time:        5.382 s
+Ran all test suites.

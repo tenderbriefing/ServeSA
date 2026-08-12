@@ -1,0 +1,14 @@
+
+> @servesa/case-contract@1.0.0 test
+> jest
+
+PASS __tests__/municipalPlanning.test.ts
+PASS __tests__/community.test.ts
+PASS __tests__/schema.test.ts
+PASS __tests__/municipalPublishing.test.ts
+
+Test Suites: 4 passed, 4 total
+Tests:       32 passed, 32 total
+Snapshots:   0 total
+Time:        2.578 s
+Ran all test suites.
