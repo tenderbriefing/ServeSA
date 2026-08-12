@@ -21,6 +21,7 @@ export const UserSchema = z.object({
   photoURL: z.string().url().optional(),
   roles: z.array(UserRoleSchema).default(['citizen']),
   contactPreferences: z.array(ContactPreferenceSchema).default(['email']),
+  province: z.string().optional(),
   municipalityCode: z.string().optional(),
   wardId: z.string().optional(),
   createdAt: z.date(),

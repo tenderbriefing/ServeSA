@@ -4,45 +4,64 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
-import { MapPin, Phone, User, AlertCircle, CheckCircle } from 'lucide-react'
-import { southAfricaProvinces, getMunicipalitiesByProvince, type Municipality } from '@/lib/southAfricaData'
+import { Phone, AlertCircle, CheckCircle } from 'lucide-react'
+import {
+  MunicipalitySelectFields,
+  type MunicipalitySelection,
+} from '@/components/municipality/MunicipalitySelectFields'
+import {
+  isValidMunicipalitySelection,
+  normalizeOptionalWard,
+} from '@/lib/southAfricaData'
 
 interface CompleteProfileModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalProps) {
+/**
+ * Legacy profile completion modal. Aligns with national onboarding:
+ * province + municipality required when saving; ward optional.
+ * Prefer ConfirmMunicipalityPanel / CitizenMunicipalityGate for gated routes.
+ */
+export function CompleteProfileModal({
+  isOpen,
+  onClose,
+}: CompleteProfileModalProps) {
   const { user, userProfile, refreshProfile } = useAuth()
-  const [formData, setFormData] = useState({
-    phone: userProfile?.phone || '',
+  const [phone, setPhone] = useState(userProfile?.phone || '')
+  const [selection, setSelection] = useState<MunicipalitySelection>({
     province: userProfile?.province || '',
-    municipalityCode: userProfile?.municipalityCode || ''
+    municipalityCode: userProfile?.municipalityCode || '',
+    wardId: (userProfile as { wardId?: string } | null)?.wardId || '',
   })
-  const [availableMunicipalities, setAvailableMunicipalities] = useState<Municipality[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    
-    // When province changes, update available municipalities and reset municipality selection
-    if (field === 'province') {
-      const municipalities = getMunicipalitiesByProvince(value)
-      setAvailableMunicipalities(municipalities)
-      setFormData(prev => ({ ...prev, municipalityCode: '' }))
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
+
+    if (
+      !isValidMunicipalitySelection(
+        selection.province,
+        selection.municipalityCode
+      )
+    ) {
+      setError('Select a valid province and municipality.')
+      return
+    }
 
     setIsSubmitting(true)
     setError('')
@@ -50,19 +69,20 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
     try {
       const userDocRef = doc(db, 'users', user.uid)
       await updateDoc(userDocRef, {
-        phone: formData.phone,
-        province: formData.province,
-        municipalityCode: formData.municipalityCode,
-        updatedAt: new Date()
+        phone: phone.trim() || null,
+        province: selection.province,
+        municipalityCode: selection.municipalityCode,
+        wardId: normalizeOptionalWard(selection.wardId),
+        updatedAt: new Date(),
       })
       await refreshProfile()
 
       setSuccess(true)
       setTimeout(() => {
         onClose()
-      }, 2000)
-    } catch (error: any) {
-      setError(error.message)
+      }, 1500)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unable to save profile')
     } finally {
       setIsSubmitting(false)
     }
@@ -71,96 +91,66 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl font-bold">Complete Your Profile</CardTitle>
+          <CardTitle className="text-xl font-bold">
+            Confirm your municipality
+          </CardTitle>
           <CardDescription>
-            Add optional contact and location details. You can skip this and
-            still report issues.
+            Province and municipality are required so Serve SA can show the
+            correct local civic services. Ward is optional.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {success ? (
-            <div className="text-center py-6">
-              <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-green-700 mb-2">Profile Updated!</h3>
-              <p className="text-ink-muted">Your profile has been successfully updated.</p>
+            <div className="py-6 text-center">
+              <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
+              <h3 className="mb-2 text-lg font-semibold text-green-700">
+                Profile updated
+              </h3>
+              <p className="text-ink-muted">
+                Your municipality context has been saved.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
+              {error ? (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
-              )}
+              ) : null}
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Mobile number <span className="text-ink-subtle">(optional)</span>
+                  Mobile number{' '}
+                  <span className="font-normal text-ink-subtle">(optional)</span>
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle" />
                   <Input
                     type="tel"
                     inputMode="tel"
                     autoComplete="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="082 123 4567"
-                    className="pl-10 min-h-touch"
+                    className="min-h-touch pl-10"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Province <span className="text-ink-subtle">(optional)</span>
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
-                  <Select value={formData.province} onValueChange={(value) => handleInputChange('province', value)}>
-                    <SelectTrigger className="pl-10">
-                      <SelectValue placeholder="Select your province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {southAfricaProvinces.map((province) => (
-                        <SelectItem key={province.code} value={province.code}>
-                          {province.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <MunicipalitySelectFields
+                value={selection}
+                onChange={setSelection}
+                required
+                showWard
+                idPrefix="complete-profile"
+                disabled={isSubmitting}
+              />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Municipality <span className="text-ink-subtle">(optional)</span>
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-subtle" />
-                  <Select 
-                    value={formData.municipalityCode} 
-                    onValueChange={(value) => handleInputChange('municipalityCode', value)}
-                    disabled={!formData.province}
-                  >
-                    <SelectTrigger className="pl-10">
-                      <SelectValue placeholder={formData.province ? "Select your municipality" : "Select province first"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableMunicipalities.map((municipality) => (
-                        <SelectItem key={municipality.code} value={municipality.code}>
-                          {municipality.name} ({municipality.type})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -168,14 +158,14 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
                   className="flex-1"
                   disabled={isSubmitting}
                 >
-                  Skip for Now
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Saving…' : 'Save profile'}
+                  {isSubmitting ? 'Saving…' : 'Save municipality'}
                 </Button>
               </div>
             </form>
