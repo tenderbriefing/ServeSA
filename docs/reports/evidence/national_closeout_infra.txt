@@ -1,0 +1,10 @@
+PASS tests/community.security.test.ts
+PASS tests/municipalPlanning.security.test.ts
+PASS tests/municipalPublishing.security.test.ts
+PASS tests/security.rules.test.ts
+
+Test Suites: 4 passed, 4 total
+Tests:       24 passed, 24 total
+Snapshots:   0 total
+Time:        0.192 s, estimated 1 s
+Ran all test suites.
