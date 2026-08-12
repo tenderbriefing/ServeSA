@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build case-contract (required by web publishing unit tests)
+        run: npm run build -w @servesa/case-contract
+
       - name: Lint functions (advisory — baseline has pre-existing eslint debt)
         continue-on-error: true
         run: npm run lint -w @servesa/functions

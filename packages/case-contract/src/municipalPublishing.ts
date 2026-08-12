@@ -185,9 +185,14 @@ export const AiExtractDraftSchema = z.object({
 
 export type AiExtractDraft = z.infer<typeof AiExtractDraftSchema>
 
+export const PLANNING_ALLOWED_MIME = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+] as const
+
 const Base64FileSchema = z.object({
   name: z.string().min(1).max(240),
-  type: z.string().min(3).max(120),
+  type: z.enum(PLANNING_ALLOWED_MIME),
   size: z.number().int().min(1).max(25 * 1024 * 1024),
   data: z.string().min(1),
 })
@@ -235,11 +240,6 @@ export const GetPlanningPublishingDashboardInputSchema = z.object({
 export type GetPlanningPublishingDashboardInput = z.infer<
   typeof GetPlanningPublishingDashboardInputSchema
 >
-
-export const PLANNING_ALLOWED_MIME = [
-  'application/pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-] as const
 
 export function canPublishFromProcessingStatus(
   processingStatus: string,
