@@ -1,29 +1,33 @@
 # National Municipality Onboarding — Production Certification
 
 **Date:** 2026-08-12  
-**Branch:** `feat/national-municipality-onboarding`
+**Branch:** `feat/national-municipality-finalisation`
 
 ## Executive Verdict
 
 **PASS WITH CONDITIONS**
 
-National citizen municipality onboarding is implemented and merged-ready: required province/municipality at signup, optional ward, shared municipality gate, no JHB citizen/ops fallback, truthful unpublished planning empty state. Live multi-municipality production UAT and official document publishing lifecycle remain outstanding where credentials/documents are unavailable.
+National citizen municipality context is finalised on `main` via PR #22 and this finalisation follow-up: required province/municipality at signup, optional ward, shared municipality gate (including `/ideas/new`), header “Your Municipality” context, no JHB citizen fallback, truthful unpublished planning empty state, CompleteProfileModal aligned with required municipality validation, UserSchema includes `province`.
+
+Live multi-municipality authenticated UAT and authentic document publishing lifecycle remain conditions where production evidence is pending after deploy.
 
 ## Git
 
 | Item | Value |
 |------|-------|
-| Starting SHA | `4c1c2c89c28d48c3007a22afd106d757c86b600f` |
-| Feature branch | `feat/national-municipality-onboarding` |
+| Starting SHA (pre-finalisation) | `bc955969bf837247b26e467fb12f73b271e5d466` (PR #22 merge) |
+| Prior national PR | #22 — `feat/national-municipality-onboarding` |
+| Feature branch | `feat/national-municipality-finalisation` |
 
-*(Merge SHA / final SHA filled after merge)*
+*(Feature / merge / final SHA filled after merge)*
 
 ## National onboarding
 
 - **Province:** required at email signup; validated against SA dataset
 - **Municipality:** required; filtered by province; canonical code persisted
 - **Ward:** optional free-text; no fabricated ward catalogue; blank accepted
-- Invalid province/municipality combinations rejected client-side via `isValidMunicipalitySelection`
+- Invalid province/municipality combinations rejected via `isValidMunicipalitySelection`
+- Canonical codes: `JHB`, `CPT`, `DBN` (eThekwini), `TSH`, `BUF`, `POL`, …
 
 ## Existing users
 
@@ -31,12 +35,13 @@ National citizen municipality onboarding is implemented and merged-ready: requir
 - Missing municipality → `CitizenMunicipalityGate` → `ConfirmMunicipalityPanel`
 - Google signup without municipality → confirm gate on municipality-dependent routes
 - No automatic JHB assignment
+- `/ideas/new` uses the same shared gate (not a competing redirect-only flow)
 
 ## Municipality context
 
 - Citizen resolver: claims → profile → null
 - Staff ops: JWT municipality claim required (no JHB fallback)
-- Display: “Your Municipality” + display name
+- Display: “Your Municipality” + display name (header + municipality page)
 
 ## /municipality
 
@@ -48,7 +53,7 @@ National citizen municipality onboarding is implemented and merged-ready: requir
 ## Updates and Ideas
 
 - Scoped via same citizen municipality resolver
-- Wrapped in `CitizenMunicipalityGate` (auth + municipality)
+- Wrapped in `CitizenMunicipalityGate` (list + new idea)
 
 ## GIS
 
@@ -66,31 +71,32 @@ National citizen municipality onboarding is implemented and merged-ready: requir
 - Architecture national: empty allow-list = all municipalities when engine flag ON
 - Engine flag remains **OFF** by default
 - No permanent `ALLOWLIST=JHB` in code
-- New publishing Functions may still need production deploy (separate from this web finalisation)
+- Publishing Functions deploy tracked separately in production deployment section
 
 ## Tests (local)
 
 | Suite | Passed | Failed | Skipped |
 |-------|--------|--------|---------|
-| Web unit | 42 | 0 | 0 |
+| Web unit | 46 | 0 | 0 |
 | Case-contract | 32 | 0 | 0 |
 | Functions | 50 | 0 | 0 |
 | Infra security | 12 | 0 | 0 |
 | Typecheck / lint / builds | PASS | — | — |
-| Live Firebase UAT | — | — | NOT EXECUTED |
+| Live Firebase UAT | — | — | NOT EXECUTED (pre-deploy) |
 | Official document publishing UAT | — | — | NOT EXECUTED |
 
 ## Rollback
 
 1. Revert merge commit on `main`
-2. Redeploy previous Hosting revision
+2. Redeploy previous Hosting / Functions revisions via Deploy Production workflow
 3. Citizen reporting continues (GIS unchanged)
+4. Publishing flag remains OFF by default — disable Hosting env if enabled
 
 ## Known conditions
 
-**Blocking for full production pilot sign-off:** live multi-muni UAT; publishing Functions deploy if not yet live; authentic municipal document for publishing lifecycle.
+**Blocking for full production pilot sign-off:** live multi-muni authenticated UAT after Hosting deploy; authentic municipal document for publishing lifecycle.
 
-**Non-blocking:** incomplete local municipality coverage in static dataset (duplicate codes historically present); ward free-text without official ward catalogue.
+**Non-blocking:** incomplete local municipality coverage in static dataset; ward free-text without official ward catalogue; eThekwini canonical code is `DBN` (not `ETH`).
 
 ## Final recommendation
 
