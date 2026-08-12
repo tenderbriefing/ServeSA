@@ -164,6 +164,24 @@ service firebase.storage {
       allow delete: if isAuthenticated() && isAdmin();
     }
 
+    /**
+     * Municipal planning document upload — Admin SDK writes only.
+     * Unpublished/processing paths: ops read via signed URLs.
+     */
+    match /municipal_planning/{muniCode}/documents/{documentId}/{fileName} {
+      allow read, write: if false;
+    }
+
+    match /municipal_planning/{muniCode}/processing/{documentId}/{fileName} {
+      allow read, write: if false;
+    }
+
+    /** Published official sources — public read when explicitly published by server */
+    match /municipal_planning/{muniCode}/published/{documentId}/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

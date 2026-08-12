@@ -13,6 +13,7 @@ export const MUNICIPAL_PLANNING_CONTRACT_VERSION = '1.0.0'
 /** Official planning document kinds supported by the ingestion pipeline */
 export const PlanDocumentKindSchema = z.enum([
   'idp',
+  'idp_review',
   'budget',
   'adjusted_budget',
   'sdbip',
@@ -21,6 +22,7 @@ export const PlanDocumentKindSchema = z.enum([
   's71',
   's52',
   'performance_report',
+  'service_delivery_plan',
   'other_official',
 ])
 
@@ -28,6 +30,7 @@ export type PlanDocumentKind = z.infer<typeof PlanDocumentKindSchema>
 
 export const PLAN_DOCUMENT_KIND_LABEL: Record<PlanDocumentKind, string> = {
   idp: 'Integrated Development Plan (IDP)',
+  idp_review: 'IDP Review',
   budget: 'Municipal Budget',
   adjusted_budget: 'Adjusted Budget',
   sdbip: 'SDBIP',
@@ -36,6 +39,7 @@ export const PLAN_DOCUMENT_KIND_LABEL: Record<PlanDocumentKind, string> = {
   s71: 'Section 71 Report',
   s52: 'Section 52 Report',
   performance_report: 'Performance Report',
+  service_delivery_plan: 'Service Delivery Plan',
   other_official: 'Other Official Document',
 }
 

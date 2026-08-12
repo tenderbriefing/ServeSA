@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { OpsShell } from '@/components/ops/OpsShell'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { planningApi } from '@/lib/api/planning'
@@ -13,7 +14,7 @@ import {
   type PlanDocumentKind,
   type MunicipalProjectStatus,
 } from '@servesa/case-contract'
-import { FEATURE_FLAGS } from '@/lib/constants'
+import { FEATURE_FLAGS, isMunicipalPublishingEnabledFor } from '@/lib/constants'
 
 type Tab = 'documents' | 'priorities' | 'projects' | 'budgets'
 
@@ -35,6 +36,7 @@ const ENTITY_MAP: Record<Tab, 'document' | 'priority' | 'project' | 'budget_line
 export default function OpsPlanningPage() {
   const { municipalityCode } = useAuth()
   const muni = municipalityCode || 'JHB'
+  const publishingEnabled = isMunicipalPublishingEnabledFor(muni)
   const [tab, setTab] = useState<Tab>('documents')
   const [items, setItems] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
@@ -114,6 +116,13 @@ export default function OpsPlanningPage() {
               see published content until{' '}
               <code>NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING</code> is left enabled
               (default) or explicitly set to <code>true</code>.
+            </p>
+          ) : null}
+          {FEATURE_FLAGS.enableMunicipalPublishingEngine && publishingEnabled ? (
+            <p className="mt-3">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/ops/planning/documents">Document publishing engine</Link>
+              </Button>
             </p>
           ) : null}
         </header>

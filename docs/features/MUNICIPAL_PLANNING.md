@@ -13,7 +13,7 @@ Help citizens understand municipal plans without IDP jargon: what is planned, wh
 
 Nav label: **Our Municipality**. Feature flag `municipal_planning` is **ON by default** (non-staged). Set `NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false` to hide. Optional municipality allow-list via `NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST` (default `*` = all municipalities; empty states when no published plan).
 
-Municipality resolution follows the same soft pattern as Updates/Ideas: claims → profile → pilot default `JHB`. Missing values never invent figures — copy uses “Not published yet” / “Data awaiting verification”.
+Municipality resolution: JWT claims → profile → null (no IP inference, no JHB fallback for citizens). Missing values never invent figures — copy uses “Not published yet” / “Data awaiting verification”.
 
 ## Ops
 

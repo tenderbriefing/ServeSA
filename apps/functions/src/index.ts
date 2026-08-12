@@ -86,6 +86,15 @@ import {
   getMunicipalPlanningSummaryOps,
   getMunicipalProjectOps,
 } from './planning/municipalPlanning'
+import {
+  uploadPlanningDocumentOps,
+  processPlanningDocumentOps,
+  updatePlanningAiDraftOps,
+  approvePlanningDocumentOps,
+  getPlanningPublishingDashboardOps,
+  getPlanningDocumentSourceUrlOps,
+  publishPlanningDocumentOps,
+} from './planning/documentIngestion'
 import { assertOfficial } from './cases/municipalityOpsShared'
 
 setGlobalOptions({
@@ -734,6 +743,92 @@ export const getMunicipalPlanningSummaryFunction = onCall(async (request) => {
 export const getMunicipalProjectFunction = onCall(async (request) => {
   try {
     return await getMunicipalProjectOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+// —— Municipal Publishing Engine (feature-flagged on web) ——
+
+export const uploadPlanningDocumentFunction = onCall(async (request) => {
+  try {
+    return await uploadPlanningDocumentOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const processPlanningDocumentFunction = onCall(async (request) => {
+  try {
+    return await processPlanningDocumentOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const updatePlanningAiDraftFunction = onCall(async (request) => {
+  try {
+    return await updatePlanningAiDraftOps(request.data, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const approvePlanningDocumentFunction = onCall(async (request) => {
+  try {
+    const data = (request.data || {}) as { documentId?: string; municipalityCode?: string }
+    return await approvePlanningDocumentOps(
+      String(data.documentId || ''),
+      {
+        uid: request.auth?.uid || '',
+        token: (request.auth?.token || null) as Record<string, unknown> | null,
+      },
+      data.municipalityCode
+    )
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const publishPlanningDocumentFunction = onCall(async (request) => {
+  try {
+    const data = (request.data || {}) as { documentId?: string }
+    return await publishPlanningDocumentOps(String(data.documentId || ''), {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getPlanningPublishingDashboardFunction = onCall(async (request) => {
+  try {
+    return await getPlanningPublishingDashboardOps(request.data || {}, {
+      uid: request.auth?.uid || '',
+      token: (request.auth?.token || null) as Record<string, unknown> | null,
+    })
+  } catch (error) {
+    mapCallableError(error)
+  }
+})
+
+export const getPlanningDocumentSourceUrlFunction = onCall(async (request) => {
+  try {
+    const data = (request.data || {}) as { documentId?: string }
+    return await getPlanningDocumentSourceUrlOps(String(data.documentId || ''), {
       uid: request.auth?.uid || '',
       token: (request.auth?.token || null) as Record<string, unknown> | null,
     })

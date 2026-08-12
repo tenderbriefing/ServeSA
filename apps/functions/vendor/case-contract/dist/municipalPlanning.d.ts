@@ -8,7 +8,7 @@
 import { z } from 'zod';
 export declare const MUNICIPAL_PLANNING_CONTRACT_VERSION = "1.0.0";
 /** Official planning document kinds supported by the ingestion pipeline */
-export declare const PlanDocumentKindSchema: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+export declare const PlanDocumentKindSchema: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
 export type PlanDocumentKind = z.infer<typeof PlanDocumentKindSchema>;
 export declare const PLAN_DOCUMENT_KIND_LABEL: Record<PlanDocumentKind, string>;
 /**
@@ -39,7 +39,7 @@ export declare const AccountabilityLayerSchema: z.ZodEnum<["promised", "budgeted
 export type AccountabilityLayer = z.infer<typeof AccountabilityLayerSchema>;
 export declare const SourceReferenceSchema: z.ZodObject<{
     sourceId: z.ZodOptional<z.ZodString>;
-    documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+    documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
     title: z.ZodString;
     publisher: z.ZodOptional<z.ZodString>;
     publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -50,7 +50,7 @@ export declare const SourceReferenceSchema: z.ZodObject<{
     excerpt: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     title: string;
-    documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+    documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
     sourceId?: string | undefined;
     publisher?: string | undefined;
     publishedAt?: string | null | undefined;
@@ -60,7 +60,7 @@ export declare const SourceReferenceSchema: z.ZodObject<{
     excerpt?: string | undefined;
 }, {
     title: string;
-    documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+    documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
     sourceId?: string | undefined;
     publisher?: string | undefined;
     publishedAt?: string | null | undefined;
@@ -77,7 +77,7 @@ export declare const MoneyAmountSchema: z.ZodObject<{
     layer: z.ZodOptional<z.ZodEnum<["promised", "budgeted", "spent", "delivered", "citizen_experience"]>>;
     source: z.ZodObject<{
         sourceId: z.ZodOptional<z.ZodString>;
-        documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+        documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
         title: z.ZodString;
         publisher: z.ZodOptional<z.ZodString>;
         publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -88,7 +88,7 @@ export declare const MoneyAmountSchema: z.ZodObject<{
         excerpt: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -98,7 +98,7 @@ export declare const MoneyAmountSchema: z.ZodObject<{
         excerpt?: string | undefined;
     }, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -112,7 +112,7 @@ export declare const MoneyAmountSchema: z.ZodObject<{
     currency: "ZAR";
     source: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -127,7 +127,7 @@ export declare const MoneyAmountSchema: z.ZodObject<{
     amountZar: number;
     source: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -144,7 +144,7 @@ export type MoneyAmount = z.infer<typeof MoneyAmountSchema>;
 export declare const UpsertPlanDocumentInputSchema: z.ZodObject<{
     documentId: z.ZodOptional<z.ZodString>;
     municipalityCode: z.ZodOptional<z.ZodString>;
-    kind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+    kind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
     title: z.ZodString;
     fiscalYear: z.ZodString;
     storagePath: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -156,7 +156,7 @@ export declare const UpsertPlanDocumentInputSchema: z.ZodObject<{
     publicationStatus: z.ZodOptional<z.ZodEnum<["draft", "awaiting_review", "verified", "published", "archived"]>>;
 }, "strip", z.ZodTypeAny, {
     title: string;
-    kind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+    kind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
     fiscalYear: string;
     municipalityCode?: string | undefined;
     publisher?: string | undefined;
@@ -168,7 +168,7 @@ export declare const UpsertPlanDocumentInputSchema: z.ZodObject<{
     publicationStatus?: "archived" | "draft" | "published" | "awaiting_review" | "verified" | undefined;
 }, {
     title: string;
-    kind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+    kind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
     fiscalYear: string;
     municipalityCode?: string | undefined;
     publisher?: string | undefined;
@@ -197,7 +197,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         layer: z.ZodOptional<z.ZodEnum<["promised", "budgeted", "spent", "delivered", "citizen_experience"]>>;
         source: z.ZodObject<{
             sourceId: z.ZodOptional<z.ZodString>;
-            documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+            documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
             title: z.ZodString;
             publisher: z.ZodOptional<z.ZodString>;
             publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -208,7 +208,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
             excerpt: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -218,7 +218,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
             excerpt?: string | undefined;
         }, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -232,7 +232,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -247,7 +247,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -264,7 +264,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
     relatedProjectIds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     sources: z.ZodArray<z.ZodObject<{
         sourceId: z.ZodOptional<z.ZodString>;
-        documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+        documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
         title: z.ZodString;
         publisher: z.ZodOptional<z.ZodString>;
         publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -275,7 +275,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         excerpt: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -285,7 +285,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         excerpt?: string | undefined;
     }, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -302,7 +302,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
     plainLanguageSummary: string;
     sources: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -318,7 +318,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -342,7 +342,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
     plainLanguageSummary: string;
     sources: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -357,7 +357,7 @@ export declare const UpsertPriorityInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -405,7 +405,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         layer: z.ZodOptional<z.ZodEnum<["promised", "budgeted", "spent", "delivered", "citizen_experience"]>>;
         source: z.ZodObject<{
             sourceId: z.ZodOptional<z.ZodString>;
-            documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+            documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
             title: z.ZodString;
             publisher: z.ZodOptional<z.ZodString>;
             publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -416,7 +416,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
             excerpt: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -426,7 +426,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
             excerpt?: string | undefined;
         }, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -440,7 +440,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -455,7 +455,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -475,7 +475,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         layer: z.ZodOptional<z.ZodEnum<["promised", "budgeted", "spent", "delivered", "citizen_experience"]>>;
         source: z.ZodObject<{
             sourceId: z.ZodOptional<z.ZodString>;
-            documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+            documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
             title: z.ZodString;
             publisher: z.ZodOptional<z.ZodString>;
             publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -486,7 +486,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
             excerpt: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -496,7 +496,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
             excerpt?: string | undefined;
         }, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -510,7 +510,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -525,7 +525,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -544,7 +544,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
     officialSourceUrl: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     sources: z.ZodArray<z.ZodObject<{
         sourceId: z.ZodOptional<z.ZodString>;
-        documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+        documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
         title: z.ZodString;
         publisher: z.ZodOptional<z.ZodString>;
         publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -555,7 +555,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         excerpt: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -565,7 +565,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         excerpt?: string | undefined;
     }, {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -583,7 +583,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
     plainLanguageSummary: string;
     sources: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -602,7 +602,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -619,7 +619,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -650,7 +650,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
     plainLanguageSummary: string;
     sources: {
         title: string;
-        documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+        documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
         sourceId?: string | undefined;
         publisher?: string | undefined;
         publishedAt?: string | null | undefined;
@@ -667,7 +667,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -684,7 +684,7 @@ export declare const UpsertMunicipalProjectInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -728,7 +728,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
         layer: z.ZodOptional<z.ZodEnum<["promised", "budgeted", "spent", "delivered", "citizen_experience"]>>;
         source: z.ZodObject<{
             sourceId: z.ZodOptional<z.ZodString>;
-            documentKind: z.ZodEnum<["idp", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "other_official"]>;
+            documentKind: z.ZodEnum<["idp", "idp_review", "budget", "adjusted_budget", "sdbip", "annual_report", "afs", "s71", "s52", "performance_report", "service_delivery_plan", "other_official"]>;
             title: z.ZodString;
             publisher: z.ZodOptional<z.ZodString>;
             publishedAt: z.ZodNullable<z.ZodOptional<z.ZodString>>;
@@ -739,7 +739,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
             excerpt: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -749,7 +749,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
             excerpt?: string | undefined;
         }, {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -763,7 +763,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -778,7 +778,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -803,7 +803,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
         currency: "ZAR";
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -829,7 +829,7 @@ export declare const UpsertBudgetLineInputSchema: z.ZodObject<{
         amountZar: number;
         source: {
             title: string;
-            documentKind: "idp" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "other_official";
+            documentKind: "idp" | "idp_review" | "budget" | "adjusted_budget" | "sdbip" | "annual_report" | "afs" | "s71" | "s52" | "performance_report" | "service_delivery_plan" | "other_official";
             sourceId?: string | undefined;
             publisher?: string | undefined;
             publishedAt?: string | null | undefined;
@@ -919,5 +919,5 @@ export declare const PLANNING_EMPTY_COPY: {
     readonly notPublished: "Not published yet";
     readonly awaitingVerification: "Data awaiting verification";
     readonly noWardMapping: "Ward-level project mapping is not available for this municipality yet.";
-    readonly resolutionUnavailable: "We could not confirm your municipality yet. Showing published planning for the pilot area when available.";
+    readonly resolutionUnavailable: "We could not confirm your municipality yet. Confirm where you live to see local planning information.";
 };

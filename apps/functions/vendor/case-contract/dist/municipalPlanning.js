@@ -15,6 +15,7 @@ exports.MUNICIPAL_PLANNING_CONTRACT_VERSION = '1.0.0';
 /** Official planning document kinds supported by the ingestion pipeline */
 exports.PlanDocumentKindSchema = zod_1.z.enum([
     'idp',
+    'idp_review',
     'budget',
     'adjusted_budget',
     'sdbip',
@@ -23,10 +24,12 @@ exports.PlanDocumentKindSchema = zod_1.z.enum([
     's71',
     's52',
     'performance_report',
+    'service_delivery_plan',
     'other_official',
 ]);
 exports.PLAN_DOCUMENT_KIND_LABEL = {
     idp: 'Integrated Development Plan (IDP)',
+    idp_review: 'IDP Review',
     budget: 'Municipal Budget',
     adjusted_budget: 'Adjusted Budget',
     sdbip: 'SDBIP',
@@ -35,6 +38,7 @@ exports.PLAN_DOCUMENT_KIND_LABEL = {
     s71: 'Section 71 Report',
     s52: 'Section 52 Report',
     performance_report: 'Performance Report',
+    service_delivery_plan: 'Service Delivery Plan',
     other_official: 'Other Official Document',
 };
 /**
@@ -246,5 +250,5 @@ exports.PLANNING_EMPTY_COPY = {
     notPublished: 'Not published yet',
     awaitingVerification: 'Data awaiting verification',
     noWardMapping: 'Ward-level project mapping is not available for this municipality yet.',
-    resolutionUnavailable: 'We could not confirm your municipality yet. Showing published planning for the pilot area when available.',
+    resolutionUnavailable: 'We could not confirm your municipality yet. Confirm where you live to see local planning information.',
 };
