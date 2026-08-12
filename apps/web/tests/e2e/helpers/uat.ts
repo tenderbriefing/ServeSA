@@ -97,6 +97,11 @@ export async function signInAndGoto(
     .first()
     .waitFor({ state: 'hidden', timeout: 30_000 })
     .catch(() => undefined)
+  await page
+    .getByText(/checking your session/i)
+    .first()
+    .waitFor({ state: 'hidden', timeout: 45_000 })
+    .catch(() => undefined)
   await dismissOnboardingIfPresent(page)
 
   if (page.url().includes('/auth/signin')) {
@@ -108,6 +113,11 @@ export async function signInAndGoto(
     await page.locator('form button[type="submit"]').click()
     await page.waitForURL(/\/dashboard(\/|$|\?)/, { timeout: 45_000 })
     await page.goto(path, { waitUntil: 'domcontentloaded' })
+    await page
+      .getByText(/checking your session/i)
+      .first()
+      .waitFor({ state: 'hidden', timeout: 45_000 })
+      .catch(() => undefined)
     await dismissOnboardingIfPresent(page)
   }
 
