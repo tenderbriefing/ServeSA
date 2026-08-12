@@ -59,7 +59,8 @@ export function Header() {
 
   const primaryLinks = basePrimaryLinks.filter((link) => {
     if (link.href === '/municipality') {
-      return FEATURE_FLAGS.enableMunicipalPlanning
+      // Authenticated citizens only — never expose Our Municipality to anonymous visitors
+      return Boolean(user) && FEATURE_FLAGS.enableMunicipalPlanning
     }
     if (link.href === '/updates' || link.href === '/ideas') {
       return FEATURE_FLAGS.enableCommunityEngagement
@@ -169,15 +170,21 @@ export function Header() {
                   <Badge className="bg-gold-100 text-gold-800">Admin</Badge>
                 )}
                 <div className="flex items-center gap-2 rounded-md px-2 py-1">
-                  <span
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-800"
-                    aria-hidden
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label="Account settings"
                   >
-                    {getInitials(displayName)}
-                  </span>
-                  <span className="hidden max-w-[140px] truncate text-sm font-medium text-ink xl:inline">
-                    {displayName}
-                  </span>
+                    <span
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-800"
+                      aria-hidden
+                    >
+                      {getInitials(displayName)}
+                    </span>
+                    <span className="hidden max-w-[140px] truncate text-sm font-medium text-ink xl:inline">
+                      {displayName}
+                    </span>
+                  </Link>
                 </div>
                 {(isOfficial || isAdmin) && (
                   <Link href="/ops">
@@ -280,6 +287,11 @@ export function Header() {
                       <p className="text-xs text-ink-subtle">Signed in</p>
                     </div>
                   </div>
+                  <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      Account & municipality
+                    </Button>
+                  </Link>
                   {(isOfficial || isAdmin) && (
                     <Link href="/ops" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full">

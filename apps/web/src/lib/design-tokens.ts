@@ -140,10 +140,30 @@ export const radii = {
   xl: '0.75rem',
 } as const
 
+/**
+ * Motion system tokens (ms).
+ * Prefer transform/opacity. Respect prefers-reduced-motion at call sites.
+ */
 export const motion = {
+  /** Micro-interactions: hover, press, focus */
+  micro: 160,
   fast: 120,
   base: 180,
   slow: 280,
+  /** UI transitions: panels, status chips */
+  ui: 320,
+  /** Section entrance reveals */
+  reveal: 560,
+  /** Hero product-film frame crossfades */
+  heroFrame: 1100,
+  /** Ambient / looping pulse (keep very subtle) */
+  ambient: 3200,
+} as const
+
+export const motionEasing = {
+  civic: 'cubic-bezier(0.2, 0, 0.13, 1)',
+  enter: 'cubic-bezier(0.16, 1, 0.3, 1)',
+  exit: 'cubic-bezier(0.4, 0, 1, 1)',
 } as const
 
 export const breakpoints = {

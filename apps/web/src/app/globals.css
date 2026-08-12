@@ -160,7 +160,12 @@
     --motion-fast: 120ms;
     --motion-base: 180ms;
     --motion-slow: 280ms;
+    --motion-ui: 320ms;
+    --motion-reveal: 560ms;
+    --motion-hero: 1100ms;
+    --motion-ambient: 3200ms;
     --motion-ease: cubic-bezier(0.2, 0, 0.13, 1);
+    --motion-enter: cubic-bezier(0.16, 1, 0.3, 1);
 
     /* Typography scale */
     --text-display: 2.75rem;
@@ -386,6 +391,20 @@
         transparent 40%
       );
   }
+
+  /* Landing motion system — GPU-friendly transform/opacity */
+  .motion-reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity var(--motion-reveal) var(--motion-enter),
+      transform var(--motion-reveal) var(--motion-enter);
+  }
+
+  .motion-reveal--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -400,6 +419,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .motion-reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

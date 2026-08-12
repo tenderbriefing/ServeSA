@@ -326,5 +326,5 @@ export const PLANNING_EMPTY_COPY = {
   noWardMapping:
     'Ward-level project mapping is not available for this municipality yet.',
   resolutionUnavailable:
-    'We could not confirm your municipality yet. Showing published planning for the pilot area when available.',
+    'We could not confirm your municipality yet. Confirm where you live to see local planning information.',
 } as const

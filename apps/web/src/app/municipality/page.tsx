@@ -6,6 +6,9 @@ import Link from 'next/link'
 import { Building2, Lightbulb } from 'lucide-react'
 import { planningApi } from '@/lib/api/planning'
 import { useAuth } from '@/hooks/useAuth'
+import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
+import { AuthGate } from '@/components/Auth/AuthGate'
+import { ConfirmMunicipalityPanel } from '@/components/municipality/ConfirmMunicipalityPanel'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
 import {
@@ -16,7 +19,9 @@ import { PLANNING_EMPTY_COPY } from '@servesa/case-contract'
 import { PlanningKpiCards, type PlanningKpi } from '@/components/planning/PlanningKpiCards'
 import { ProjectCard, type ProjectCardModel } from '@/components/planning/ProjectCard'
 import { ServeSaSummaryBanner } from '@/components/planning/SourceCitation'
+import { MunicipalityCompleteness } from '@/components/municipality/MunicipalityCompleteness'
 import { trackPlanningEvent } from '@/lib/telemetry/planning'
+import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 
 const BudgetBreakdown = dynamic(
   () =>
@@ -30,8 +35,6 @@ const BudgetBreakdown = dynamic(
     ),
   }
 )
-
-const DEFAULT_MUNI = 'JHB'
 
 type SummaryResponse = {
   municipalityCode: string
@@ -63,21 +66,18 @@ type SummaryResponse = {
   emptyCopy: string
 }
 
-export default function MunicipalityPage() {
-  const { userProfile, municipalityCode } = useAuth()
-  const profile = userProfile as {
-    municipalityCode?: string
-    wardId?: string
-  } | null
-  const muni =
-    municipalityCode || profile?.municipalityCode || DEFAULT_MUNI
-  const wardId = profile?.wardId || null
-  const resolutionFallback = !municipalityCode && !profile?.municipalityCode
-
-  const enabled = isMunicipalPlanningEnabledFor(muni)
+function MunicipalityPlanningContent({
+  municipalityCode,
+  wardId,
+}: {
+  municipalityCode: string
+  wardId: string | null
+}) {
+  const enabled = isMunicipalPlanningEnabledFor(municipalityCode)
   const [summary, setSummary] = useState<SummaryResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const displayName = getMunicipalityDisplayName(municipalityCode)
 
   useEffect(() => {
     if (!FEATURE_FLAGS.enableMunicipalPlanning || !enabled) {
@@ -90,13 +90,13 @@ export default function MunicipalityPage() {
       setError(null)
       try {
         const res = (await planningApi.getSummary({
-          municipalityCode: muni,
+          municipalityCode,
           wardId,
         })) as SummaryResponse
         if (!cancelled) {
           setSummary(res)
           trackPlanningEvent('municipal_planning_page_viewed', {
-            municipalityCode: muni,
+            municipalityCode,
             hasWard: Boolean(wardId),
             empty: Boolean(res.empty),
           })
@@ -116,7 +116,7 @@ export default function MunicipalityPage() {
     return () => {
       cancelled = true
     }
-  }, [muni, wardId, enabled])
+  }, [municipalityCode, wardId, enabled])
 
   if (!FEATURE_FLAGS.enableMunicipalPlanning || !enabled) {
     return (
@@ -137,31 +137,68 @@ export default function MunicipalityPage() {
           </p>
           <h1 className="mt-2 flex items-center gap-2 font-display text-h1 text-ink">
             <Building2 className="h-8 w-8 shrink-0 text-primary-600" aria-hidden />
-            What your municipality plans to do
+            {displayName}
           </h1>
           <p className="mt-3 text-body text-ink-muted">
-            Plain-language view of priorities, budgets, and projects — based on
-            verified official documents, not social posts.
+            Understand what your municipality plans to deliver and how those
+            plans affect your community — based on verified official documents,
+            not social posts.
           </p>
-          <p className="mt-2 text-sm text-ink-subtle">
-            Showing municipality <strong className="text-ink">{muni}</strong>
-            {wardId ? (
-              <>
-                {' '}
-                · your ward reference <strong className="text-ink">{wardId}</strong>
-              </>
-            ) : null}
-            .
-          </p>
-          {resolutionFallback ? (
-            <p className="mt-3 rounded-md border border-border bg-surface-muted px-3 py-2 text-sm text-ink-muted">
-              {PLANNING_EMPTY_COPY.resolutionUnavailable}
+          {wardId ? (
+            <p className="mt-2 text-sm text-ink-subtle">
+              Ward reference <strong className="text-ink">{wardId}</strong>
             </p>
           ) : null}
         </div>
       </section>
 
       <div className="container max-w-3xl space-y-12 py-10">
+        {!loading ? (
+          <MunicipalityCompleteness
+            modules={[
+              {
+                id: 'verified',
+                label: 'Municipality verified',
+                available: true,
+              },
+              {
+                id: 'updates',
+                label: 'Municipal updates',
+                available: true,
+                href: '/updates',
+              },
+              {
+                id: 'ideas',
+                label: 'Community ideas',
+                available: true,
+                href: '/ideas',
+              },
+              {
+                id: 'idp',
+                label: 'IDP summary',
+                available: Boolean(summary && !summary.empty && summary.priorities?.length),
+              },
+              {
+                id: 'budget',
+                label: 'Budget summary',
+                available: Boolean(
+                  summary && !summary.empty && summary.budgetLines?.length
+                ),
+              },
+              {
+                id: 'projects',
+                label: 'Projects',
+                available: Boolean(summary && !summary.empty && summary.projects?.length),
+              },
+              {
+                id: 'contacts',
+                label: 'Service contacts',
+                available: false,
+              },
+            ]}
+          />
+        ) : null}
+
         {loading ? (
           <div className="flex justify-center py-16" role="status">
             <Spinner />
@@ -176,10 +213,36 @@ export default function MunicipalityPage() {
         ) : null}
 
         {!loading && !error && summary?.empty ? (
-          <p className="rounded-lg border border-border bg-surface p-6 text-ink-muted">
-            {summary.emptyCopy || PLANNING_EMPTY_COPY.notPublished} Official
-            planning documents are still being reviewed for publication.
-          </p>
+          <div className="rounded-lg border border-border bg-surface p-6">
+            <p className="text-label font-display text-primary-700">Your Municipality</p>
+            <h2 className="mt-1 font-display text-h3 text-ink">{displayName}</h2>
+            <h3 className="mt-4 font-display text-h4 text-ink">
+              Municipal planning information is being prepared
+            </h3>
+            <p className="mt-2 text-ink-muted">
+              {summary.emptyCopy ||
+                'Verified planning information for this municipality has not yet been published on Serve SA.'}
+            </p>
+            <p className="mt-3 text-body-sm text-ink-subtle">
+              Serve SA only publishes information verified from official municipal
+              documents. We will not show another municipality’s plans in its
+              place.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button asChild variant="secondary">
+                <Link href="/updates">Municipal Updates</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/ideas">Community Ideas</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/report">Report an Issue</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link href="/account">Change municipality</Link>
+              </Button>
+            </div>
+          </div>
         ) : null}
 
         {!loading && summary && !summary.empty ? (
@@ -198,7 +261,7 @@ export default function MunicipalityPage() {
 
             <section aria-labelledby="priorities-heading">
               <h2 id="priorities-heading" className="font-display text-h2 text-ink">
-                Our priorities
+                Key priorities
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
                 What the municipality says it will focus on — in everyday
@@ -236,9 +299,7 @@ export default function MunicipalityPage() {
                             onClick={() =>
                               trackPlanningEvent(
                                 'municipal_planning_priority_cta',
-                                {
-                                  municipalityCode: muni,
-                                }
+                                { municipalityCode }
                               )
                             }
                           >
@@ -255,7 +316,7 @@ export default function MunicipalityPage() {
 
             <section aria-labelledby="budget-heading">
               <h2 id="budget-heading" className="font-display text-h2 text-ink">
-                Where the money goes
+                Budget highlights
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
                 Published budget lines with source references for every amount.
@@ -267,7 +328,7 @@ export default function MunicipalityPage() {
 
             <section aria-labelledby="projects-heading">
               <h2 id="projects-heading" className="font-display text-h2 text-ink">
-                Projects
+                Planned projects
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
                 Structured municipal projects with official statuses only.
@@ -310,11 +371,11 @@ export default function MunicipalityPage() {
 
             <section className="rounded-lg border border-border bg-surface p-5">
               <h2 className="font-display text-lg font-semibold text-ink">
-                Have a constructive idea?
+                Stay connected locally
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Share it through Community Ideas — the same channel used across
-                Serve SA. This is not for reporting broken infrastructure.
+                Follow municipal updates and share constructive community ideas
+                for this municipality.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button asChild>
@@ -322,7 +383,7 @@ export default function MunicipalityPage() {
                     href="/ideas/new"
                     onClick={() =>
                       trackPlanningEvent('municipal_planning_idea_cta', {
-                        municipalityCode: muni,
+                        municipalityCode,
                       })
                     }
                   >
@@ -338,5 +399,55 @@ export default function MunicipalityPage() {
         ) : null}
       </div>
     </div>
+  )
+}
+
+function MunicipalityAuthenticatedView() {
+  const { userProfile } = useAuth()
+  const resolution = useCitizenMunicipality()
+  const municipalityCode = resolution.municipalityCode
+  const wardId =
+    (userProfile as { wardId?: string } | null)?.wardId || null
+
+  if (resolution.loading) {
+    return (
+      <div className="flex justify-center py-16" role="status">
+        <Spinner label="Loading your municipality…" />
+      </div>
+    )
+  }
+
+  if (!municipalityCode) {
+    return (
+      <div className="bg-canvas py-12">
+        <div className="container">
+          <ConfirmMunicipalityPanel />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <MunicipalityPlanningContent
+      municipalityCode={municipalityCode}
+      wardId={wardId}
+    />
+  )
+}
+
+/**
+ * Our Municipality / Visual IDP — authenticated citizens with a confirmed
+ * municipality only. Never falls back to JHB or pilot planning for anonymous
+ * or unresolved users.
+ */
+export default function MunicipalityPage() {
+  return (
+    <AuthGate
+      next="/municipality"
+      title="Sign in to view Our Municipality"
+      description="Municipal plans, priorities and projects are available after you sign in and confirm your municipality. Reporting an issue does not require an account."
+    >
+      <MunicipalityAuthenticatedView />
+    </AuthGate>
   )
 }

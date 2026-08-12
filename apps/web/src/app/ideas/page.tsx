@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Lightbulb } from 'lucide-react'
 import { communityApi } from '@/lib/api/community'
 import { useAuth } from '@/hooks/useAuth'
+import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
@@ -26,20 +27,22 @@ type IdeaRow = {
   suburbLabel?: string | null
 }
 
-const DEFAULT_MUNI = 'JHB'
-
 export default function IdeasPage() {
-  const { user, userProfile, municipalityCode } = useAuth()
-  const muni =
-    municipalityCode ||
-    (userProfile as { municipalityCode?: string } | null)?.municipalityCode ||
-    DEFAULT_MUNI
+  const { user } = useAuth()
+  const { municipalityCode: muni, loading: muniLoading } =
+    useCitizenMunicipality()
   const [ideas, setIdeas] = useState<IdeaRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!FEATURE_FLAGS.enableCommunityEngagement) return
+    if (muniLoading) return
+    if (!muni) {
+      setLoading(false)
+      setIdeas([])
+      return
+    }
     let cancelled = false
     ;(async () => {
       setLoading(true)
@@ -59,7 +62,24 @@ export default function IdeasPage() {
     return () => {
       cancelled = true
     }
-  }, [muni])
+  }, [muni, muniLoading])
+
+  if (!muniLoading && !muni) {
+    return (
+      <div className="container max-w-3xl py-12">
+        <h1 className="font-display text-h2 text-ink">Community Ideas</h1>
+        <p className="mt-3 text-body text-ink-muted">
+          Confirm your municipality to browse and share local community ideas.
+          Serve SA will not show another municipality’s ideas as a substitute.
+        </p>
+        <div className="mt-6">
+          <Link href="/municipality">
+            <Button>Confirm your municipality</Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-canvas">
