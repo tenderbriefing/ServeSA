@@ -34,4 +34,19 @@ export const planningApi = {
     callOps('upsertBudgetLineFunction', data),
   transitionStatus: (data: Record<string, unknown>) =>
     callOps('transitionPlanningStatusFunction', data),
+
+  uploadDocument: (data: Record<string, unknown>) =>
+    callOps('uploadPlanningDocumentFunction', data),
+  processDocument: (data: Record<string, unknown>) =>
+    callOps('processPlanningDocumentFunction', data),
+  updateAiDraft: (data: Record<string, unknown>) =>
+    callOps('updatePlanningAiDraftFunction', data),
+  approveDocument: (data: Record<string, unknown>) =>
+    callOps('approvePlanningDocumentFunction', data),
+  publishDocument: (data: Record<string, unknown>) =>
+    callOps('publishPlanningDocumentFunction', data),
+  getPublishingDashboard: (data: Record<string, unknown>) =>
+    callOps('getPlanningPublishingDashboardFunction', data),
+  getDocumentSourceUrl: (data: Record<string, unknown>) =>
+    callOps('getPlanningDocumentSourceUrlFunction', data),
 }

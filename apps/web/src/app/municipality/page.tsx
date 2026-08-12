@@ -15,12 +15,13 @@ import {
   FEATURE_FLAGS,
   isMunicipalPlanningEnabledFor,
 } from '@/lib/constants'
-import { PLANNING_EMPTY_COPY } from '@servesa/case-contract'
+import { PLANNING_EMPTY_COPY, PLANNING_CONTENT_MODULE_LABEL } from '@servesa/case-contract'
 import { PlanningKpiCards, type PlanningKpi } from '@/components/planning/PlanningKpiCards'
 import { ProjectCard, type ProjectCardModel } from '@/components/planning/ProjectCard'
 import { ServeSaSummaryBanner } from '@/components/planning/SourceCitation'
 import { MunicipalityCompleteness } from '@/components/municipality/MunicipalityCompleteness'
 import { trackPlanningEvent } from '@/lib/telemetry/planning'
+import { trackPublishingEvent } from '@/lib/telemetry/publishing'
 import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 
 const BudgetBreakdown = dynamic(
@@ -62,6 +63,13 @@ type SummaryResponse = {
     wardProjects: ProjectCardModel[]
     emptyCopy: string | null
   }
+  documents?: Array<{
+    documentId: string
+    title: string
+    kind?: string
+    officialUrl?: string | null
+    publishedStoragePath?: string | null
+  }>
   empty: boolean
   emptyCopy: string
 }
@@ -100,6 +108,7 @@ function MunicipalityPlanningContent({
             hasWard: Boolean(wardId),
             empty: Boolean(res.empty),
           })
+          trackPublishingEvent('municipality_page_viewed', { municipalityCode })
         }
       } catch (e) {
         if (!cancelled) {
@@ -157,42 +166,38 @@ function MunicipalityPlanningContent({
           <MunicipalityCompleteness
             modules={[
               {
-                id: 'verified',
-                label: 'Municipality verified',
-                available: true,
+                id: 'municipality_overview',
+                label: PLANNING_CONTENT_MODULE_LABEL.municipality_overview,
+                available: Boolean(summary && !summary.empty),
               },
               {
-                id: 'updates',
-                label: 'Municipal updates',
-                available: true,
-                href: '/updates',
+                id: 'strategic_priorities',
+                label: PLANNING_CONTENT_MODULE_LABEL.strategic_priorities,
+                available: Boolean(summary?.priorities?.length),
               },
               {
-                id: 'ideas',
-                label: 'Community ideas',
-                available: true,
-                href: '/ideas',
+                id: 'idp_summary',
+                label: PLANNING_CONTENT_MODULE_LABEL.idp_summary,
+                available: Boolean(summary?.priorities?.length),
               },
               {
-                id: 'idp',
-                label: 'IDP summary',
-                available: Boolean(summary && !summary.empty && summary.priorities?.length),
+                id: 'budget_overview',
+                label: PLANNING_CONTENT_MODULE_LABEL.budget_overview,
+                available: Boolean(summary?.budgetLines?.length),
               },
               {
-                id: 'budget',
-                label: 'Budget summary',
-                available: Boolean(
-                  summary && !summary.empty && summary.budgetLines?.length
-                ),
+                id: 'capital_projects',
+                label: PLANNING_CONTENT_MODULE_LABEL.capital_projects,
+                available: Boolean(summary?.projects?.length),
               },
               {
-                id: 'projects',
-                label: 'Projects',
-                available: Boolean(summary && !summary.empty && summary.projects?.length),
+                id: 'service_delivery_priorities',
+                label: PLANNING_CONTENT_MODULE_LABEL.service_delivery_priorities,
+                available: false,
               },
               {
-                id: 'contacts',
-                label: 'Service contacts',
+                id: 'service_contacts',
+                label: PLANNING_CONTENT_MODULE_LABEL.service_contacts,
                 available: false,
               },
             ]}
@@ -368,6 +373,41 @@ function MunicipalityPlanningContent({
                 </ul>
               )}
             </section>
+
+            {summary.documents?.length ? (
+              <section aria-labelledby="sources-heading">
+                <h2 id="sources-heading" className="font-display text-h2 text-ink">
+                  Official source documents
+                </h2>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Verified municipal documents behind this summary.
+                </p>
+                <ul className="mt-4 space-y-2">
+                  {summary.documents.map((doc) => (
+                    <li key={doc.documentId}>
+                      {doc.officialUrl ? (
+                        <a
+                          href={doc.officialUrl}
+                          className="text-sm text-primary-700 underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() =>
+                            trackPublishingEvent('source_document_opened', {
+                              documentId: doc.documentId,
+                              municipalityCode,
+                            })
+                          }
+                        >
+                          {doc.title}
+                        </a>
+                      ) : (
+                        <span className="text-sm text-ink">{doc.title}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
 
             <section className="rounded-lg border border-border bg-surface p-5">
               <h2 className="font-display text-lg font-semibold text-ink">

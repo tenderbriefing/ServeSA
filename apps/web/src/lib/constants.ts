@@ -116,6 +116,13 @@ export const FEATURE_FLAGS = {
    */
   enableMunicipalPlanning:
     process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING !== 'false',
+  /**
+   * AI Municipal Publishing Engine — OFF by default.
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PUBLISHING_ENGINE=true for pilot.
+   * Optional allow-list via NEXT_PUBLIC_MUNICIPAL_PUBLISHING_ALLOWLIST.
+   */
+  enableMunicipalPublishingEngine:
+    process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PUBLISHING_ENGINE === 'true',
 } as const
 
 /**
@@ -137,6 +144,24 @@ export function isMunicipalPlanningEnabledFor(
   if (!code) return false
   if (MUNICIPAL_PLANNING_ALLOWLIST.includes('*')) return true
   return MUNICIPAL_PLANNING_ALLOWLIST.includes(code)
+}
+
+export const MUNICIPAL_PUBLISHING_ALLOWLIST: readonly string[] = (
+  process.env.NEXT_PUBLIC_MUNICIPAL_PUBLISHING_ALLOWLIST || ''
+)
+  .split(',')
+  .map((s) => s.trim().toUpperCase())
+  .filter(Boolean)
+
+export function isMunicipalPublishingEnabledFor(
+  municipalityCode: string | null | undefined
+): boolean {
+  if (!FEATURE_FLAGS.enableMunicipalPublishingEngine) return false
+  const code = (municipalityCode || '').trim().toUpperCase()
+  if (!code) return false
+  if (MUNICIPAL_PUBLISHING_ALLOWLIST.length === 0) return true
+  if (MUNICIPAL_PUBLISHING_ALLOWLIST.includes('*')) return true
+  return MUNICIPAL_PUBLISHING_ALLOWLIST.includes(code)
 }
 
 export const COLLECTIONS_COMMUNITY = {
