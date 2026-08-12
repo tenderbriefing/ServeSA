@@ -116,10 +116,10 @@ export default function MunicipalProjectDetailClient() {
   if (projectId === '_') {
     return (
       <div className="container py-12">
-        <p className="text-ink-muted">Select a project from Our Municipality.</p>
-        <Link href="/municipality" className="mt-2 inline-block text-primary-700">
-          Back to Our Municipality
-        </Link>
+        <p className="text-ink-muted">Select a project from My Municipality.</p>
+        <Button asChild variant="secondary" className="mt-4">
+          <Link href="/municipality">Back to My Municipality</Link>
+        </Button>
       </div>
     )
   }
@@ -132,7 +132,7 @@ export default function MunicipalProjectDetailClient() {
     return (
       <div className="container py-12">
         <p className="text-ink-muted">
-          Our Municipality planning summary is not enabled for this area yet.
+          My Municipality is not enabled for this area yet.
         </p>
       </div>
     )
@@ -143,7 +143,7 @@ export default function MunicipalProjectDetailClient() {
       <div className="container max-w-3xl py-10">
         <p className="text-sm">
           <Link href="/municipality" className="text-primary-700 hover:underline">
-            ← Our Municipality
+            ← My Municipality
           </Link>
         </p>
 
@@ -201,14 +201,6 @@ export default function MunicipalProjectDetailClient() {
                 <dt className="text-label text-ink-subtle">Department</dt>
                 <dd className="text-ink">
                   {project.departmentLabel || 'Not published yet'}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-label text-ink-subtle">Ward mapping</dt>
-                <dd className="text-ink">
-                  {project.wardMappingAvailable && project.wardIds?.length
-                    ? project.wardIds.join(', ')
-                    : 'Not published yet'}
                 </dd>
               </div>
               <div>

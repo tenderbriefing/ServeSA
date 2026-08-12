@@ -53,7 +53,7 @@ export function FinalCTA({ signedIn = false }: FinalCTAProps) {
                   href="/municipality"
                   className="font-medium text-primary-700 underline-offset-4 hover:underline"
                 >
-                  Our Municipality
+                  My Municipality
                 </Link>
               ) : null}
               <Link

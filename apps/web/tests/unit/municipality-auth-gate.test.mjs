@@ -1,6 +1,6 @@
 /**
  * Landing must stay municipality-neutral for anonymous visitors.
- * Our Municipality is auth-gated with no JHB pilot fallback.
+ * My Municipality is auth-gated with no JHB pilot fallback.
  */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -32,7 +32,7 @@ const emptyCopy = fs.readFileSync(
   'utf8'
 )
 
-test('homepage does not render Our Municipality / planning preview', () => {
+test('homepage does not render My Municipality / planning preview', () => {
   assert.doesNotMatch(page, /MunicipalityPlanningPreview/)
   assert.doesNotMatch(page, /Explore Your Municipality/)
   assert.doesNotMatch(page, /\bJHB\b/)
@@ -46,27 +46,48 @@ test('homepage does not render Our Municipality / planning preview', () => {
   )
 })
 
-test('FinalCTA only links Our Municipality when signed in', () => {
+test('FinalCTA only links My Municipality when signed in', () => {
   assert.match(finalCta, /signedIn && FEATURE_FLAGS\.enableMunicipalPlanning/)
   assert.doesNotMatch(finalCta, /Explore Your Municipality/)
+  assert.match(finalCta, /My Municipality/)
 })
 
-test('Header Our Municipality requires authenticated user', () => {
+test('Header My Municipality requires authenticated user', () => {
   assert.match(header, /Boolean\(user\) && FEATURE_FLAGS\.enableMunicipalPlanning/)
-  assert.match(header, /label:\s*'Our Municipality'/)
+  assert.match(header, /label:\s*'My Municipality'/)
 })
 
 test('municipality page requires AuthGate and has no JHB default', () => {
   assert.match(municipalityPage, /AuthGate/)
   assert.match(municipalityPage, /ConfirmMunicipalityPanel/)
+  assert.match(municipalityPage, /My Municipality/)
+  assert.match(municipalityPage, /Municipality Snapshot/)
+  assert.doesNotMatch(municipalityPage, /Your community/)
+  assert.doesNotMatch(municipalityPage, /getSummary\(\{\s*municipalityCode\s*,\s*ward/)
   assert.doesNotMatch(municipalityPage, /DEFAULT_MUNI/)
   assert.doesNotMatch(municipalityPage, /['"]JHB['"]/)
   assert.doesNotMatch(municipalityPage, /pilot area/i)
   assert.doesNotMatch(municipalityPage, /savedCode/)
 })
 
+test('constants default My Municipality allow-list to Gauteng', () => {
+  const constants = fs.readFileSync(
+    path.join(webRoot, 'src/lib/constants.ts'),
+    'utf8'
+  )
+  assert.match(constants, /GAUTENG_MUNICIPALITY_CODES/)
+  assert.match(constants, /'JHB'/)
+  assert.match(constants, /'TSH'/)
+  assert.match(constants, /'EKU'/)
+  assert.match(constants, /GAUTENG_MUNICIPALITY_CODES\.join/)
+  assert.doesNotMatch(
+    constants,
+    /MUNICIPAL_PLANNING_ALLOWLIST[\s\S]{0,120}\|\|\s*'\*'/
+  )
+})
+
 test('planning empty copy no longer promises pilot-area substitute', () => {
   assert.match(emptyCopy, /resolutionUnavailable/)
+  assert.match(emptyCopy, /municipalitySnapshotComingSoon/)
   assert.doesNotMatch(emptyCopy, /pilot area/i)
-  assert.doesNotMatch(emptyCopy, /Showing published planning for the pilot/i)
 })

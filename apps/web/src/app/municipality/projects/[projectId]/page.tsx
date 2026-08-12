@@ -10,7 +10,7 @@ export default function MunicipalProjectDetailPage() {
     <AuthGate
       next="/municipality"
       title="Sign in to view municipal projects"
-      description="Project details from Our Municipality are available after you sign in."
+      description="Project details from My Municipality are available after you sign in."
     >
       <MunicipalProjectDetailClient />
     </AuthGate>

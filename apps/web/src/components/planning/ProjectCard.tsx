@@ -50,7 +50,9 @@ export function ProjectCard({ project }: { project: ProjectCardModel }) {
         </h3>
         <div className="flex flex-wrap gap-1.5">
           <Badge variant="secondary">{statusLabel}</Badge>
-          <Badge variant="outline">{scopeLabel}</Badge>
+          {project.scope && project.scope !== 'ward_specific' ? (
+            <Badge variant="outline">{scopeLabel}</Badge>
+          ) : null}
         </div>
       </div>
       <p className="mt-2 text-sm text-ink-muted">{project.plainLanguageSummary}</p>
@@ -58,11 +60,7 @@ export function ProjectCard({ project }: { project: ProjectCardModel }) {
         <p className="mt-2 text-xs text-ink-subtle">
           Progress (official): {project.progressPercent}%
         </p>
-      ) : (
-        <p className="mt-2 text-xs text-ink-subtle">
-          Progress: Not published yet
-        </p>
-      )}
+      ) : null}
       {project.locationLabel ? (
         <p className="mt-1 text-xs text-ink-subtle">Where: {project.locationLabel}</p>
       ) : null}

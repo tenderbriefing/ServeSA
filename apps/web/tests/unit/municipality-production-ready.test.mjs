@@ -54,8 +54,9 @@ test('signup persists province with municipalityCode', () => {
 test('municipality page has no local savedCode override', () => {
   const page = read('src/app/municipality/page.tsx')
   assert.doesNotMatch(page, /savedCode/)
-  assert.match(page, /MunicipalityCompleteness/)
+  assert.match(page, /Municipality Snapshot/)
   assert.match(page, /Change municipality/)
+  assert.doesNotMatch(page, /Your community/)
 })
 
 test('landing demo cases are labelled DEMO not live JHB fallbacks', () => {

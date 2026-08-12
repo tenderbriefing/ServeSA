@@ -96,7 +96,7 @@ function AccountMunicipalitySection() {
             Your Municipality
           </h2>
           <p className="mt-1 text-body-sm text-ink-muted">
-            Used for Our Municipality, Municipal Updates and Community Ideas.
+            Used for My Municipality, Municipal Updates and Community Ideas.
             Changing this never grants municipal staff permissions and does not
             move historical cases between municipalities.
           </p>
@@ -145,7 +145,7 @@ function AccountMunicipalitySection() {
                   href="/municipality"
                   className="ml-3 text-body-sm font-medium text-primary-700 underline-offset-4 hover:underline"
                 >
-                  Open Our Municipality
+                  Open My Municipality
                 </Link>
               ) : null}
             </div>

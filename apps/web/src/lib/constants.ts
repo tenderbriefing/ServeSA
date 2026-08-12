@@ -110,9 +110,11 @@ export const FEATURE_FLAGS = {
   enableCommunityEngagement:
     process.env.NEXT_PUBLIC_ENABLE_COMMUNITY !== 'false',
   /**
-   * Visual IDP / Our Municipality — ON by default (non-staged).
-   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to hide.
-   * Optional allow-list via NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST (* = all).
+   * My Municipality snapshot — ON by default for allow-listed municipalities.
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to hide entirely.
+   * Allow-list via NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST (* = all).
+   * Default allow-list is Gauteng only (controlled rollout — not national).
+   * Publishing engine remains a separate safety switch (default OFF).
    */
   enableMunicipalPlanning:
     process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING !== 'false',
@@ -127,11 +129,27 @@ export const FEATURE_FLAGS = {
 } as const
 
 /**
- * Municipality allow-list for municipal planning (comma-separated codes).
- * Default `*` = all municipalities (empty states when no published plan).
+ * Gauteng municipality codes for controlled My Municipality activation.
+ * Derived from southAfricaData GP entries — keep in sync when dataset expands.
+ */
+export const GAUTENG_MUNICIPALITY_CODES = [
+  'JHB',
+  'TSH',
+  'EKU',
+  'WTS',
+  'SED',
+  'MTS',
+] as const
+
+/**
+ * Municipality allow-list for My Municipality snapshot (comma-separated codes).
+ * Default = Gauteng only. Override with NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST
+ * (`*` = all municipalities). Non-allowlisted citizens see an honest
+ * not-enabled state — never another municipality's content.
  */
 export const MUNICIPAL_PLANNING_ALLOWLIST: readonly string[] = (
-  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST || '*'
+  process.env.NEXT_PUBLIC_MUNICIPAL_PLANNING_ALLOWLIST ||
+  GAUTENG_MUNICIPALITY_CODES.join(',')
 )
   .split(',')
   .map((s) => s.trim().toUpperCase())

@@ -133,8 +133,10 @@ test('ops planning has no JHB fallback', () => {
 
 test('municipality page empty state is national-honest', () => {
   const page = read('src/app/municipality/page.tsx')
-  assert.match(page, /Planning information is not available yet/)
-  assert.match(page, /Your Municipality/)
+  assert.match(page, /Municipal information coming soon|municipalitySnapshotComingSoon/)
+  assert.doesNotMatch(page, /Your community/)
+  assert.doesNotMatch(page, /Projects in your ward/i)
+  assert.match(page, /My Municipality/)
   assert.doesNotMatch(page, /municipalityCode \|\| ['"]JHB['"]/)
 })
 

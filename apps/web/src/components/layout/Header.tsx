@@ -32,7 +32,7 @@ const basePrimaryLinks = [
   { href: '/report', label: 'Report', icon: FileText },
   { href: '/updates', label: 'Updates', icon: Megaphone },
   { href: '/ideas', label: 'Ideas', icon: Lightbulb },
-  { href: '/municipality', label: 'Our Municipality', icon: Building2 },
+  { href: '/municipality', label: 'My Municipality', icon: Building2 },
   { href: '/case', label: 'Track', icon: Search },
   { href: '/dashboard', label: 'My Cases', icon: User },
 ] as const
@@ -65,7 +65,7 @@ export function Header() {
 
   const primaryLinks = basePrimaryLinks.filter((link) => {
     if (link.href === '/municipality') {
-      // Authenticated citizens only — never expose Our Municipality to anonymous visitors
+      // Authenticated citizens only — never expose My Municipality to anonymous visitors
       return Boolean(user) && FEATURE_FLAGS.enableMunicipalPlanning
     }
     if (link.href === '/updates' || link.href === '/ideas') {
