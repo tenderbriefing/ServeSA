@@ -118,8 +118,9 @@ export const FEATURE_FLAGS = {
     process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING !== 'false',
   /**
    * AI Municipal Publishing Engine — OFF by default.
-   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PUBLISHING_ENGINE=true for pilot.
-   * Optional allow-list via NEXT_PUBLIC_MUNICIPAL_PUBLISHING_ALLOWLIST.
+   * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PUBLISHING_ENGINE=true to enable ops publishing UI.
+   * Empty allow-list = all municipalities (national). Optional allow-list for staged rollout only.
+   * Never use JHB as a permanent national citizen fallback.
    */
   enableMunicipalPublishingEngine:
     process.env.NEXT_PUBLIC_ENABLE_MUNICIPAL_PUBLISHING_ENGINE === 'true',
@@ -146,6 +147,7 @@ export function isMunicipalPlanningEnabledFor(
   return MUNICIPAL_PLANNING_ALLOWLIST.includes(code)
 }
 
+/** Empty = national (all). Set comma codes only for temporary staged publishing rollout. */
 export const MUNICIPAL_PUBLISHING_ALLOWLIST: readonly string[] = (
   process.env.NEXT_PUBLIC_MUNICIPAL_PUBLISHING_ALLOWLIST || ''
 )

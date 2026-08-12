@@ -86,6 +86,7 @@ export const signUpWithEmail = async (
     municipalityCode?: string;
     province?: string;
     phone?: string;
+    wardId?: string;
   }
 ): Promise<User> => {
   try {
@@ -123,6 +124,7 @@ export const signUpWithEmail = async (
     await setDoc(doc(db, collections.users, user.uid), {
       ...newUser,
       ...(userData.province ? { province: userData.province } : {}),
+      ...(userData.wardId ? { wardId: userData.wardId } : {}),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       lastActiveAt: serverTimestamp(),

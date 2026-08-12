@@ -6,6 +6,7 @@ import { Lightbulb } from 'lucide-react'
 import { communityApi } from '@/lib/api/community'
 import { useAuth } from '@/hooks/useAuth'
 import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
+import { CitizenMunicipalityGate } from '@/components/municipality/CitizenMunicipalityGate'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
@@ -14,6 +15,7 @@ import {
   CITIZEN_IDEA_STATUS_LABEL,
 } from '@servesa/case-contract'
 import { FEATURE_FLAGS } from '@/lib/constants'
+import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 
 type IdeaRow = {
   ideaId: string
@@ -28,15 +30,37 @@ type IdeaRow = {
 }
 
 export default function IdeasPage() {
+  if (!FEATURE_FLAGS.enableCommunityEngagement) {
+    return (
+      <div className="container py-12">
+        <p className="text-ink-muted">Community Ideas are not enabled.</p>
+      </div>
+    )
+  }
+
+  return (
+    <CitizenMunicipalityGate
+      next="/ideas"
+      authTitle="Sign in to view Community Ideas"
+      authDescription="Community Ideas are scoped to your confirmed municipality after you sign in."
+      confirmTitle="Confirm your municipality for ideas"
+      confirmDescription="Serve SA shows community ideas for your municipality only — never another municipality as a substitute."
+    >
+      <IdeasContent />
+    </CitizenMunicipalityGate>
+  )
+}
+
+function IdeasContent() {
   const { user } = useAuth()
   const { municipalityCode: muni, loading: muniLoading } =
     useCitizenMunicipality()
   const [ideas, setIdeas] = useState<IdeaRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const displayName = getMunicipalityDisplayName(muni)
 
   useEffect(() => {
-    if (!FEATURE_FLAGS.enableCommunityEngagement) return
     if (muniLoading) return
     if (!muni) {
       setLoading(false)
@@ -64,29 +88,12 @@ export default function IdeasPage() {
     }
   }, [muni, muniLoading])
 
-  if (!muniLoading && !muni) {
-    return (
-      <div className="container max-w-3xl py-12">
-        <h1 className="font-display text-h2 text-ink">Community Ideas</h1>
-        <p className="mt-3 text-body text-ink-muted">
-          Confirm your municipality to browse and share local community ideas.
-          Serve SA will not show another municipality’s ideas as a substitute.
-        </p>
-        <div className="mt-6">
-          <Link href="/municipality">
-            <Button>Confirm your municipality</Button>
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="bg-canvas">
       <section className="border-b border-border bg-surface py-10">
         <div className="container max-w-3xl">
           <p className="text-label font-display text-green-700">
-            Ideas for My Community
+            Your Municipality · {displayName}
           </p>
           <h1 className="mt-2 font-display text-h1 text-ink">
             Suggest constructive improvements
@@ -119,7 +126,7 @@ export default function IdeasPage() {
         ) : ideas.length === 0 ? (
           <div className="py-12 text-center text-ink-muted">
             <Lightbulb className="mx-auto h-10 w-10 text-green-600" aria-hidden />
-            <p className="mt-4">No community ideas yet for {muni}.</p>
+            <p className="mt-4">No community ideas yet for {displayName}.</p>
           </div>
         ) : (
           <ul className="space-y-4">
