@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Label } from '@/components/ui/Label'
+import { Input } from '@/components/ui/Input'
 import {
   Select,
   SelectContent,
@@ -19,6 +20,8 @@ import {
 export type MunicipalitySelection = {
   province: string
   municipalityCode: string
+  /** Optional — blank if citizen does not know their ward */
+  wardId?: string
 }
 
 type MunicipalitySelectFieldsProps = {
@@ -27,11 +30,13 @@ type MunicipalitySelectFieldsProps = {
   disabled?: boolean
   idPrefix?: string
   required?: boolean
+  /** Show optional ward field (no fabricated ward catalogue) */
+  showWard?: boolean
 }
 
 /**
  * Controlled province → municipality selectors from the static SA dataset.
- * No free-text municipality entry.
+ * No free-text municipality entry. Ward is optional free-text when enabled.
  */
 export function MunicipalitySelectFields({
   value,
@@ -39,6 +44,7 @@ export function MunicipalitySelectFields({
   disabled = false,
   idPrefix = 'muni',
   required = false,
+  showWard = false,
 }: MunicipalitySelectFieldsProps) {
   const [municipalities, setMunicipalities] = useState<Municipality[]>([])
 
@@ -58,9 +64,9 @@ export function MunicipalitySelectFields({
       onChange({
         province: province.code,
         municipalityCode: value.municipalityCode,
+        wardId: value.wardId || '',
       })
     }
-    // intentionally only when municipalityCode arrives without province
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.municipalityCode])
 
@@ -69,7 +75,9 @@ export function MunicipalitySelectFields({
       <div className="space-y-2">
         <Label htmlFor={`${idPrefix}-province`}>
           Province
-          {required ? '' : (
+          {required ? (
+            <span className="ml-1 text-danger">*</span>
+          ) : (
             <span className="ml-1 font-normal text-ink-subtle">(optional)</span>
           )}
         </Label>
@@ -77,7 +85,7 @@ export function MunicipalitySelectFields({
           value={value.province || undefined}
           disabled={disabled}
           onValueChange={(province) =>
-            onChange({ province, municipalityCode: '' })
+            onChange({ province, municipalityCode: '', wardId: '' })
           }
         >
           <SelectTrigger
@@ -100,7 +108,9 @@ export function MunicipalitySelectFields({
       <div className="space-y-2">
         <Label htmlFor={`${idPrefix}-municipality`}>
           Municipality
-          {required ? '' : (
+          {required ? (
+            <span className="ml-1 text-danger">*</span>
+          ) : (
             <span className="ml-1 font-normal text-ink-subtle">(optional)</span>
           )}
         </Label>
@@ -108,7 +118,11 @@ export function MunicipalitySelectFields({
           value={value.municipalityCode || undefined}
           disabled={disabled || !value.province}
           onValueChange={(municipalityCode) =>
-            onChange({ province: value.province, municipalityCode })
+            onChange({
+              province: value.province,
+              municipalityCode,
+              wardId: '',
+            })
           }
         >
           <SelectTrigger
@@ -116,17 +130,55 @@ export function MunicipalitySelectFields({
             className="min-h-touch"
             aria-required={required}
           >
-            <SelectValue placeholder="Select municipality" />
+            <SelectValue
+              placeholder={
+                value.province
+                  ? 'Select municipality'
+                  : 'Select a province first'
+              }
+            />
           </SelectTrigger>
           <SelectContent>
             {municipalities.map((m) => (
-              <SelectItem key={m.code} value={m.code}>
+              <SelectItem key={`${m.code}-${m.name}`} value={m.code}>
                 {m.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
+
+      {showWard ? (
+        <div className="space-y-2">
+          <Label htmlFor={`${idPrefix}-ward`}>
+            Ward — optional
+            <span className="ml-1 font-normal text-ink-subtle">
+              (if you know it)
+            </span>
+          </Label>
+          <Input
+            id={`${idPrefix}-ward`}
+            className="min-h-touch"
+            value={value.wardId || ''}
+            disabled={disabled || !value.municipalityCode}
+            placeholder="Select your ward if you know it"
+            maxLength={64}
+            onChange={(e) =>
+              onChange({
+                province: value.province,
+                municipalityCode: value.municipalityCode,
+                wardId: e.target.value,
+              })
+            }
+            aria-describedby={`${idPrefix}-ward-hint`}
+          />
+          <p id={`${idPrefix}-ward-hint`} className="text-caption text-ink-subtle">
+            You do not need your ward number to use Serve SA. When you report an
+            issue, location-based GIS determines the authoritative ward for
+            routing.
+          </p>
+        </div>
+      ) : null}
     </div>
   )
 }

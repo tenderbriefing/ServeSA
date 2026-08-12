@@ -152,3 +152,35 @@ export function getMunicipalityDisplayName(
   }
   return found.name
 }
+
+export function isValidProvinceCode(provinceCode: string | null | undefined): boolean {
+  const code = (provinceCode || '').trim().toUpperCase()
+  if (!code) return false
+  return southAfricaProvinces.some((p) => p.code === code)
+}
+
+/**
+ * Validates that municipalityCode exists and belongs to provinceCode when both provided.
+ * Rejects invented / mismatched codes — never invents a municipality.
+ */
+export function isValidMunicipalitySelection(
+  provinceCode: string | null | undefined,
+  municipalityCode: string | null | undefined
+): boolean {
+  const province = (provinceCode || '').trim().toUpperCase()
+  const municipality = (municipalityCode || '').trim().toUpperCase()
+  if (!province || !municipality) return false
+  if (!isValidProvinceCode(province)) return false
+  return getMunicipalitiesByProvince(province).some((m) => m.code === municipality)
+}
+
+/** Optional ward label — blank accepted; no fabricated ward catalogue. */
+export function normalizeOptionalWard(
+  ward: string | null | undefined
+): string | null {
+  const trimmed = (ward || '').trim()
+  if (!trimmed) return null
+  if (trimmed.length > 64) return null
+  return trimmed
+}
+

@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { Megaphone } from 'lucide-react'
 import { communityApi } from '@/lib/api/community'
 import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
+import { CitizenMunicipalityGate } from '@/components/municipality/CitizenMunicipalityGate'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
 import { MUNICIPAL_UPDATE_TYPE_LABEL } from '@servesa/case-contract'
 import { FEATURE_FLAGS } from '@/lib/constants'
+import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 
 type UpdateRow = {
   updateId: string
@@ -25,15 +27,37 @@ type UpdateRow = {
 }
 
 export default function UpdatesPage() {
+  if (!FEATURE_FLAGS.enableCommunityEngagement) {
+    return (
+      <div className="container py-12">
+        <p className="text-ink-muted">Municipal Updates are not enabled.</p>
+      </div>
+    )
+  }
+
+  return (
+    <CitizenMunicipalityGate
+      next="/updates"
+      authTitle="Sign in to view Municipal Updates"
+      authDescription="Municipal Updates are scoped to your confirmed municipality after you sign in."
+      confirmTitle="Confirm your municipality for updates"
+      confirmDescription="Serve SA shows verified local notices for your municipality only — never another municipality as a substitute."
+    >
+      <UpdatesContent />
+    </CitizenMunicipalityGate>
+  )
+}
+
+function UpdatesContent() {
   const { municipalityCode: muni, loading: muniLoading } =
     useCitizenMunicipality()
   const [updates, setUpdates] = useState<UpdateRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [typeFilter, setTypeFilter] = useState<string>('')
+  const displayName = getMunicipalityDisplayName(muni)
 
   useEffect(() => {
-    if (!FEATURE_FLAGS.enableCommunityEngagement) return
     if (muniLoading) return
     if (!muni) {
       setLoading(false)
@@ -66,42 +90,19 @@ export default function UpdatesPage() {
     }
   }, [muni, muniLoading, typeFilter])
 
-  if (!FEATURE_FLAGS.enableCommunityEngagement) {
-    return (
-      <div className="container py-12">
-        <p className="text-ink-muted">Municipal Updates are not enabled.</p>
-      </div>
-    )
-  }
-
-  if (!muniLoading && !muni) {
-    return (
-      <div className="container max-w-3xl py-12">
-        <h1 className="font-display text-h2 text-ink">Municipal Updates</h1>
-        <p className="mt-3 text-body text-ink-muted">
-          Confirm your municipality to see verified local updates. Serve SA will
-          not show another municipality’s notices as a substitute.
-        </p>
-        <div className="mt-6">
-          <Link href="/municipality">
-            <Button>Confirm your municipality</Button>
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="bg-canvas">
       <section className="border-b border-border bg-surface py-10">
         <div className="container max-w-3xl">
-          <p className="text-label font-display text-primary-700">Municipal Updates</p>
+          <p className="text-label font-display text-primary-700">
+            Your Municipality · {displayName}
+          </p>
           <h1 className="mt-2 font-display text-h1 text-ink">
             Verified information from your municipality
           </h1>
           <p className="mt-3 text-body text-ink-muted">
             Service alerts, planned work, and community notices — not a social
-            feed. Showing updates for municipality {muni}.
+            feed.
           </p>
           <div className="mt-4">
             <label htmlFor="update-type" className="sr-only">
@@ -134,7 +135,9 @@ export default function UpdatesPage() {
         ) : updates.length === 0 ? (
           <div className="py-12 text-center text-ink-muted">
             <Megaphone className="mx-auto h-10 w-10 text-primary-600" aria-hidden />
-            <p className="mt-4">No published updates for this municipality yet.</p>
+            <p className="mt-4">
+              No published updates for {displayName} yet.
+            </p>
           </div>
         ) : (
           <ul className="space-y-4">

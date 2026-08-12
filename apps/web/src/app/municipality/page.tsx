@@ -141,8 +141,8 @@ function MunicipalityPlanningContent({
     <div className="bg-canvas">
       <section className="border-b border-border bg-surface py-10">
         <div className="container max-w-3xl">
-          <p className="text-label font-display text-primary-700">
-            Our Municipality
+          <p className="mt-1 text-label font-display text-primary-700">
+            Your Municipality
           </p>
           <h1 className="mt-2 flex items-center gap-2 font-display text-h1 text-ink">
             <Building2 className="h-8 w-8 shrink-0 text-primary-600" aria-hidden />
@@ -222,11 +222,11 @@ function MunicipalityPlanningContent({
             <p className="text-label font-display text-primary-700">Your Municipality</p>
             <h2 className="mt-1 font-display text-h3 text-ink">{displayName}</h2>
             <h3 className="mt-4 font-display text-h4 text-ink">
-              Municipal planning information is being prepared
+              Planning information is not available yet
             </h3>
             <p className="mt-2 text-ink-muted">
-              {summary.emptyCopy ||
-                'Verified planning information for this municipality has not yet been published on Serve SA.'}
+              Your municipality&apos;s verified planning information has not yet
+              been published on Serve SA.
             </p>
             <p className="mt-3 text-body-sm text-ink-subtle">
               Serve SA only publishes information verified from official municipal

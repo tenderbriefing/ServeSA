@@ -10,6 +10,10 @@ import {
   MunicipalitySelectFields,
   type MunicipalitySelection,
 } from '@/components/municipality/MunicipalitySelectFields'
+import {
+  isValidMunicipalitySelection,
+  normalizeOptionalWard,
+} from '@/lib/southAfricaData'
 
 type ConfirmMunicipalityPanelProps = {
   onSaved?: (municipalityCode: string) => void
@@ -30,18 +34,25 @@ export function ConfirmMunicipalityPanel({
   const [selection, setSelection] = useState<MunicipalitySelection>({
     province: userProfile?.province || '',
     municipalityCode: '',
+    wardId: '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleSave = async () => {
-    if (!user || !selection.municipalityCode || !selection.province) return
+    if (!user) return
+    if (!isValidMunicipalitySelection(selection.province, selection.municipalityCode)) {
+      setError('Select a valid province and municipality.')
+      return
+    }
     setSaving(true)
     setError(null)
     try {
+      const wardId = normalizeOptionalWard(selection.wardId)
       await updateDoc(doc(db, 'users', user.uid), {
         province: selection.province,
         municipalityCode: selection.municipalityCode,
+        wardId: wardId,
         updatedAt: new Date(),
       })
       await refreshProfile()
@@ -81,6 +92,7 @@ export function ConfirmMunicipalityPanel({
         <MunicipalitySelectFields
           idPrefix="confirm"
           required
+          showWard
           value={selection}
           onChange={setSelection}
           disabled={saving}
@@ -94,7 +106,12 @@ export function ConfirmMunicipalityPanel({
 
         <Button
           className="min-h-touch w-full"
-          disabled={!selection.municipalityCode || !selection.province || saving}
+          disabled={
+            !isValidMunicipalitySelection(
+              selection.province,
+              selection.municipalityCode
+            ) || saving
+          }
           onClick={handleSave}
         >
           {saving ? 'Saving…' : 'Save municipality'}

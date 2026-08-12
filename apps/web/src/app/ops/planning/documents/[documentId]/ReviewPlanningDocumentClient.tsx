@@ -19,8 +19,8 @@ export default function ReviewPlanningDocumentClient() {
   const params = useParams()
   const documentId = String(params.documentId || '')
   const { municipalityCode } = useAuth()
-  const muni = municipalityCode || 'JHB'
-  const enabled = isMunicipalPublishingEnabledFor(muni)
+  const muni = municipalityCode?.trim() || null
+  const enabled = muni ? isMunicipalPublishingEnabledFor(muni) : false
   const [doc, setDoc] = useState<Record<string, unknown> | null>(null)
   const [draftJson, setDraftJson] = useState('')
   const [sourceUrl, setSourceUrl] = useState<string | null>(null)
@@ -30,7 +30,7 @@ export default function ReviewPlanningDocumentClient() {
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    if (!documentId || !enabled) {
+    if (!documentId || !muni || !enabled) {
       setLoading(false)
       return
     }

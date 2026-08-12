@@ -31,16 +31,17 @@ type DashboardResponse = {
 
 export default function OpsPlanningDocumentsPage() {
   const { municipalityCode } = useAuth()
-  const muni = municipalityCode || 'JHB'
-  const enabled = isMunicipalPublishingEnabledFor(muni)
+  const muni = municipalityCode?.trim() || null
+  const enabled = muni ? isMunicipalPublishingEnabledFor(muni) : false
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null)
   const [documents, setDocuments] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    if (!FEATURE_FLAGS.enableMunicipalPublishingEngine || !enabled) {
+    if (!muni || !FEATURE_FLAGS.enableMunicipalPublishingEngine || !enabled) {
       setLoading(false)
+      if (!muni) setError('Municipality claim required for publishing ops.')
       return
     }
     setLoading(true)
@@ -110,8 +111,8 @@ export default function OpsPlanningDocumentsPage() {
               Official documents
             </h1>
             <p className="mt-1 text-sm text-ink-muted">
-              Upload → extract → review → approve → publish. AI never
-              auto-publishes. Municipality: <strong>{muni}</strong>
+            Upload → extract → review → approve → publish. AI never
+            auto-publishes. Municipality: <strong>{muni || 'not assigned'}</strong>
             </p>
           </div>
           <div className="flex gap-2">

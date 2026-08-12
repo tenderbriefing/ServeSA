@@ -35,8 +35,10 @@ const ENTITY_MAP: Record<Tab, 'document' | 'priority' | 'project' | 'budget_line
 
 export default function OpsPlanningPage() {
   const { municipalityCode } = useAuth()
-  const muni = municipalityCode || 'JHB'
-  const publishingEnabled = isMunicipalPublishingEnabledFor(muni)
+  const muni = municipalityCode?.trim() || null
+  const publishingEnabled = muni
+    ? isMunicipalPublishingEnabledFor(muni)
+    : false
   const [tab, setTab] = useState<Tab>('documents')
   const [items, setItems] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,6 +47,12 @@ export default function OpsPlanningPage() {
   const [message, setMessage] = useState<string | null>(null)
 
   const load = useCallback(async () => {
+    if (!muni) {
+      setLoading(false)
+      setItems([])
+      setError('Municipality claim required for ops planning.')
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -108,7 +116,7 @@ export default function OpsPlanningPage() {
           <p className="mt-1 text-sm text-ink-muted">
             Review documents, priorities, projects, and budgets. Verify before
             publish — AI drafts never auto-publish. Municipality:{' '}
-            <strong>{muni}</strong>
+            <strong>{muni || 'not assigned'}</strong>
           </p>
           {!FEATURE_FLAGS.enableMunicipalPlanning ? (
             <p className="mt-2 rounded-md border border-border bg-surface-muted px-3 py-2 text-xs text-ink-muted">

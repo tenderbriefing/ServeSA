@@ -38,8 +38,8 @@ function fileToBase64(file: File): Promise<string> {
 export default function UploadPlanningDocumentPage() {
   const router = useRouter()
   const { municipalityCode } = useAuth()
-  const muni = municipalityCode || 'JHB'
-  const enabled = isMunicipalPublishingEnabledFor(muni)
+  const muni = municipalityCode?.trim() || null
+  const enabled = muni ? isMunicipalPublishingEnabledFor(muni) : false
   const [kind, setKind] = useState<PlanDocumentKind>('idp')
   const [title, setTitle] = useState('')
   const [fiscalYear, setFiscalYear] = useState('2026/27')
@@ -47,6 +47,18 @@ export default function UploadPlanningDocumentPage() {
   const [file, setFile] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  if (!muni) {
+    return (
+      <OpsShell>
+        <div className="mx-auto max-w-xl px-4 py-10">
+          <p className="text-sm text-ink-muted">
+            Municipality claim required for document upload.
+          </p>
+        </div>
+      </OpsShell>
+    )
+  }
 
   if (!FEATURE_FLAGS.enableMunicipalPublishingEngine || !enabled) {
     return (

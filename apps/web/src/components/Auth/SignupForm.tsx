@@ -22,6 +22,8 @@ import { AlertCircle, Mail, Lock, Eye, EyeOff, User, Phone } from 'lucide-react'
 import {
   southAfricaProvinces,
   getMunicipalitiesByProvince,
+  isValidMunicipalitySelection,
+  normalizeOptionalWard,
   type Municipality,
 } from '@/lib/southAfricaData'
 import { AlertBanner } from '@/components/ui/AlertBanner'
@@ -48,6 +50,7 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
     phone: '',
     province: '',
     municipality: '',
+    wardId: '',
   })
   const [availableMunicipalities, setAvailableMunicipalities] = useState<
     Municipality[]
@@ -69,7 +72,10 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
     if (field === 'province') {
       const municipalities = getMunicipalitiesByProvince(value)
       setAvailableMunicipalities(municipalities)
-      setFormData((prev) => ({ ...prev, municipality: '' }))
+      setFormData((prev) => ({ ...prev, municipality: '', wardId: '' }))
+    }
+    if (field === 'municipality') {
+      setFormData((prev) => ({ ...prev, wardId: '' }))
     }
   }
 
@@ -94,6 +100,20 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
       errors.phone =
         'Enter a South African mobile number, such as 082 123 4567.'
     }
+    if (!formData.province) {
+      errors.province = 'Select your province.'
+    }
+    if (!formData.municipality) {
+      errors.municipality = 'Select your municipality.'
+    } else if (
+      !isValidMunicipalitySelection(formData.province, formData.municipality)
+    ) {
+      errors.municipality =
+        'Select a municipality that belongs to your province.'
+    }
+    if (formData.wardId.trim() && formData.wardId.trim().length > 64) {
+      errors.wardId = 'Ward label is too long.'
+    }
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -107,9 +127,10 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
     try {
       await signUpWithEmail(formData.email, formData.password, {
         displayName: `${formData.firstName} ${formData.lastName}`,
-        municipalityCode: formData.municipality || undefined,
-        province: formData.province || undefined,
+        municipalityCode: formData.municipality,
+        province: formData.province,
         phone: formData.phone || undefined,
+        wardId: normalizeOptionalWard(formData.wardId) || undefined,
       })
       onSuccess?.()
     } catch (err: unknown) {
@@ -146,15 +167,16 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
         <CardHeader className="text-center">
           <CardTitle className="font-display text-2xl font-bold">Create account</CardTitle>
           <CardDescription>
-            Create an account to save your cases and receive updates. You can also
-            report without signing in.
+            Create an account to access your municipality on Serve SA. You can
+            also report without signing in.
           </CardDescription>
         </CardHeader>
       )}
       <CardContent className="space-y-4">
         <AlertBanner variant="info">
-          Province and municipality are optional now — you can add them later in
-          your profile. Reporting does not wait on a complete profile.
+          Province and municipality are required so Serve SA can show you the
+          correct local civic services. Ward is optional — you do not need to
+          know your ward number.
         </AlertBanner>
 
         {error && (
@@ -277,13 +299,18 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Province <span className="text-ink-subtle">(optional)</span>
+              Province <span className="text-danger">*</span>
             </label>
             <Select
               value={formData.province}
               onValueChange={(value) => handleInputChange('province', value)}
             >
-              <SelectTrigger className="min-h-touch" aria-label="Province">
+              <SelectTrigger
+                className="min-h-touch"
+                aria-label="Province"
+                aria-required
+                aria-invalid={Boolean(fieldErrors.province)}
+              >
                 <SelectValue placeholder="Select your province" />
               </SelectTrigger>
               <SelectContent>
@@ -298,14 +325,19 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Municipality <span className="text-ink-subtle">(optional)</span>
+              Municipality <span className="text-danger">*</span>
             </label>
             <Select
               value={formData.municipality}
               onValueChange={(value) => handleInputChange('municipality', value)}
               disabled={!formData.province}
             >
-              <SelectTrigger className="min-h-touch" aria-label="Municipality">
+              <SelectTrigger
+                className="min-h-touch"
+                aria-label="Municipality"
+                aria-required
+                aria-invalid={Boolean(fieldErrors.municipality)}
+              >
                 <SelectValue
                   placeholder={
                     formData.province
@@ -316,12 +348,36 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
               </SelectTrigger>
               <SelectContent>
                 {availableMunicipalities.map((municipality) => (
-                  <SelectItem key={municipality.code} value={municipality.code}>
+                  <SelectItem
+                    key={`${municipality.code}-${municipality.name}`}
+                    value={municipality.code}
+                  >
                     {municipality.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="signup-ward" className="text-sm font-medium">
+              Ward — optional
+            </label>
+            <Input
+              id="signup-ward"
+              value={formData.wardId}
+              onChange={(e) => handleInputChange('wardId', e.target.value)}
+              placeholder="Select your ward if you know it"
+              className="min-h-touch"
+              maxLength={64}
+              disabled={!formData.municipality}
+              aria-describedby="signup-ward-hint"
+              aria-invalid={Boolean(fieldErrors.wardId)}
+            />
+            <p id="signup-ward-hint" className="text-xs text-ink-subtle">
+              Optional. Leave blank if you are unsure — GIS determines the
+              authoritative ward when you report an issue.
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -430,6 +486,10 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
         >
           Continue with Google
         </Button>
+        <p className="text-center text-xs text-ink-subtle">
+          After Google sign-in, you will confirm your province and municipality
+          before seeing local municipal services.
+        </p>
 
         {onSwitchToLogin && (
           <div className="text-center text-sm">
