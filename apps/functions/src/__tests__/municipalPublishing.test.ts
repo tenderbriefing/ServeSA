@@ -115,11 +115,15 @@ describe('conservative AI draft', () => {
         'Strategic priority: water services. Capital project: reservoir upgrade.',
       officialTitle: 'Example IDP',
     })
-    expect(draft.strategicPriorities.every((p) => p.verificationStatus === 'needs_review')).toBe(
-      true
-    )
-    expect(draft.projects.every((p) => p.verificationStatus === 'needs_review')).toBe(
-      true
-    )
+    expect(
+      draft.strategicPriorities.every(
+        (p: { verificationStatus: string }) => p.verificationStatus === 'needs_review'
+      )
+    ).toBe(true)
+    expect(
+      draft.projects.every(
+        (p: { verificationStatus: string }) => p.verificationStatus === 'needs_review'
+      )
+    ).toBe(true)
   })
 })
