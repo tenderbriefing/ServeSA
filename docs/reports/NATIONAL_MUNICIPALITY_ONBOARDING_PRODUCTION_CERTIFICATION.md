@@ -19,7 +19,7 @@ National citizen municipality context is merged to `main` (PR #22 + PR #23), Hos
 | Feature branch | `feat/national-municipality-finalisation` |
 | PR | [#23](https://github.com/tenderbriefing/ServeSA/pull/23) (prior national: [#22](https://github.com/tenderbriefing/ServeSA/pull/22)) |
 | Merge SHA | `1f5dd33f9bb8ad0a9375bb0c6c0ba0ddf6e9c6ed` |
-| Final SHA (post-cert docs / UAT harness) | *(filled at docs PR merge)* |
+| Final SHA (post-cert docs / UAT harness) | `23aac77b287a605328f487856f45caefb5bee72f` (docs closeout branch; merge SHA updates when PR lands on main) |
 
 ## National onboarding
 
