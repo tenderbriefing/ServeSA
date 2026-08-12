@@ -232,6 +232,14 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // National Treasury finance cache — Admin SDK only (no client reads/writes)
+    match /municipal_finance_snapshots/{municipalityCode} {
+      allow read, write: if false;
+    }
+    match /municipal_finance_snapshot_changes/{changeId} {
+      allow read, write: if false;
+    }
+
     match /case_idempotency/{id} {
       allow read, write: if false;
     }

@@ -17,6 +17,7 @@ import {
 import {
   PLANNING_EMPTY_COPY,
   PLAN_DOCUMENT_KIND_LABEL,
+  formatCitizenBudgetPeriodLabel,
   type PlanDocumentKind,
 } from '@servesa/case-contract'
 import { ProjectCard, type ProjectCardModel } from '@/components/planning/ProjectCard'
@@ -40,6 +41,49 @@ const BudgetBreakdown = dynamic(
     ),
   }
 )
+
+type TreasuryFinanceView = {
+  empty: boolean
+  financialYearLabel?: string | null
+  amountType?: string | null
+  amountTypeLabel?: string | null
+  operatingBudget?: {
+    amountZar: number
+    amountTypeLabel?: string
+    financialYearLabel?: string
+  } | null
+  capitalBudget?: {
+    amountZar: number
+    amountTypeLabel?: string
+    financialYearLabel?: string
+  } | null
+  totalBudget?: {
+    amountZar: number
+    amountTypeLabel?: string
+    financialYearLabel?: string
+    derivation?: string
+  } | null
+  majorAllocations?: Array<{
+    id: string
+    rawTreasuryLabel: string
+    displayLabel: string
+    amountZar: number
+    percentage: number
+  }>
+  sources?: Array<{
+    dataset: string
+    financialYearLabel: string
+    amountTypeLabel: string
+    reference?: string
+    retrievedAt: string
+    verificationState?: string
+  }>
+  dataUpdatedAt?: string | null
+  retrievedAt?: string
+  completenessWarning?: string | null
+  dataQuality?: string
+  cacheStatus?: string
+}
 
 type SummaryResponse = {
   municipalityCode: string
@@ -68,6 +112,7 @@ type SummaryResponse = {
     publishedStoragePath?: string | null
     publishedAt?: string | null
   }>
+  treasuryFinance?: TreasuryFinanceView | null
   empty: boolean
   emptyCopy?: string
   emptyBody?: string
@@ -159,14 +204,66 @@ function MunicipalitySnapshotContent({
     }
   }, [municipalityCode, enabled])
 
-  const fiscalYearLabel = useMemo(
-    () => resolveFiscalYearLabel(summary?.budgetLines || []),
-    [summary]
+  const treasury = summary?.treasuryFinance
+  const hasTreasuryFinance = Boolean(
+    treasury && !treasury.empty && treasury.operatingBudget
   )
-  const namedBudget = useMemo(
-    () => pickNamedBudgetMetrics(summary?.budgetLines || []),
-    [summary]
-  )
+
+  const fiscalYearLabel = useMemo(() => {
+    if (
+      hasTreasuryFinance &&
+      treasury?.financialYearLabel &&
+      treasury.amountType &&
+      treasury.amountTypeLabel
+    ) {
+      return formatCitizenBudgetPeriodLabel({
+        financialYearLabel: treasury.financialYearLabel,
+        amountType: treasury.amountType,
+        amountTypeLabel: treasury.amountTypeLabel,
+      })
+    }
+    return resolveFiscalYearLabel(summary?.budgetLines || [])
+  }, [hasTreasuryFinance, treasury, summary])
+
+  const namedBudget = useMemo(() => {
+    if (hasTreasuryFinance && treasury) {
+      return {
+        total: treasury.totalBudget
+          ? {
+              plainLanguageLabel: 'Operating + capital budget',
+              amount: { amountZar: treasury.totalBudget.amountZar },
+            }
+          : undefined,
+        operating: treasury.operatingBudget
+          ? {
+              plainLanguageLabel: 'Operating budget',
+              amount: { amountZar: treasury.operatingBudget.amountZar },
+            }
+          : undefined,
+        capital: treasury.capitalBudget
+          ? {
+              plainLanguageLabel: 'Capital budget',
+              amount: { amountZar: treasury.capitalBudget.amountZar },
+            }
+          : undefined,
+        infra: undefined as undefined,
+        fromTreasury: true as const,
+      }
+    }
+    return { ...pickNamedBudgetMetrics(summary?.budgetLines || []), fromTreasury: false as const }
+  }, [hasTreasuryFinance, treasury, summary])
+
+  const allocationLines = useMemo(() => {
+    if (hasTreasuryFinance && treasury?.majorAllocations?.length) {
+      return treasury.majorAllocations.map((a) => ({
+        budgetLineId: a.id,
+        categoryLabel: a.rawTreasuryLabel,
+        plainLanguageLabel: a.displayLabel,
+        amount: { amountZar: a.amountZar },
+      }))
+    }
+    return summary?.budgetLines || []
+  }, [hasTreasuryFinance, treasury, summary])
 
   if (!FEATURE_FLAGS.enableMunicipalPlanning || !enabled) {
     return (
@@ -219,8 +316,9 @@ function MunicipalitySnapshotContent({
             <p className="mt-2 text-body text-ink-muted">{province.name}</p>
           ) : null}
           <p className="mt-3 text-body-sm text-ink-subtle">
-            What your municipality plans to do and where its money is going —
-            from verified official documents only.
+            Plans and priorities from verified municipal documents. Financial
+            figures from National Treasury Municipal Finance data where
+            available.
           </p>
         </div>
       </section>
@@ -274,7 +372,9 @@ function MunicipalitySnapshotContent({
                 Municipality Snapshot
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Verified official municipal information only.
+                {hasTreasuryFinance
+                  ? 'Financial figures sourced from National Treasury. Planning content from verified municipal documents.'
+                  : 'Verified official municipal information only.'}
               </p>
             </section>
 
@@ -282,20 +382,32 @@ function MunicipalitySnapshotContent({
               namedBudget.operating ||
               namedBudget.capital ||
               namedBudget.infra ||
-              summary.budgetLines?.length) ? (
+              summary.budgetLines?.length ||
+              hasTreasuryFinance) ? (
               <section aria-labelledby="budget-heading">
                 <h2 id="budget-heading" className="font-display text-h2 text-ink">
                   {fiscalYearLabel || 'Municipal budget'}
                 </h2>
                 <p className="mt-1 text-sm text-ink-muted">
-                  Figures appear only when published from verified official
-                  documents.
+                  {hasTreasuryFinance
+                    ? 'Original/adjusted budget measures from National Treasury Municipal Finance data. Budget and actual figures are never mixed.'
+                    : 'Figures appear only when published from verified official documents.'}
                 </p>
+                {hasTreasuryFinance && treasury?.completenessWarning ? (
+                  <p className="mt-2 text-xs text-ink-subtle" role="note">
+                    Source: National Treasury. {treasury.completenessWarning}
+                    {treasury.dataUpdatedAt
+                      ? ` Last updated: ${new Date(treasury.dataUpdatedAt).toLocaleDateString('en-ZA')}.`
+                      : ''}
+                  </p>
+                ) : null}
                 <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                   {[
                     namedBudget.total && {
                       id: 'total',
-                      label: 'Total municipal budget',
+                      label: hasTreasuryFinance
+                        ? 'Operating + capital budget'
+                        : 'Total municipal budget',
                       amount: namedBudget.total.amount.amountZar,
                     },
                     namedBudget.operating && {
@@ -346,11 +458,12 @@ function MunicipalitySnapshotContent({
                 Where the money goes
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Categories shown only when the municipality&apos;s verified
-                budget supports them.
+                {hasTreasuryFinance
+                  ? 'High-level municipal functions from National Treasury Income & Expenditure data.'
+                  : "Categories shown only when the municipality's verified budget supports them."}
               </p>
               <div className="mt-4">
-                <BudgetBreakdown lines={summary.budgetLines || []} />
+                <BudgetBreakdown lines={allocationLines} />
               </div>
             </section>
 
@@ -442,61 +555,87 @@ function MunicipalitySnapshotContent({
                 Official sources
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Documents used for this Municipality Snapshot.
+                Authoritative datasets powering this Municipality Snapshot.
               </p>
-              {!summary.documents?.length ? (
-                <p className="mt-4 text-ink-muted">
-                  {PLANNING_EMPTY_COPY.notPublished}
-                </p>
-              ) : (
-                <ul className="mt-4 space-y-3">
-                  {summary.documents.map((doc) => {
-                    const kindLabel =
-                      PLAN_DOCUMENT_KIND_LABEL[
-                        doc.kind as PlanDocumentKind
-                      ] || doc.kind
-                    return (
-                      <li
-                        key={doc.documentId}
-                        className="border-b border-border pb-3 last:border-0"
-                      >
-                        {doc.officialUrl ? (
-                          <a
-                            href={doc.officialUrl}
-                            className="text-sm font-medium text-primary-700 underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() =>
-                              trackPublishingEvent('source_document_opened', {
-                                documentId: doc.documentId,
-                                municipalityCode,
-                              })
-                            }
-                          >
-                            {doc.title}
-                          </a>
-                        ) : (
-                          <span className="text-sm font-medium text-ink">
-                            {doc.title}
-                          </span>
-                        )}
-                        <p className="mt-1 text-xs text-ink-subtle">
-                          {[
-                            kindLabel,
-                            doc.fiscalYear ? `Period ${doc.fiscalYear}` : null,
-                            displayName,
-                            doc.publishedAt
-                              ? `Verified ${new Date(doc.publishedAt).toLocaleDateString('en-ZA')}`
-                              : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
+              <ul className="mt-4 space-y-3">
+                {hasTreasuryFinance && treasury ? (
+                  <li className="border-b border-border pb-3">
+                    <p className="text-sm font-medium text-ink">
+                      National Treasury Municipal Finance Data
+                    </p>
+                    <p className="mt-1 text-xs text-ink-subtle">
+                      {[
+                        treasury.financialYearLabel
+                          ? `Financial year ${treasury.financialYearLabel}`
+                          : null,
+                        treasury.amountTypeLabel || null,
+                        'Operating & capital budgets',
+                        treasury.dataUpdatedAt
+                          ? `Updated ${new Date(treasury.dataUpdatedAt).toLocaleDateString('en-ZA')}`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </p>
+                    <p className="mt-1 text-xs text-ink-subtle">
+                      Source: National Treasury (not an independent Serve SA
+                      audit).
+                    </p>
+                  </li>
+                ) : null}
+                {(summary.documents || []).map((doc) => {
+                  const kindLabel =
+                    PLAN_DOCUMENT_KIND_LABEL[
+                      doc.kind as PlanDocumentKind
+                    ] || doc.kind
+                  return (
+                    <li
+                      key={doc.documentId}
+                      className="border-b border-border pb-3 last:border-0"
+                    >
+                      {doc.officialUrl ? (
+                        <a
+                          href={doc.officialUrl}
+                          className="text-sm font-medium text-primary-700 underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() =>
+                            trackPublishingEvent('source_document_opened', {
+                              documentId: doc.documentId,
+                              municipalityCode,
+                            })
+                          }
+                        >
+                          {doc.title}
+                        </a>
+                      ) : (
+                        <span className="text-sm font-medium text-ink">
+                          {doc.title}
+                        </span>
+                      )}
+                      <p className="mt-1 text-xs text-ink-subtle">
+                        {[
+                          kindLabel,
+                          doc.fiscalYear ? `Period ${doc.fiscalYear}` : null,
+                          displayName,
+                          doc.publishedAt
+                            ? `Verified ${new Date(doc.publishedAt).toLocaleDateString('en-ZA')}`
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    </li>
+                  )
+                })}
+                {!hasTreasuryFinance && !(summary.documents || []).length ? (
+                  <li>
+                    <p className="text-ink-muted">
+                      {PLANNING_EMPTY_COPY.notPublished}
+                    </p>
+                  </li>
+                ) : null}
+              </ul>
             </section>
 
             <section className="border-t border-border pt-6">
