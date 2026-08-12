@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Building2, Lightbulb } from 'lucide-react'
@@ -19,6 +19,7 @@ import { PLANNING_EMPTY_COPY } from '@servesa/case-contract'
 import { PlanningKpiCards, type PlanningKpi } from '@/components/planning/PlanningKpiCards'
 import { ProjectCard, type ProjectCardModel } from '@/components/planning/ProjectCard'
 import { ServeSaSummaryBanner } from '@/components/planning/SourceCitation'
+import { MunicipalityCompleteness } from '@/components/municipality/MunicipalityCompleteness'
 import { trackPlanningEvent } from '@/lib/telemetry/planning'
 import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 
@@ -152,6 +153,52 @@ function MunicipalityPlanningContent({
       </section>
 
       <div className="container max-w-3xl space-y-12 py-10">
+        {!loading ? (
+          <MunicipalityCompleteness
+            modules={[
+              {
+                id: 'verified',
+                label: 'Municipality verified',
+                available: true,
+              },
+              {
+                id: 'updates',
+                label: 'Municipal updates',
+                available: true,
+                href: '/updates',
+              },
+              {
+                id: 'ideas',
+                label: 'Community ideas',
+                available: true,
+                href: '/ideas',
+              },
+              {
+                id: 'idp',
+                label: 'IDP summary',
+                available: Boolean(summary && !summary.empty && summary.priorities?.length),
+              },
+              {
+                id: 'budget',
+                label: 'Budget summary',
+                available: Boolean(
+                  summary && !summary.empty && summary.budgetLines?.length
+                ),
+              },
+              {
+                id: 'projects',
+                label: 'Projects',
+                available: Boolean(summary && !summary.empty && summary.projects?.length),
+              },
+              {
+                id: 'contacts',
+                label: 'Service contacts',
+                available: false,
+              },
+            ]}
+          />
+        ) : null}
+
         {loading ? (
           <div className="flex justify-center py-16" role="status">
             <Spinner />
@@ -167,16 +214,18 @@ function MunicipalityPlanningContent({
 
         {!loading && !error && summary?.empty ? (
           <div className="rounded-lg border border-border bg-surface p-6">
-            <h2 className="font-display text-h4 text-ink">
+            <p className="text-label font-display text-primary-700">Your Municipality</p>
+            <h2 className="mt-1 font-display text-h3 text-ink">{displayName}</h2>
+            <h3 className="mt-4 font-display text-h4 text-ink">
               Municipal planning information is being prepared
-            </h2>
+            </h3>
             <p className="mt-2 text-ink-muted">
               {summary.emptyCopy ||
                 'Verified planning information for this municipality has not yet been published on Serve SA.'}
             </p>
             <p className="mt-3 text-body-sm text-ink-subtle">
-              Official planning documents are still being reviewed for
-              publication. We will not show another municipality’s data in its
+              Serve SA only publishes information verified from official municipal
+              documents. We will not show another municipality’s plans in its
               place.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -185,6 +234,12 @@ function MunicipalityPlanningContent({
               </Button>
               <Button asChild variant="outline">
                 <Link href="/ideas">Community Ideas</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/report">Report an Issue</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link href="/account">Change municipality</Link>
               </Button>
             </div>
           </div>
@@ -350,16 +405,11 @@ function MunicipalityPlanningContent({
 function MunicipalityAuthenticatedView() {
   const { userProfile } = useAuth()
   const resolution = useCitizenMunicipality()
-  const [savedCode, setSavedCode] = useState<string | null>(null)
-  const municipalityCode = savedCode || resolution.municipalityCode
+  const municipalityCode = resolution.municipalityCode
   const wardId =
     (userProfile as { wardId?: string } | null)?.wardId || null
 
-  const handleSaved = useCallback((code: string) => {
-    setSavedCode(code)
-  }, [])
-
-  if (resolution.loading && !savedCode) {
+  if (resolution.loading) {
     return (
       <div className="flex justify-center py-16" role="status">
         <Spinner label="Loading your municipality…" />
@@ -371,7 +421,7 @@ function MunicipalityAuthenticatedView() {
     return (
       <div className="bg-canvas py-12">
         <div className="container">
-          <ConfirmMunicipalityPanel onSaved={handleSaved} />
+          <ConfirmMunicipalityPanel />
         </div>
       </div>
     )

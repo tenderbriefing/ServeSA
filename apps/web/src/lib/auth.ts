@@ -84,6 +84,7 @@ export const signUpWithEmail = async (
   userData: {
     displayName: string;
     municipalityCode?: string;
+    province?: string;
     phone?: string;
   }
 ): Promise<User> => {
@@ -121,6 +122,7 @@ export const signUpWithEmail = async (
 
     await setDoc(doc(db, collections.users, user.uid), {
       ...newUser,
+      ...(userData.province ? { province: userData.province } : {}),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       lastActiveAt: serverTimestamp(),

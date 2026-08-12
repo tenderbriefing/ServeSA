@@ -1,62 +1,51 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { doc, updateDoc } from 'firebase/firestore'
 import { MapPin } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { db } from '@/lib/firebase'
 import { Button } from '@/components/ui/Button'
-import { Label } from '@/components/ui/Label'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/Select'
-import {
-  getMunicipalitiesByProvince,
-  southAfricaProvinces,
-  type Municipality,
-} from '@/lib/southAfricaData'
+  MunicipalitySelectFields,
+  type MunicipalitySelection,
+} from '@/components/municipality/MunicipalitySelectFields'
 
 type ConfirmMunicipalityPanelProps = {
   onSaved?: (municipalityCode: string) => void
+  title?: string
+  description?: string
 }
 
 /**
  * Authenticated onboarding when Serve SA cannot confirm the citizen's municipality.
- * Never substitutes pilot/JHB planning content.
+ * Persists profile then refreshes shared auth/profile context — no stale override.
  */
 export function ConfirmMunicipalityPanel({
   onSaved,
+  title = 'Confirm your municipality',
+  description = 'Serve SA uses your municipality to show you local updates, community ideas, municipal plans and service information relevant to where you live.',
 }: ConfirmMunicipalityPanelProps) {
-  const { user, userProfile } = useAuth()
-  const [province, setProvince] = useState(userProfile?.province || '')
-  const [municipalityCode, setMunicipalityCode] = useState('')
-  const [municipalities, setMunicipalities] = useState<Municipality[]>([])
+  const { user, userProfile, refreshProfile } = useAuth()
+  const [selection, setSelection] = useState<MunicipalitySelection>({
+    province: userProfile?.province || '',
+    municipalityCode: '',
+  })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!province) {
-      setMunicipalities([])
-      return
-    }
-    setMunicipalities(getMunicipalitiesByProvince(province))
-  }, [province])
-
   const handleSave = async () => {
-    if (!user || !municipalityCode) return
+    if (!user || !selection.municipalityCode || !selection.province) return
     setSaving(true)
     setError(null)
     try {
       await updateDoc(doc(db, 'users', user.uid), {
-        province,
-        municipalityCode,
+        province: selection.province,
+        municipalityCode: selection.municipalityCode,
         updatedAt: new Date(),
       })
-      onSaved?.(municipalityCode)
+      await refreshProfile()
+      onSaved?.(selection.municipalityCode)
     } catch (e) {
       setError(
         e instanceof Error
@@ -82,58 +71,20 @@ export function ConfirmMunicipalityPanel({
             id="confirm-muni-heading"
             className="font-display text-h3 text-ink"
           >
-            Confirm your municipality
+            {title}
           </h1>
-          <p className="mt-2 text-body-sm text-ink-muted">
-            Serve SA uses your municipality to show you local updates, community
-            ideas, municipal plans and service information relevant to where you
-            live.
-          </p>
+          <p className="mt-2 text-body-sm text-ink-muted">{description}</p>
         </div>
       </div>
 
       <div className="mt-6 space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="confirm-province">Province</Label>
-          <Select
-            value={province || undefined}
-            onValueChange={(value) => {
-              setProvince(value)
-              setMunicipalityCode('')
-            }}
-          >
-            <SelectTrigger id="confirm-province" className="min-h-touch">
-              <SelectValue placeholder="Select province" />
-            </SelectTrigger>
-            <SelectContent>
-              {southAfricaProvinces.map((p) => (
-                <SelectItem key={p.code} value={p.code}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="confirm-municipality">Municipality</Label>
-          <Select
-            value={municipalityCode || undefined}
-            onValueChange={setMunicipalityCode}
-            disabled={!province}
-          >
-            <SelectTrigger id="confirm-municipality" className="min-h-touch">
-              <SelectValue placeholder="Select municipality" />
-            </SelectTrigger>
-            <SelectContent>
-              {municipalities.map((m) => (
-                <SelectItem key={m.code} value={m.code}>
-                  {m.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <MunicipalitySelectFields
+          idPrefix="confirm"
+          required
+          value={selection}
+          onChange={setSelection}
+          disabled={saving}
+        />
 
         {error ? (
           <p className="text-body-sm text-danger" role="alert">
@@ -143,14 +94,15 @@ export function ConfirmMunicipalityPanel({
 
         <Button
           className="min-h-touch w-full"
-          disabled={!municipalityCode || saving}
+          disabled={!selection.municipalityCode || !selection.province || saving}
           onClick={handleSave}
         >
           {saving ? 'Saving…' : 'Save municipality'}
         </Button>
         <p className="text-caption text-ink-subtle">
-          You can update this later from your profile. We will not show another
-          municipality’s plans while yours is unconfirmed.
+          Changing this only updates your citizen location context. It does not
+          grant municipal staff access. We will not show another municipality’s
+          plans while yours is unconfirmed.
         </p>
       </div>
     </section>

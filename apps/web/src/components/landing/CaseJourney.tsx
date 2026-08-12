@@ -137,7 +137,7 @@ export function CaseJourney() {
               <div className="mb-4 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-caption text-ink-subtle">Example demo case</p>
-                  <p className="font-mono text-sm font-semibold text-ink">CASE-JHB-28471</p>
+                  <p className="font-mono text-sm font-semibold text-ink">CASE-DEMO-28471</p>
                 </div>
                 <AnimatedCaseStatus
                   activeIndex={Math.min(4, Math.floor((active / (STEPS.length - 1)) * 4))}

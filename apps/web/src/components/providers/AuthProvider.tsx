@@ -34,9 +34,17 @@ interface AuthContextType {
   loading: boolean
   isOfficial: boolean
   isAdmin: boolean
+  /**
+   * Convenience municipality for display/legacy callers:
+   * JWT claim first, then citizen profile. Never invents a default.
+   */
   municipalityCode: string | null
+  /** JWT custom claim only — never conflated with profile for resolver precedence */
+  claimsMunicipalityCode: string | null
   claimsRoles: string[]
   refreshClaims: () => Promise<void>
+  /** Re-read Firestore citizen profile after municipality/profile edits */
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -46,8 +54,10 @@ const AuthContext = createContext<AuthContextType>({
   isOfficial: false,
   isAdmin: false,
   municipalityCode: null,
+  claimsMunicipalityCode: null,
   claimsRoles: [],
   refreshClaims: async () => {},
+  refreshProfile: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -55,12 +65,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userProfile, setUserProfile] = useState<AppUserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [claimsRoles, setClaimsRoles] = useState<string[]>([])
-  const [municipalityCode, setMunicipalityCode] = useState<string | null>(null)
+  const [claimsMunicipalityCode, setClaimsMunicipalityCode] = useState<
+    string | null
+  >(null)
 
   const refreshClaims = async () => {
     if (!auth.currentUser) {
       setClaimsRoles([])
-      setMunicipalityCode(null)
+      setClaimsMunicipalityCode(null)
       return
     }
     const token = await auth.currentUser.getIdTokenResult(true)
@@ -68,11 +80,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ? (token.claims.roles as string[])
       : []
     setClaimsRoles(roles)
-    setMunicipalityCode(
+    setClaimsMunicipalityCode(
       token.claims.municipalityCode
         ? String(token.claims.municipalityCode)
         : null
     )
+  }
+
+  const refreshProfile = async () => {
+    if (!auth.currentUser) {
+      setUserProfile(null)
+      return
+    }
+    const snap = await getDoc(doc(db, 'users', auth.currentUser.uid))
+    setUserProfile(snap.exists() ? (snap.data() as AppUserProfile) : null)
   }
 
   useEffect(() => {
@@ -96,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!next) {
         setUserProfile(null)
         setClaimsRoles([])
-        setMunicipalityCode(null)
+        setClaimsMunicipalityCode(null)
         clearLoadingIfReady()
         return
       }
@@ -120,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? (token.claims.roles as string[])
           : []
         setClaimsRoles(roles)
-        setMunicipalityCode(
+        setClaimsMunicipalityCode(
           token.claims.municipalityCode
             ? String(token.claims.municipalityCode)
             : null
@@ -206,6 +227,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     claimsRoles.includes('comms_publisher')
   const isAdmin = claimsRoles.includes('admin')
 
+  const profileMunicipality =
+    (userProfile as { municipalityCode?: string } | null)?.municipalityCode ||
+    null
+
   return (
     <AuthContext.Provider
       value={{
@@ -214,12 +239,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isOfficial,
         isAdmin,
-        municipalityCode:
-          municipalityCode ||
-          (userProfile as any)?.municipalityCode ||
-          null,
+        municipalityCode: claimsMunicipalityCode || profileMunicipality || null,
+        claimsMunicipalityCode,
         claimsRoles,
         refreshClaims,
+        refreshProfile,
       }}
     >
       {children}

@@ -62,6 +62,7 @@ test('municipality page requires AuthGate and has no JHB default', () => {
   assert.doesNotMatch(municipalityPage, /DEFAULT_MUNI/)
   assert.doesNotMatch(municipalityPage, /['"]JHB['"]/)
   assert.doesNotMatch(municipalityPage, /pilot area/i)
+  assert.doesNotMatch(municipalityPage, /savedCode/)
 })
 
 test('planning empty copy no longer promises pilot-area substitute', () => {

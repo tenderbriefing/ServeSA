@@ -132,7 +132,7 @@ export function CitizenReportDemo() {
                     </div>
                     <div className="flex items-center gap-2 text-caption text-ink-muted">
                       <MapPin className="h-3.5 w-3.5 text-primary-600" aria-hidden />
-                      Midrand · Johannesburg
+                      Example area · Sample city
                     </div>
                   </div>
                 )}
@@ -168,7 +168,7 @@ export function CitizenReportDemo() {
                     <div className="rounded-md border border-primary-200 bg-primary-50 px-3 py-3 text-center">
                       <p className="text-[11px] text-primary-700">Your case number</p>
                       <p className="font-mono text-base font-semibold text-primary-900">
-                        CASE-JHB-28471
+                        CASE-DEMO-28471
                       </p>
                       <p className="mt-1 text-[10px] text-ink-subtle">Example demo reference</p>
                     </div>

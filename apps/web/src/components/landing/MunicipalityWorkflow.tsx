@@ -74,11 +74,11 @@ export function MunicipalityWorkflow() {
             <DeviceFrame label="Citizen case view preview" className="max-w-[260px]">
               <div className="space-y-3 p-4 pt-7">
                 <p className="text-caption font-semibold text-primary-700">My Case</p>
-                <p className="font-mono text-sm font-semibold text-ink">CASE-JHB-28471</p>
+                <p className="font-mono text-sm font-semibold text-ink">CASE-DEMO-28471</p>
                 <p className="text-body-sm text-ink-muted">Roads & Infrastructure · Pothole</p>
                 <AnimatedCaseStatus activeIndex={Math.min(phase, 4)} />
                 <div className="rounded-md border border-border bg-surface-muted/60 px-3 py-2 text-caption text-ink-muted">
-                  Midrand · Photo attached · Submitted today
+                  Example suburb · Photo attached · Submitted today
                 </div>
               </div>
             </DeviceFrame>
@@ -112,7 +112,7 @@ export function MunicipalityWorkflow() {
                 <div className="rounded-md border border-primary-200 bg-primary-50/50 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-mono text-caption font-semibold text-ink">
-                      CASE-JHB-28471
+                      CASE-DEMO-28471
                     </p>
                     <span className="text-[11px] text-ink-subtle">Ward 84</span>
                   </div>

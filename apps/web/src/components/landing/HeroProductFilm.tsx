@@ -136,7 +136,7 @@ export function HeroProductFilm({ className }: { className?: string }) {
                 <div className="rounded-md border border-primary-200 bg-primary-50 px-2.5 py-2">
                   <p className="text-[11px] text-primary-700">Case created</p>
                   <p className="font-mono text-sm font-semibold text-primary-900">
-                    CASE-JHB-28471
+                    CASE-DEMO-28471
                   </p>
                   <p className="mt-0.5 text-[10px] text-ink-subtle">Example demo reference</p>
                 </div>
@@ -167,7 +167,7 @@ export function HeroProductFilm({ className }: { className?: string }) {
               <circle cx="70" cy="40" r="5" fill="rgb(0 122 77)" />
               <circle cx="180" cy="30" r="6" fill="rgb(0 35 149)" />
               <text x="100" y="108" fontSize="9" fill="rgb(70 83 95)">
-                City of Johannesburg
+                City of Example Metro
               </text>
             </svg>
           </div>
@@ -183,7 +183,7 @@ export function HeroProductFilm({ className }: { className?: string }) {
           <div className="rounded-xl border border-border bg-surface p-3 shadow-md">
             <div className="flex items-center justify-between gap-2">
               <p className="text-caption font-medium text-ink">Operations queue</p>
-              <span className="font-mono text-[11px] text-ink-subtle">CASE-JHB-28471</span>
+              <span className="font-mono text-[11px] text-ink-subtle">CASE-DEMO-28471</span>
             </div>
             <p className="mt-1 text-body-sm text-ink-muted">Roads · Ward 84 · Pothole</p>
             <div className="mt-3">

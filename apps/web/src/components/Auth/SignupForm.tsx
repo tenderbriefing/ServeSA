@@ -108,6 +108,7 @@ export function SignupForm({ onSuccess, onSwitchToLogin, hideHeader }: SignupFor
       await signUpWithEmail(formData.email, formData.password, {
         displayName: `${formData.firstName} ${formData.lastName}`,
         municipalityCode: formData.municipality || undefined,
+        province: formData.province || undefined,
         phone: formData.phone || undefined,
       })
       onSuccess?.()

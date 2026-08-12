@@ -14,44 +14,45 @@ type DemoUpdate = {
   areas: string
 }
 
+/** Illustrative sample notices — never treated as live municipal data */
 const DEMO_UPDATES: DemoUpdate[] = [
   {
-    org: 'Johannesburg Water',
+    org: 'Example Water Utility',
     type: 'planned_maintenance',
     title: 'Planned maintenance',
     when: 'Wednesday · 08:00–16:00',
-    areas: 'Midrand · Vorna Valley · Halfway Gardens',
+    areas: 'Example suburb A · Suburb B · Suburb C',
   },
   {
-    org: 'City Power',
+    org: 'Example Electricity Utility',
     type: 'electricity_interruption',
     title: 'Electricity updates',
     when: 'Thursday · 09:00–14:00',
-    areas: 'Alexandra · Wynberg',
+    areas: 'Example suburb D · Suburb E',
   },
   {
-    org: 'JRA',
+    org: 'Example Roads Agency',
     type: 'road_closure',
     title: 'Road closures',
     when: 'Friday · 06:00–18:00',
-    areas: 'Sandton Drive · Grayston',
+    areas: 'Example Main Road · Connector Avenue',
   },
   {
-    org: 'City of Johannesburg',
+    org: 'Example Metro Municipality',
     type: 'public_meeting',
     title: 'Community meetings',
     when: 'Saturday · 10:00',
-    areas: 'Ward 84 community hall',
+    areas: 'Example ward community hall',
   },
   {
-    org: 'Johannesburg Water',
+    org: 'Example Water Utility',
     type: 'water_interruption',
     title: 'Water interruptions',
     when: 'Monday · 22:00–04:00',
-    areas: 'Diepsloot Ext. 5',
+    areas: 'Example Ext. 5',
   },
   {
-    org: 'Development Planning',
+    org: 'Example Development Planning',
     type: 'development_update',
     title: 'New developments',
     when: 'Programme update',
@@ -82,7 +83,7 @@ export function MunicipalUpdatesPreview() {
               Verified municipal notices — not a social feed.
             </p>
             <p className="mt-2 text-caption text-ink-subtle">
-              Example demo notices for illustration only.
+              Sample illustration only — not live notices from any municipality.
             </p>
           </div>
         </MotionReveal>
@@ -95,7 +96,12 @@ export function MunicipalUpdatesPreview() {
                   'h-full rounded-lg border border-border bg-canvas p-4 transition-shadow duration-base hover:shadow-sm'
                 )}
               >
-                <p className="text-caption font-medium text-primary-700">{item.org}</p>
+                <p className="text-[11px] font-medium uppercase tracking-wide text-ink-subtle">
+                  Example demo
+                </p>
+                <p className="mt-1 text-caption font-medium text-primary-700">
+                  {item.org}
+                </p>
                 <h3 className="mt-1 font-display text-h4 text-ink">{item.title}</h3>
                 <p className="mt-1 text-caption text-ink-subtle">
                   {MUNICIPAL_UPDATE_TYPE_LABEL[item.type]}

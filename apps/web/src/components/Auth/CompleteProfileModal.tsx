@@ -18,7 +18,7 @@ interface CompleteProfileModalProps {
 }
 
 export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalProps) {
-  const { user, userProfile } = useAuth()
+  const { user, userProfile, refreshProfile } = useAuth()
   const [formData, setFormData] = useState({
     phone: userProfile?.phone || '',
     province: userProfile?.province || '',
@@ -55,6 +55,7 @@ export function CompleteProfileModal({ isOpen, onClose }: CompleteProfileModalPr
         municipalityCode: formData.municipalityCode,
         updatedAt: new Date()
       })
+      await refreshProfile()
 
       setSuccess(true)
       setTimeout(() => {
