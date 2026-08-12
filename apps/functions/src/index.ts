@@ -87,6 +87,11 @@ import {
   getMunicipalProjectOps,
 } from './planning/municipalPlanning'
 import {
+  refreshMunicipalFinanceBatch,
+  refreshMunicipalFinanceSnapshot,
+  DEFAULT_TREASURY_REFRESH_MUNICIPALITIES,
+} from './treasury/TreasuryMunicipalFinanceService'
+import {
   uploadPlanningDocumentOps,
   processPlanningDocumentOps,
   updatePlanningAiDraftOps,
@@ -739,6 +744,56 @@ export const getMunicipalPlanningSummaryFunction = onCall(async (request) => {
     mapCallableError(error)
   }
 })
+
+/**
+ * National Treasury municipal finance refresh — official/admin only.
+ * Citizen path reads Firestore cache only (no open Treasury proxy).
+ */
+export const refreshMunicipalFinanceFunction = onCall(
+  {
+    timeoutSeconds: 300,
+    memory: '512MiB',
+  },
+  async (request) => {
+    try {
+      assertOfficial({
+        uid: request.auth?.uid || '',
+        token: (request.auth?.token || null) as Record<string, unknown> | null,
+      })
+      const codes = Array.isArray(request.data?.municipalityCodes)
+        ? (request.data.municipalityCodes as string[])
+        : request.data?.municipalityCode
+          ? [String(request.data.municipalityCode)]
+          : [...DEFAULT_TREASURY_REFRESH_MUNICIPALITIES]
+      if (codes.length === 1) {
+        return {
+          success: true,
+          ...(await refreshMunicipalFinanceSnapshot(codes[0])),
+        }
+      }
+      return await refreshMunicipalFinanceBatch(codes)
+    } catch (error) {
+      mapCallableError(error)
+    }
+  }
+)
+
+/**
+ * Weekly Treasury refresh — Section 71 data updates quarterly; weekly is enough.
+ * Does not enable the municipal publishing engine.
+ */
+export const refreshMunicipalFinanceScheduled = onSchedule(
+  {
+    schedule: '0 3 * * 0',
+    region: 'europe-west1',
+    timeZone: 'Africa/Johannesburg',
+    timeoutSeconds: 540,
+    memory: '512MiB',
+  },
+  async () => {
+    await refreshMunicipalFinanceBatch([...DEFAULT_TREASURY_REFRESH_MUNICIPALITIES])
+  }
+)
 
 export const getMunicipalProjectFunction = onCall(async (request) => {
   try {

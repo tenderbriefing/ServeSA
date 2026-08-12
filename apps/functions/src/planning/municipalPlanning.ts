@@ -22,6 +22,7 @@ import {
   selectMajorMunicipalProjects,
   type PlanPublicationStatus,
 } from '@servesa/case-contract'
+import { getMunicipalFinanceSnapshotCached } from '../treasury/TreasuryMunicipalFinanceService'
 import {
   AuthCtx,
   OpsError,
@@ -478,32 +479,35 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
   // wardId accepted for backwards compatibility but must NOT shape the snapshot
   const wardIdIgnored = parsed.wardId?.trim() || null
 
-  const [prioritiesSnap, projectsSnap, budgetSnap, docsSnap] = await Promise.all([
-    db
-      .collection(COLLECTIONS.priority)
-      .where('municipalityCode', '==', municipalityCode)
-      .where('publicationStatus', '==', 'published')
-      .limit(40)
-      .get(),
-    db
-      .collection(COLLECTIONS.project)
-      .where('municipalityCode', '==', municipalityCode)
-      .where('publicationStatus', '==', 'published')
-      .limit(80)
-      .get(),
-    db
-      .collection(COLLECTIONS.budget_line)
-      .where('municipalityCode', '==', municipalityCode)
-      .where('publicationStatus', '==', 'published')
-      .limit(40)
-      .get(),
-    db
-      .collection(COLLECTIONS.document)
-      .where('municipalityCode', '==', municipalityCode)
-      .where('publicationStatus', '==', 'published')
-      .limit(20)
-      .get(),
-  ])
+  const [prioritiesSnap, projectsSnap, budgetSnap, docsSnap, treasuryFinance] =
+    await Promise.all([
+      db
+        .collection(COLLECTIONS.priority)
+        .where('municipalityCode', '==', municipalityCode)
+        .where('publicationStatus', '==', 'published')
+        .limit(40)
+        .get(),
+      db
+        .collection(COLLECTIONS.project)
+        .where('municipalityCode', '==', municipalityCode)
+        .where('publicationStatus', '==', 'published')
+        .limit(80)
+        .get(),
+      db
+        .collection(COLLECTIONS.budget_line)
+        .where('municipalityCode', '==', municipalityCode)
+        .where('publicationStatus', '==', 'published')
+        .limit(40)
+        .get(),
+      db
+        .collection(COLLECTIONS.document)
+        .where('municipalityCode', '==', municipalityCode)
+        .where('publicationStatus', '==', 'published')
+        .limit(20)
+        .get(),
+      // Cache-only — never live-call Treasury on citizen page render
+      getMunicipalFinanceSnapshotCached(municipalityCode).catch(() => null),
+    ])
 
   const priorities = prioritiesSnap.docs
     .map((d) => serializeTimestamps(d.data() as Record<string, unknown>))
@@ -595,6 +599,10 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     snapshotMode: 'municipality',
   })
 
+  const hasTreasuryFinance = Boolean(
+    treasuryFinance && !treasuryFinance.empty && treasuryFinance.operatingBudget
+  )
+
   return {
     success: true,
     municipalityCode,
@@ -605,6 +613,11 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     projects,
     budgetLines,
     documents,
+    /**
+     * National Treasury municipal finance (cached/normalised).
+     * Independent of IDP publishing engine — null/empty when cache miss.
+     */
+    treasuryFinance: treasuryFinance || null,
     /** Ward community section removed from My Municipality product */
     community: {
       wardId: null,
@@ -615,7 +628,8 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     empty:
       priorities.length === 0 &&
       projects.length === 0 &&
-      budgetLines.length === 0,
+      budgetLines.length === 0 &&
+      !hasTreasuryFinance,
     emptyCopy: PLANNING_EMPTY_COPY.municipalitySnapshotComingSoon,
     emptyBody: PLANNING_EMPTY_COPY.municipalitySnapshotComingSoonBody,
     contractVersion: MUNICIPAL_PLANNING_CONTRACT_VERSION,
