@@ -1,7 +1,9 @@
 # National Treasury Municipal Finance Integration Certification
 
 **Branch:** `feat/treasury-municipal-finance`  
+**PR:** https://github.com/tenderbriefing/ServeSA/pull/29  
 **Starting SHA:** `4f45d10a6ecd685862bf43f7121fcda8f5a9a691` (PR #28 My Municipality snapshot merged to main)  
+**Final SHA:** `dd3e8766c86e75305e5676178a8ac75f702358c2`  
 **Product surface:** `/municipality` (My Municipality Snapshot)  
 **Publishing engine:** remains **OFF** (Treasury finance is decoupled)
 
