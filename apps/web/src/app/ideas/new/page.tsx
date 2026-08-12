@@ -4,9 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { communityApi } from '@/lib/api/community'
-import { useAuth } from '@/hooks/useAuth'
 import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
+import { CitizenMunicipalityGate } from '@/components/municipality/CitizenMunicipalityGate'
 import { Button } from '@/components/ui/Button'
+import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 import {
   COMMUNITY_IDEA_CATEGORY_LABEL,
   CommunityIdeaCategorySchema,
@@ -14,10 +15,8 @@ import {
 
 const STEPS = ['What', 'Where', 'Type', 'Review'] as const
 
-export default function NewIdeaPage() {
-  const { user, loading } = useAuth()
-  const { municipalityCode: muni, loading: muniLoading } =
-    useCitizenMunicipality()
+function NewIdeaForm() {
+  const { municipalityCode: muni } = useCitizenMunicipality()
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [title, setTitle] = useState('')
@@ -27,31 +26,7 @@ export default function NewIdeaPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (loading || muniLoading) {
-    return <div className="container py-12 text-ink-muted">Checking sign-in…</div>
-  }
-
-  if (!user) {
-    router.replace('/auth/signin?next=/ideas/new')
-    return null
-  }
-
-  if (!muni) {
-    return (
-      <div className="container max-w-lg py-12">
-        <h1 className="font-display text-h2 text-ink">Confirm your municipality</h1>
-        <p className="mt-3 text-body text-ink-muted">
-          Ideas are scoped to your municipality. Confirm where you live before
-          sharing an idea.
-        </p>
-        <div className="mt-6">
-          <Link href="/municipality">
-            <Button>Confirm your municipality</Button>
-          </Link>
-        </div>
-      </div>
-    )
-  }
+  const displayName = getMunicipalityDisplayName(muni)
 
   const canNext =
     (step === 0 && title.trim().length >= 5 && description.trim().length >= 20) ||
@@ -60,6 +35,7 @@ export default function NewIdeaPage() {
     step === 3
 
   const submit = async () => {
+    if (!muni) return
     setSubmitting(true)
     setError(null)
     try {
@@ -89,6 +65,7 @@ export default function NewIdeaPage() {
         Guided idea submission
       </h1>
       <p className="mt-2 text-body-sm text-ink-muted">
+        Your Municipality: <strong className="text-ink">{displayName}</strong>.
         This is for constructive suggestions. Broken infrastructure belongs on{' '}
         <Link href="/report" className="text-primary-700 underline">
           Report an Issue
@@ -146,8 +123,8 @@ export default function NewIdeaPage() {
         {step === 1 && (
           <>
             <p className="text-body-sm text-ink-muted">
-              Municipality: <strong>{muni}</strong> (from your profile or
-              location preference)
+              Municipality: <strong>{displayName}</strong> (from your confirmed
+              municipality)
             </p>
             <label className="block text-sm font-medium text-ink" htmlFor="suburb">
               Suburb or area (optional)
@@ -192,7 +169,7 @@ export default function NewIdeaPage() {
               <strong>Description:</strong> {description}
             </p>
             <p className="mt-2">
-              <strong>Where:</strong> {muni}
+              <strong>Where:</strong> {displayName}
               {suburbLabel ? ` · ${suburbLabel}` : ''}
             </p>
             <p className="mt-2">
@@ -242,5 +219,19 @@ export default function NewIdeaPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function NewIdeaPage() {
+  return (
+    <CitizenMunicipalityGate
+      next="/ideas/new"
+      authTitle="Sign in to share an idea"
+      authDescription="Ideas are scoped to your municipality. Sign in, then confirm where you live if needed."
+      confirmTitle="Confirm your municipality"
+      confirmDescription="Ideas are scoped to your municipality. Confirm where you live before sharing an idea."
+    >
+      <NewIdeaForm />
+    </CitizenMunicipalityGate>
   )
 }

@@ -72,14 +72,50 @@ test('southAfricaData exports national validators', () => {
   assert.match(data, /code: 'BUF'/)
 })
 
-test('shared CitizenMunicipalityGate used by updates and ideas', () => {
+test('shared CitizenMunicipalityGate used by updates, ideas, and new idea', () => {
   const gate = read('src/components/municipality/CitizenMunicipalityGate.tsx')
   const updates = read('src/app/updates/page.tsx')
   const ideas = read('src/app/ideas/page.tsx')
+  const ideasNew = read('src/app/ideas/new/page.tsx')
   assert.match(gate, /AuthGate/)
   assert.match(gate, /ConfirmMunicipalityPanel/)
   assert.match(updates, /CitizenMunicipalityGate/)
   assert.match(ideas, /CitizenMunicipalityGate/)
+  assert.match(ideasNew, /CitizenMunicipalityGate/)
+})
+
+test('CompleteProfileModal requires province and municipality when saving', () => {
+  const modal = read('src/components/Auth/CompleteProfileModal.tsx')
+  assert.match(modal, /isValidMunicipalitySelection/)
+  assert.match(modal, /MunicipalitySelectFields/)
+  assert.match(modal, /required/)
+  assert.match(modal, /showWard/)
+  assert.doesNotMatch(modal, /Province <span className="text-ink-subtle">\(optional\)<\/span>/)
+})
+
+test('UserSchema includes province with municipalityCode and wardId', () => {
+  const types = read('src/types/index.ts')
+  assert.match(types, /province:\s*z\.string\(\)\.optional\(\)/)
+  assert.match(types, /municipalityCode:\s*z\.string\(\)\.optional\(\)/)
+  assert.match(types, /wardId:\s*z\.string\(\)\.optional\(\)/)
+})
+
+test('Header surfaces Your Municipality context when resolved', () => {
+  const header = read('src/components/layout/Header.tsx')
+  assert.match(header, /Your Municipality/)
+  assert.match(header, /useCitizenMunicipality/)
+  assert.match(header, /getMunicipalityDisplayName/)
+})
+
+test('canonical municipality codes cover national samples', () => {
+  const data = read('src/lib/southAfricaData.ts')
+  // eThekwini is DBN in the Serve SA dataset (not ETH)
+  assert.match(data, /code: 'DBN'[\s\S]*?eThekwini/)
+  assert.match(data, /code: 'JHB'/)
+  assert.match(data, /code: 'CPT'/)
+  assert.match(data, /code: 'POL'/)
+  assert.match(data, /code: 'BUF'/)
+  assert.match(data, /code: 'TSH'/)
 })
 
 test('ops planning has no JHB fallback', () => {

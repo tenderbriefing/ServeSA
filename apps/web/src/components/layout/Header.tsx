@@ -18,6 +18,8 @@ import {
   Building2,
 } from 'lucide-react'
 import { FEATURE_FLAGS } from '@/lib/constants'
+import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
+import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
 import { useEffect, useId, useRef, useState } from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
@@ -37,6 +39,10 @@ const basePrimaryLinks = [
 
 export function Header() {
   const { user, userProfile, isOfficial, isAdmin } = useAuth()
+  const { municipalityCode } = useCitizenMunicipality()
+  const municipalityLabel = municipalityCode
+    ? getMunicipalityDisplayName(municipalityCode)
+    : null
   const { isOnline } = useOffline()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -163,6 +169,16 @@ export function Header() {
 
             {user ? (
               <div className="flex items-center gap-2 pl-1">
+                {municipalityLabel ? (
+                  <Link
+                    href="/account"
+                    className="hidden max-w-[12rem] truncate rounded-md px-2 py-1 text-caption text-ink-muted hover:bg-surface-muted hover:text-ink lg:inline"
+                    title={`Your Municipality: ${municipalityLabel}`}
+                  >
+                    Your Municipality:{' '}
+                    <span className="font-medium text-ink">{municipalityLabel}</span>
+                  </Link>
+                ) : null}
                 {isOfficial && (
                   <Badge className="bg-green-100 text-green-800">Staff</Badge>
                 )}
