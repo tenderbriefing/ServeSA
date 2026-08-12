@@ -6,7 +6,6 @@ import { CaseJourney } from '@/components/landing/CaseJourney'
 import { CitizenReportDemo } from '@/components/landing/CitizenReportDemo'
 import { MunicipalityWorkflow } from '@/components/landing/MunicipalityWorkflow'
 import { MunicipalUpdatesPreview } from '@/components/landing/MunicipalUpdatesPreview'
-import { MunicipalityPlanningPreview } from '@/components/landing/MunicipalityPlanningPreview'
 import { CommunityIdeasPreview } from '@/components/landing/CommunityIdeasPreview'
 import { CivicImpactMap } from '@/components/landing/CivicImpactMap'
 import { TrustPrinciples } from '@/components/landing/TrustPrinciples'
@@ -34,7 +33,6 @@ export default function HomePage() {
       <CitizenReportDemo />
       <MunicipalityWorkflow />
       <MunicipalUpdatesPreview />
-      <MunicipalityPlanningPreview />
       <CommunityIdeasPreview />
       <CivicImpactMap />
       <TrustPrinciples />

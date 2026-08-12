@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Megaphone } from 'lucide-react'
 import { communityApi } from '@/lib/api/community'
-import { useAuth } from '@/hooks/useAuth'
+import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/LoadingSkeleton'
@@ -24,14 +24,9 @@ type UpdateRow = {
   targeting?: { affectedAreaLabel?: string | null; wardIds?: string[] }
 }
 
-const DEFAULT_MUNI = 'JHB'
-
 export default function UpdatesPage() {
-  const { userProfile, municipalityCode } = useAuth()
-  const muni =
-    municipalityCode ||
-    (userProfile as { municipalityCode?: string } | null)?.municipalityCode ||
-    DEFAULT_MUNI
+  const { municipalityCode: muni, loading: muniLoading } =
+    useCitizenMunicipality()
   const [updates, setUpdates] = useState<UpdateRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +34,12 @@ export default function UpdatesPage() {
 
   useEffect(() => {
     if (!FEATURE_FLAGS.enableCommunityEngagement) return
+    if (muniLoading) return
+    if (!muni) {
+      setLoading(false)
+      setUpdates([])
+      return
+    }
     let cancelled = false
     ;(async () => {
       setLoading(true)
@@ -63,12 +64,29 @@ export default function UpdatesPage() {
     return () => {
       cancelled = true
     }
-  }, [muni, typeFilter])
+  }, [muni, muniLoading, typeFilter])
 
   if (!FEATURE_FLAGS.enableCommunityEngagement) {
     return (
       <div className="container py-12">
         <p className="text-ink-muted">Municipal Updates are not enabled.</p>
+      </div>
+    )
+  }
+
+  if (!muniLoading && !muni) {
+    return (
+      <div className="container max-w-3xl py-12">
+        <h1 className="font-display text-h2 text-ink">Municipal Updates</h1>
+        <p className="mt-3 text-body text-ink-muted">
+          Confirm your municipality to see verified local updates. Serve SA will
+          not show another municipality’s notices as a substitute.
+        </p>
+        <div className="mt-6">
+          <Link href="/municipality">
+            <Button>Confirm your municipality</Button>
+          </Link>
+        </div>
       </div>
     )
   }

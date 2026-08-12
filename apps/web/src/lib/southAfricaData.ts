@@ -133,3 +133,22 @@ export const getProvinceByMunicipality = (municipalityCode: string): Province | 
     province.municipalities.some(municipality => municipality.code === municipalityCode)
   ) || null
 }
+
+export function getMunicipalityByCode(
+  municipalityCode: string | null | undefined
+): Municipality | null {
+  const code = (municipalityCode || '').trim().toUpperCase()
+  if (!code) return null
+  return getAllMunicipalities().find((m) => m.code === code) || null
+}
+
+export function getMunicipalityDisplayName(
+  municipalityCode: string | null | undefined
+): string {
+  const found = getMunicipalityByCode(municipalityCode)
+  if (!found) return municipalityCode?.trim() || 'Your municipality'
+  if (found.type === 'Metropolitan') {
+    return `${found.name} Metropolitan Municipality`
+  }
+  return found.name
+}

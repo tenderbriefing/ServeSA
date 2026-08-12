@@ -23,7 +23,6 @@ test('homepage composes cinematic landing sections', () => {
     'CitizenReportDemo',
     'MunicipalityWorkflow',
     'MunicipalUpdatesPreview',
-    'MunicipalityPlanningPreview',
     'CommunityIdeasPreview',
     'CivicImpactMap',
     'TrustPrinciples',
@@ -32,6 +31,7 @@ test('homepage composes cinematic landing sections', () => {
   ]) {
     assert.match(page, new RegExp(name))
   }
+  assert.doesNotMatch(page, /MunicipalityPlanningPreview/)
 })
 
 test('landing components exist as modular files', () => {

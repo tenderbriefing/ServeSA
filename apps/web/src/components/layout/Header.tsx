@@ -59,7 +59,8 @@ export function Header() {
 
   const primaryLinks = basePrimaryLinks.filter((link) => {
     if (link.href === '/municipality') {
-      return FEATURE_FLAGS.enableMunicipalPlanning
+      // Authenticated citizens only — never expose Our Municipality to anonymous visitors
+      return Boolean(user) && FEATURE_FLAGS.enableMunicipalPlanning
     }
     if (link.href === '/updates' || link.href === '/ideas') {
       return FEATURE_FLAGS.enableCommunityEngagement

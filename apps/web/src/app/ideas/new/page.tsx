@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { communityApi } from '@/lib/api/community'
 import { useAuth } from '@/hooks/useAuth'
+import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
 import { Button } from '@/components/ui/Button'
 import {
   COMMUNITY_IDEA_CATEGORY_LABEL,
@@ -14,7 +15,9 @@ import {
 const STEPS = ['What', 'Where', 'Type', 'Review'] as const
 
 export default function NewIdeaPage() {
-  const { user, userProfile, municipalityCode, loading } = useAuth()
+  const { user, loading } = useAuth()
+  const { municipalityCode: muni, loading: muniLoading } =
+    useCitizenMunicipality()
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [title, setTitle] = useState('')
@@ -24,21 +27,30 @@ export default function NewIdeaPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const muni = useMemo(
-    () =>
-      municipalityCode ||
-      (userProfile as { municipalityCode?: string } | null)?.municipalityCode ||
-      'JHB',
-    [municipalityCode, userProfile]
-  )
-
-  if (loading) {
+  if (loading || muniLoading) {
     return <div className="container py-12 text-ink-muted">Checking sign-in…</div>
   }
 
   if (!user) {
     router.replace('/auth/signin?next=/ideas/new')
     return null
+  }
+
+  if (!muni) {
+    return (
+      <div className="container max-w-lg py-12">
+        <h1 className="font-display text-h2 text-ink">Confirm your municipality</h1>
+        <p className="mt-3 text-body text-ink-muted">
+          Ideas are scoped to your municipality. Confirm where you live before
+          sharing an idea.
+        </p>
+        <div className="mt-6">
+          <Link href="/municipality">
+            <Button>Confirm your municipality</Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const canNext =

@@ -48,14 +48,14 @@ export function FinalCTA({ signedIn = false }: FinalCTAProps) {
               </Link>
             </div>
             <div className="mt-6 flex flex-col items-center gap-2 text-body-sm">
-              {FEATURE_FLAGS.enableMunicipalPlanning && (
+              {signedIn && FEATURE_FLAGS.enableMunicipalPlanning ? (
                 <Link
                   href="/municipality"
                   className="font-medium text-primary-700 underline-offset-4 hover:underline"
                 >
-                  Explore Your Municipality
+                  Our Municipality
                 </Link>
-              )}
+              ) : null}
               <Link
                 href={signedIn ? '/dashboard' : '/auth/signin'}
                 className="text-ink-muted underline-offset-4 hover:underline"

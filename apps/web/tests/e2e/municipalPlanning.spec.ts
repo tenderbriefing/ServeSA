@@ -1,25 +1,18 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Municipal planning citizen surfaces — structural smoke.
- * Feature is ON by default (non-staged); expects heading, empty, or load error.
- * Set NEXT_PUBLIC_ENABLE_MUNICIPAL_PLANNING=false to expect disabled copy.
+ * Municipal planning citizen surfaces — auth-gated; no anonymous JHB fallback.
  * Uses .html paths so local static `out/` servers work without Firebase cleanUrls.
  */
 test.describe('municipal planning @planning', () => {
-  test('municipality route loads with honest empty or disabled state', async ({
-    page,
-  }) => {
+  test('anonymous municipality route requires sign-in', async ({ page }) => {
     await page.goto('/municipality.html')
-    const disabled = page.getByText(/not enabled for this area/i)
-    const heading = page.getByRole('heading', {
-      name: /What your municipality plans to do/i,
-    })
-    const empty = page.getByText(/Not published yet/i)
-    const loadError = page.getByText(/Unable to load municipal planning/i)
     await expect(
-      disabled.or(heading).or(empty).or(loadError).first()
+      page.getByRole('heading', { name: /Sign in to view Our Municipality/i })
     ).toBeVisible({ timeout: 20_000 })
+    await expect(page.getByRole('link', { name: /Sign in/i }).first()).toBeVisible()
+    await expect(page.getByText(/\bJHB\b/)).toHaveCount(0)
+    await expect(page.getByText(/pilot area/i)).toHaveCount(0)
   })
 
   test('ops planning route exists under staff shell path', async ({ page }) => {

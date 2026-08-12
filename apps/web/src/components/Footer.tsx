@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
 import { brandCopy } from '@/lib/design-tokens'
 import { FEATURE_FLAGS } from '@/lib/constants'
+import { useAuth } from '@/hooks/useAuth'
 
 const baseNavLinks = [
   { href: '/report', label: 'Report an Issue' },
@@ -19,10 +22,11 @@ const footerLinkClass =
   'rounded-sm text-[13px] leading-none text-neutral-300 transition-colors duration-150 ease-civic hover:text-gold-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-inverse md:text-sm'
 
 export function Footer() {
+  const { user } = useAuth()
   const year = new Date().getFullYear()
   const navLinks = baseNavLinks.filter((link) => {
     if (link.href === '/municipality') {
-      return FEATURE_FLAGS.enableMunicipalPlanning
+      return Boolean(user) && FEATURE_FLAGS.enableMunicipalPlanning
     }
     if (link.href === '/updates' || link.href === '/ideas') {
       return FEATURE_FLAGS.enableCommunityEngagement
