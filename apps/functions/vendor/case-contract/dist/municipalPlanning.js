@@ -1,15 +1,17 @@
 "use strict";
 /**
- * Municipal Planning (Visual IDP Summary) — shared typed contract.
+ * Municipal Planning (Municipality Snapshot) — shared typed contract.
  *
- * Source of truth for budgets, dates, %, status, ward, and expenditure is
+ * Source of truth for budgets, dates, %, status, and expenditure is
  * verified municipal documents — never AI. AI may assist summarisation only
  * and must be labelled as ServeSA plain-language summary.
+ * Citizen My Municipality is municipality-level; ward must not shape the snapshot.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PLANNING_EMPTY_COPY = exports.ListPlanningEntitiesInputSchema = exports.GetMunicipalProjectInputSchema = exports.GetMunicipalPlanningSummaryInputSchema = exports.TransitionPlanningStatusInputSchema = exports.UpsertBudgetLineInputSchema = exports.UpsertMunicipalProjectInputSchema = exports.UpsertPriorityInputSchema = exports.UpsertPlanDocumentInputSchema = exports.MoneyAmountSchema = exports.SourceReferenceSchema = exports.AccountabilityLayerSchema = exports.DATA_CONFIDENCE_LABEL = exports.DataConfidenceSchema = exports.PROJECT_SCOPE_LABEL = exports.ProjectScopeSchema = exports.MUNICIPAL_PROJECT_STATUS_LABEL = exports.MunicipalProjectStatusSchema = exports.PLAN_PUBLICATION_TRANSITIONS = exports.PlanPublicationStatusSchema = exports.PLAN_DOCUMENT_KIND_LABEL = exports.PlanDocumentKindSchema = exports.MUNICIPAL_PLANNING_CONTRACT_VERSION = void 0;
+exports.MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT = exports.MUNICIPALITY_SNAPSHOT_PRIORITY_LIMIT = exports.PLANNING_EMPTY_COPY = exports.ListPlanningEntitiesInputSchema = exports.GetMunicipalProjectInputSchema = exports.GetMunicipalPlanningSummaryInputSchema = exports.TransitionPlanningStatusInputSchema = exports.UpsertBudgetLineInputSchema = exports.UpsertMunicipalProjectInputSchema = exports.UpsertPriorityInputSchema = exports.UpsertPlanDocumentInputSchema = exports.MoneyAmountSchema = exports.SourceReferenceSchema = exports.AccountabilityLayerSchema = exports.DATA_CONFIDENCE_LABEL = exports.DataConfidenceSchema = exports.PROJECT_SCOPE_LABEL = exports.ProjectScopeSchema = exports.MUNICIPAL_PROJECT_STATUS_LABEL = exports.MunicipalProjectStatusSchema = exports.PLAN_PUBLICATION_TRANSITIONS = exports.PlanPublicationStatusSchema = exports.PLAN_DOCUMENT_KIND_LABEL = exports.PlanDocumentKindSchema = exports.MUNICIPAL_PLANNING_CONTRACT_VERSION = void 0;
 exports.canTransitionPlanPublication = canTransitionPlanPublication;
 exports.assertPlanPublicationTransition = assertPlanPublicationTransition;
+exports.selectMajorMunicipalProjects = selectMajorMunicipalProjects;
 const zod_1 = require("zod");
 exports.MUNICIPAL_PLANNING_CONTRACT_VERSION = '1.0.0';
 /** Official planning document kinds supported by the ingestion pipeline */
@@ -84,12 +86,13 @@ exports.MunicipalProjectStatusSchema = zod_1.z.enum([
 exports.MUNICIPAL_PROJECT_STATUS_LABEL = {
     planned: 'Planned',
     procurement: 'Procurement',
-    tender_awarded: 'Tender Awarded',
-    in_progress: 'In Progress',
+    tender_awarded: 'Tender awarded',
+    /** Official in-progress only — never imply construction from IDP listing alone */
+    in_progress: 'In implementation',
     delayed: 'Delayed',
     completed: 'Completed',
     cancelled: 'Cancelled',
-    unknown: 'Unknown',
+    unknown: 'Status not published',
 };
 exports.ProjectScopeSchema = zod_1.z.enum([
     'municipality_wide',
@@ -229,7 +232,10 @@ exports.TransitionPlanningStatusInputSchema = zod_1.z.object({
 });
 exports.GetMunicipalPlanningSummaryInputSchema = zod_1.z.object({
     municipalityCode: zod_1.z.string().min(1).max(32),
-    /** Optional ward for YOUR COMMUNITY section — never invent if absent */
+    /**
+     * Deprecated for My Municipality snapshot — ward is not used to construct
+     * the citizen planning view. Accepted for backwards compatibility only.
+     */
     wardId: zod_1.z.string().max(64).optional().nullable(),
     fiscalYear: zod_1.z.string().max(16).optional(),
 });
@@ -249,6 +255,53 @@ exports.ListPlanningEntitiesInputSchema = zod_1.z.object({
 exports.PLANNING_EMPTY_COPY = {
     notPublished: 'Not published yet',
     awaitingVerification: 'Data awaiting verification',
+    /** @deprecated Ward planning is not part of My Municipality snapshot */
     noWardMapping: 'Ward-level project mapping is not available for this municipality yet.',
-    resolutionUnavailable: 'We could not confirm your municipality yet. Confirm where you live to see local planning information.',
+    resolutionUnavailable: 'We could not confirm your municipality yet. Confirm where you live to see local municipal information.',
+    municipalitySnapshotComingSoon: 'Municipal information coming soon',
+    municipalitySnapshotComingSoonBody: 'We have identified your municipality. Verified planning and budget information has not yet been published on Serve SA.',
 };
+/** Deterministic major-project selection for citizen Municipality Snapshot */
+exports.MUNICIPALITY_SNAPSHOT_PRIORITY_LIMIT = 6;
+exports.MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT = 8;
+function scopeRank(scope) {
+    if (scope === 'municipality_wide')
+        return 0;
+    if (scope === 'regional')
+        return 1;
+    if (scope === 'ward_specific')
+        return 3;
+    return 2;
+}
+function statusRank(status) {
+    const order = [
+        'in_progress',
+        'planned',
+        'procurement',
+        'tender_awarded',
+        'delayed',
+        'completed',
+        'unknown',
+        'cancelled',
+    ];
+    const i = order.indexOf(status || 'unknown');
+    return i < 0 ? 99 : i;
+}
+/**
+ * Select a small, reviewable set of major published projects.
+ * Prefers municipality-wide/regional over ward-specific; never invents data.
+ */
+function selectMajorMunicipalProjects(projects, limit = exports.MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT) {
+    return [...projects]
+        .filter((p) => p.status !== 'cancelled')
+        .sort((a, b) => {
+        const byScope = scopeRank(a.scope) - scopeRank(b.scope);
+        if (byScope)
+            return byScope;
+        const byStatus = statusRank(a.status) - statusRank(b.status);
+        if (byStatus)
+            return byStatus;
+        return Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+    })
+        .slice(0, Math.max(0, limit));
+}

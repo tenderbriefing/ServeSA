@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Building2, Lightbulb } from 'lucide-react'
 import { planningApi } from '@/lib/api/planning'
-import { useAuth } from '@/hooks/useAuth'
 import { useCitizenMunicipality } from '@/hooks/useCitizenMunicipality'
 import { AuthGate } from '@/components/Auth/AuthGate'
 import { ConfirmMunicipalityPanel } from '@/components/municipality/ConfirmMunicipalityPanel'
@@ -15,14 +14,19 @@ import {
   FEATURE_FLAGS,
   isMunicipalPlanningEnabledFor,
 } from '@/lib/constants'
-import { PLANNING_EMPTY_COPY, PLANNING_CONTENT_MODULE_LABEL } from '@servesa/case-contract'
-import { PlanningKpiCards, type PlanningKpi } from '@/components/planning/PlanningKpiCards'
+import {
+  PLANNING_EMPTY_COPY,
+  PLAN_DOCUMENT_KIND_LABEL,
+  type PlanDocumentKind,
+} from '@servesa/case-contract'
 import { ProjectCard, type ProjectCardModel } from '@/components/planning/ProjectCard'
 import { ServeSaSummaryBanner } from '@/components/planning/SourceCitation'
-import { MunicipalityCompleteness } from '@/components/municipality/MunicipalityCompleteness'
 import { trackPlanningEvent } from '@/lib/telemetry/planning'
 import { trackPublishingEvent } from '@/lib/telemetry/publishing'
-import { getMunicipalityDisplayName } from '@/lib/southAfricaData'
+import {
+  getMunicipalityDisplayName,
+  getProvinceByMunicipality,
+} from '@/lib/southAfricaData'
 
 const BudgetBreakdown = dynamic(
   () =>
@@ -39,53 +43,82 @@ const BudgetBreakdown = dynamic(
 
 type SummaryResponse = {
   municipalityCode: string
-  wardId?: string | null
-  kpis: PlanningKpi[]
   priorities: Array<{
     priorityId: string
     title: string
     plainLanguageSummary: string
     isServeSaSummary?: boolean
-    progressPercent?: number | null
     budgeted?: { amountZar: number } | null
     sources?: unknown[]
   }>
   projects: ProjectCardModel[]
   budgetLines: Array<{
     budgetLineId: string
+    fiscalYear?: string
     categoryLabel: string
     plainLanguageLabel: string
     amount: { amountZar: number; source?: never }
   }>
-  community: {
-    wardId: string | null
-    wardMappingAvailable: boolean
-    wardProjects: ProjectCardModel[]
-    emptyCopy: string | null
-  }
   documents?: Array<{
     documentId: string
     title: string
     kind?: string
+    fiscalYear?: string | null
     officialUrl?: string | null
     publishedStoragePath?: string | null
+    publishedAt?: string | null
   }>
   empty: boolean
-  emptyCopy: string
+  emptyCopy?: string
+  emptyBody?: string
 }
 
-function MunicipalityPlanningContent({
+function formatZar(n: number) {
+  return new Intl.NumberFormat('en-ZA', {
+    style: 'currency',
+    currency: 'ZAR',
+    maximumFractionDigits: 0,
+  }).format(n)
+}
+
+function resolveFiscalYearLabel(
+  lines: SummaryResponse['budgetLines']
+): string | null {
+  const years = [
+    ...new Set(
+      lines
+        .map((l) => (l.fiscalYear || '').trim())
+        .filter(Boolean)
+    ),
+  ]
+  if (years.length === 1) return `${years[0]} Municipal Budget`
+  if (years.length > 1) return 'Municipal budget (multiple financial years)'
+  return null
+}
+
+function pickNamedBudgetMetrics(lines: SummaryResponse['budgetLines']) {
+  const find = (re: RegExp) =>
+    lines.find((l) =>
+      re.test(`${l.plainLanguageLabel} ${l.categoryLabel}`)
+    )
+  const total = find(/total\s+(municipal\s+)?budget|municipal\s+budget\s+total/i)
+  const operating = find(/operating\s+budget/i)
+  const capital = find(/capital\s+budget/i)
+  const infra = find(/infrastructure/i)
+  return { total, operating, capital, infra }
+}
+
+function MunicipalitySnapshotContent({
   municipalityCode,
-  wardId,
 }: {
   municipalityCode: string
-  wardId: string | null
 }) {
   const enabled = isMunicipalPlanningEnabledFor(municipalityCode)
   const [summary, setSummary] = useState<SummaryResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const displayName = getMunicipalityDisplayName(municipalityCode)
+  const province = getProvinceByMunicipality(municipalityCode)
 
   useEffect(() => {
     if (!FEATURE_FLAGS.enableMunicipalPlanning || !enabled) {
@@ -97,15 +130,14 @@ function MunicipalityPlanningContent({
       setLoading(true)
       setError(null)
       try {
+        // Municipality snapshot only — never pass citizen ward into planning summary
         const res = (await planningApi.getSummary({
           municipalityCode,
-          wardId,
         })) as SummaryResponse
         if (!cancelled) {
           setSummary(res)
           trackPlanningEvent('municipal_planning_page_viewed', {
             municipalityCode,
-            hasWard: Boolean(wardId),
             empty: Boolean(res.empty),
           })
           trackPublishingEvent('municipality_page_viewed', { municipalityCode })
@@ -115,7 +147,7 @@ function MunicipalityPlanningContent({
           setError(
             e instanceof Error
               ? e.message
-              : 'Unable to load municipal planning summary'
+              : 'Unable to load municipality snapshot'
           )
         }
       } finally {
@@ -125,89 +157,79 @@ function MunicipalityPlanningContent({
     return () => {
       cancelled = true
     }
-  }, [municipalityCode, wardId, enabled])
+  }, [municipalityCode, enabled])
+
+  const fiscalYearLabel = useMemo(
+    () => resolveFiscalYearLabel(summary?.budgetLines || []),
+    [summary]
+  )
+  const namedBudget = useMemo(
+    () => pickNamedBudgetMetrics(summary?.budgetLines || []),
+    [summary]
+  )
 
   if (!FEATURE_FLAGS.enableMunicipalPlanning || !enabled) {
     return (
-      <div className="container py-12">
+      <div className="container max-w-xl space-y-3 py-12">
+        <p className="text-label font-display text-primary-700">My Municipality</p>
+        <h1 className="font-display text-h2 text-ink">{displayName}</h1>
+        {province ? (
+          <p className="text-body text-ink-muted">{province.name}</p>
+        ) : null}
+        <h2 className="pt-2 font-display text-h3 text-ink">
+          Municipal information coming soon
+        </h2>
         <p className="text-ink-muted" role="status">
-          Our Municipality planning summary is not enabled for this area yet.
+          We have identified your municipality. Verified planning and budget
+          information has not yet been activated for this municipality on Serve
+          SA.
         </p>
+        <p className="text-body-sm text-ink-subtle">
+          You can still report issues and track cases. Serve SA never shows
+          another municipality&apos;s plans in place of yours.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Button asChild>
+            <Link href="/report">Report an Issue</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href="/updates">Municipal Updates</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/account">Change municipality</Link>
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="bg-canvas">
-      <section className="border-b border-border bg-surface py-10">
-        <div className="container max-w-3xl">
-          <p className="mt-1 text-label font-display text-primary-700">
-            Your Municipality
-          </p>
-          <h1 className="mt-2 flex items-center gap-2 font-display text-h1 text-ink">
-            <Building2 className="h-8 w-8 shrink-0 text-primary-600" aria-hidden />
-            {displayName}
+      <section className="border-b border-border bg-surface py-8">
+        <div className="container max-w-xl">
+          <p className="text-label font-display text-primary-700">My Municipality</p>
+          <h1 className="mt-2 flex items-start gap-2 font-display text-h1 text-ink">
+            <Building2
+              className="mt-1 h-7 w-7 shrink-0 text-primary-600"
+              aria-hidden
+            />
+            <span>{displayName}</span>
           </h1>
-          <p className="mt-3 text-body text-ink-muted">
-            Understand what your municipality plans to deliver and how those
-            plans affect your community — based on verified official documents,
-            not social posts.
-          </p>
-          {wardId ? (
-            <p className="mt-2 text-sm text-ink-subtle">
-              Ward reference <strong className="text-ink">{wardId}</strong>
-            </p>
+          {province ? (
+            <p className="mt-2 text-body text-ink-muted">{province.name}</p>
           ) : null}
+          <p className="mt-3 text-body-sm text-ink-subtle">
+            What your municipality plans to do and where its money is going —
+            from verified official documents only.
+          </p>
         </div>
       </section>
 
-      <div className="container max-w-3xl space-y-12 py-10">
-        {!loading ? (
-          <MunicipalityCompleteness
-            modules={[
-              {
-                id: 'municipality_overview',
-                label: PLANNING_CONTENT_MODULE_LABEL.municipality_overview,
-                available: Boolean(summary && !summary.empty),
-              },
-              {
-                id: 'strategic_priorities',
-                label: PLANNING_CONTENT_MODULE_LABEL.strategic_priorities,
-                available: Boolean(summary?.priorities?.length),
-              },
-              {
-                id: 'idp_summary',
-                label: PLANNING_CONTENT_MODULE_LABEL.idp_summary,
-                available: Boolean(summary?.priorities?.length),
-              },
-              {
-                id: 'budget_overview',
-                label: PLANNING_CONTENT_MODULE_LABEL.budget_overview,
-                available: Boolean(summary?.budgetLines?.length),
-              },
-              {
-                id: 'capital_projects',
-                label: PLANNING_CONTENT_MODULE_LABEL.capital_projects,
-                available: Boolean(summary?.projects?.length),
-              },
-              {
-                id: 'service_delivery_priorities',
-                label: PLANNING_CONTENT_MODULE_LABEL.service_delivery_priorities,
-                available: false,
-              },
-              {
-                id: 'service_contacts',
-                label: PLANNING_CONTENT_MODULE_LABEL.service_contacts,
-                available: false,
-              },
-            ]}
-          />
-        ) : null}
-
+      <div className="container max-w-xl space-y-10 py-8">
         {loading ? (
           <div className="flex justify-center py-16" role="status">
             <Spinner />
-            <span className="sr-only">Loading municipal planning</span>
+            <span className="sr-only">Loading municipality snapshot</span>
           </div>
         ) : null}
 
@@ -218,32 +240,27 @@ function MunicipalityPlanningContent({
         ) : null}
 
         {!loading && !error && summary?.empty ? (
-          <div className="rounded-lg border border-border bg-surface p-6">
-            <p className="text-label font-display text-primary-700">Your Municipality</p>
-            <h2 className="mt-1 font-display text-h3 text-ink">{displayName}</h2>
-            <h3 className="mt-4 font-display text-h4 text-ink">
-              Planning information is not available yet
-            </h3>
-            <p className="mt-2 text-ink-muted">
-              Your municipality&apos;s verified planning information has not yet
-              been published on Serve SA.
+          <div className="space-y-3">
+            <h2 className="font-display text-h3 text-ink">
+              {summary.emptyCopy ||
+                PLANNING_EMPTY_COPY.municipalitySnapshotComingSoon}
+            </h2>
+            <p className="text-ink-muted">
+              {summary.emptyBody ||
+                PLANNING_EMPTY_COPY.municipalitySnapshotComingSoonBody}
             </p>
-            <p className="mt-3 text-body-sm text-ink-subtle">
-              Serve SA only publishes information verified from official municipal
-              documents. We will not show another municipality’s plans in its
-              place.
+            <p className="text-body-sm text-ink-subtle">
+              You can still report issues and track cases. Serve SA never shows
+              another municipality&apos;s plans in place of yours.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button asChild>
+                <Link href="/report">Report an Issue</Link>
+              </Button>
               <Button asChild variant="secondary">
                 <Link href="/updates">Municipal Updates</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/ideas">Community Ideas</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/report">Report an Issue</Link>
-              </Button>
-              <Button asChild variant="ghost">
                 <Link href="/account">Change municipality</Link>
               </Button>
             </div>
@@ -252,28 +269,105 @@ function MunicipalityPlanningContent({
 
         {!loading && summary && !summary.empty ? (
           <>
-            <section aria-labelledby="overview-heading">
-              <h2 id="overview-heading" className="font-display text-h2 text-ink">
-                Municipality overview
+            <section aria-labelledby="snapshot-heading">
+              <h2 id="snapshot-heading" className="font-display text-h2 text-ink">
+                Municipality Snapshot
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Figures come only from published, verified municipal data.
+                Verified official municipal information only.
+              </p>
+            </section>
+
+            {(namedBudget.total ||
+              namedBudget.operating ||
+              namedBudget.capital ||
+              namedBudget.infra ||
+              summary.budgetLines?.length) ? (
+              <section aria-labelledby="budget-heading">
+                <h2 id="budget-heading" className="font-display text-h2 text-ink">
+                  {fiscalYearLabel || 'Municipal budget'}
+                </h2>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Figures appear only when published from verified official
+                  documents.
+                </p>
+                <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {[
+                    namedBudget.total && {
+                      id: 'total',
+                      label: 'Total municipal budget',
+                      amount: namedBudget.total.amount.amountZar,
+                    },
+                    namedBudget.operating && {
+                      id: 'operating',
+                      label: 'Operating budget',
+                      amount: namedBudget.operating.amount.amountZar,
+                    },
+                    namedBudget.capital && {
+                      id: 'capital',
+                      label: 'Capital budget',
+                      amount: namedBudget.capital.amount.amountZar,
+                    },
+                    namedBudget.infra && {
+                      id: 'infra',
+                      label: 'Infrastructure investment',
+                      amount: namedBudget.infra.amount.amountZar,
+                    },
+                  ]
+                    .filter(Boolean)
+                    .map((metric) => {
+                      const m = metric as {
+                        id: string
+                        label: string
+                        amount: number
+                      }
+                      return (
+                        <li
+                          key={m.id}
+                          className="rounded-lg border border-border bg-surface p-4"
+                          style={{ borderTopColor: 'rgb(0 35 149)', borderTopWidth: 3 }}
+                        >
+                          <p className="text-label text-ink-muted">{m.label}</p>
+                          <p className="mt-2 font-display text-xl font-semibold tabular-nums text-ink">
+                            {formatZar(m.amount)}
+                          </p>
+                        </li>
+                      )
+                    })}
+                </ul>
+              </section>
+            ) : null}
+
+            <section aria-labelledby="allocations-heading">
+              <h2
+                id="allocations-heading"
+                className="font-display text-h2 text-ink"
+              >
+                Where the money goes
+              </h2>
+              <p className="mt-1 text-sm text-ink-muted">
+                Categories shown only when the municipality&apos;s verified
+                budget supports them.
               </p>
               <div className="mt-4">
-                <PlanningKpiCards kpis={summary.kpis || []} />
+                <BudgetBreakdown lines={summary.budgetLines || []} />
               </div>
             </section>
 
             <section aria-labelledby="priorities-heading">
-              <h2 id="priorities-heading" className="font-display text-h2 text-ink">
-                Key priorities
+              <h2
+                id="priorities-heading"
+                className="font-display text-h2 text-ink"
+              >
+                What your municipality plans to do
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                What the municipality says it will focus on — in everyday
-                language.
+                Major priorities from verified planning documents.
               </p>
               {!summary.priorities?.length ? (
-                <p className="mt-4 text-ink-muted">Not published yet</p>
+                <p className="mt-4 text-ink-muted">
+                  {PLANNING_EMPTY_COPY.notPublished}
+                </p>
               ) : (
                 <ul className="mt-4 space-y-4">
                   {summary.priorities.map((p) => (
@@ -281,22 +375,23 @@ function MunicipalityPlanningContent({
                       key={p.priorityId}
                       className="rounded-lg border border-border bg-surface p-4"
                     >
-                      <h3 className="font-display text-lg font-semibold text-ink">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-xs font-medium uppercase tracking-wide text-ink-subtle">
+                          Priority
+                        </p>
+                        {p.budgeted?.amountZar ? (
+                          <p className="text-xs font-medium text-primary-700">
+                            Budgeted · {formatZar(p.budgeted.amountZar)}
+                          </p>
+                        ) : null}
+                      </div>
+                      <h3 className="mt-1 font-display text-lg font-semibold text-ink">
                         {p.title}
                       </h3>
                       <ServeSaSummaryBanner show={p.isServeSaSummary !== false} />
                       <p className="mt-2 text-sm text-ink-muted">
                         {p.plainLanguageSummary}
                       </p>
-                      {typeof p.progressPercent === 'number' ? (
-                        <p className="mt-2 text-xs text-ink-subtle">
-                          Progress: {p.progressPercent}%
-                        </p>
-                      ) : (
-                        <p className="mt-2 text-xs text-ink-subtle">
-                          Progress: Not published yet
-                        </p>
-                      )}
                       <div className="mt-3">
                         <Button asChild variant="secondary" size="sm">
                           <Link
@@ -319,27 +414,18 @@ function MunicipalityPlanningContent({
               )}
             </section>
 
-            <section aria-labelledby="budget-heading">
-              <h2 id="budget-heading" className="font-display text-h2 text-ink">
-                Budget highlights
-              </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Published budget lines with source references for every amount.
-              </p>
-              <div className="mt-4 rounded-lg border border-border bg-surface p-4">
-                <BudgetBreakdown lines={summary.budgetLines || []} />
-              </div>
-            </section>
-
             <section aria-labelledby="projects-heading">
               <h2 id="projects-heading" className="font-display text-h2 text-ink">
-                Planned projects
+                Major plans and projects
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Structured municipal projects with official statuses only.
+                A small set of major published items — status only when
+                officially supported.
               </p>
               {!summary.projects?.length ? (
-                <p className="mt-4 text-ink-muted">Not published yet</p>
+                <p className="mt-4 text-ink-muted">
+                  {PLANNING_EMPTY_COPY.notPublished}
+                </p>
               ) : (
                 <ul className="mt-4 space-y-3">
                   {summary.projects.map((project) => (
@@ -351,74 +437,83 @@ function MunicipalityPlanningContent({
               )}
             </section>
 
-            <section aria-labelledby="community-heading">
-              <h2 id="community-heading" className="font-display text-h2 text-ink">
-                Your community
+            <section aria-labelledby="sources-heading">
+              <h2 id="sources-heading" className="font-display text-h2 text-ink">
+                Official sources
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Ward-specific projects when official documents include ward
-                mapping.
+                Documents used for this Municipality Snapshot.
               </p>
-              {summary.community?.emptyCopy ? (
-                <p className="mt-4 text-ink-muted">{summary.community.emptyCopy}</p>
-              ) : !summary.community?.wardProjects?.length ? (
-                <p className="mt-4 text-ink-muted">Not published yet</p>
+              {!summary.documents?.length ? (
+                <p className="mt-4 text-ink-muted">
+                  {PLANNING_EMPTY_COPY.notPublished}
+                </p>
               ) : (
                 <ul className="mt-4 space-y-3">
-                  {summary.community.wardProjects.map((project) => (
-                    <li key={project.projectId}>
-                      <ProjectCard project={project} />
-                    </li>
-                  ))}
+                  {summary.documents.map((doc) => {
+                    const kindLabel =
+                      PLAN_DOCUMENT_KIND_LABEL[
+                        doc.kind as PlanDocumentKind
+                      ] || doc.kind
+                    return (
+                      <li
+                        key={doc.documentId}
+                        className="border-b border-border pb-3 last:border-0"
+                      >
+                        {doc.officialUrl ? (
+                          <a
+                            href={doc.officialUrl}
+                            className="text-sm font-medium text-primary-700 underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() =>
+                              trackPublishingEvent('source_document_opened', {
+                                documentId: doc.documentId,
+                                municipalityCode,
+                              })
+                            }
+                          >
+                            {doc.title}
+                          </a>
+                        ) : (
+                          <span className="text-sm font-medium text-ink">
+                            {doc.title}
+                          </span>
+                        )}
+                        <p className="mt-1 text-xs text-ink-subtle">
+                          {[
+                            kindLabel,
+                            doc.fiscalYear ? `Period ${doc.fiscalYear}` : null,
+                            displayName,
+                            doc.publishedAt
+                              ? `Verified ${new Date(doc.publishedAt).toLocaleDateString('en-ZA')}`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </li>
+                    )
+                  })}
                 </ul>
               )}
             </section>
 
-            {summary.documents?.length ? (
-              <section aria-labelledby="sources-heading">
-                <h2 id="sources-heading" className="font-display text-h2 text-ink">
-                  Official source documents
-                </h2>
-                <p className="mt-1 text-sm text-ink-muted">
-                  Verified municipal documents behind this summary.
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {summary.documents.map((doc) => (
-                    <li key={doc.documentId}>
-                      {doc.officialUrl ? (
-                        <a
-                          href={doc.officialUrl}
-                          className="text-sm text-primary-700 underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() =>
-                            trackPublishingEvent('source_document_opened', {
-                              documentId: doc.documentId,
-                              municipalityCode,
-                            })
-                          }
-                        >
-                          {doc.title}
-                        </a>
-                      ) : (
-                        <span className="text-sm text-ink">{doc.title}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            <section className="rounded-lg border border-border bg-surface p-5">
+            <section className="border-t border-border pt-6">
               <h2 className="font-display text-lg font-semibold text-ink">
                 Stay connected locally
               </h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Follow municipal updates and share constructive community ideas
-                for this municipality.
+                Follow updates and share ideas for this municipality.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button asChild>
+                  <Link href="/report">Report an Issue</Link>
+                </Button>
+                <Button asChild variant="secondary">
+                  <Link href="/updates">Municipal Updates</Link>
+                </Button>
+                <Button asChild variant="outline">
                   <Link
                     href="/ideas/new"
                     onClick={() =>
@@ -430,9 +525,6 @@ function MunicipalityPlanningContent({
                     Share an Idea
                   </Link>
                 </Button>
-                <Button asChild variant="secondary">
-                  <Link href="/updates">Municipal Updates</Link>
-                </Button>
               </div>
             </section>
           </>
@@ -443,11 +535,8 @@ function MunicipalityPlanningContent({
 }
 
 function MunicipalityAuthenticatedView() {
-  const { userProfile } = useAuth()
   const resolution = useCitizenMunicipality()
   const municipalityCode = resolution.municipalityCode
-  const wardId =
-    (userProfile as { wardId?: string } | null)?.wardId || null
 
   if (resolution.loading) {
     return (
@@ -467,25 +556,20 @@ function MunicipalityAuthenticatedView() {
     )
   }
 
-  return (
-    <MunicipalityPlanningContent
-      municipalityCode={municipalityCode}
-      wardId={wardId}
-    />
-  )
+  return <MunicipalitySnapshotContent municipalityCode={municipalityCode} />
 }
 
 /**
- * Our Municipality / Visual IDP — authenticated citizens with a confirmed
- * municipality only. Never falls back to JHB or pilot planning for anonymous
- * or unresolved users.
+ * My Municipality — authenticated citizens with a confirmed municipality.
+ * Municipality-level snapshot only. Never uses ward for planning content.
+ * Never falls back to JHB for anonymous or unresolved users.
  */
 export default function MunicipalityPage() {
   return (
     <AuthGate
       next="/municipality"
-      title="Sign in to view Our Municipality"
-      description="Municipal plans, priorities and projects are available after you sign in and confirm your municipality. Reporting an issue does not require an account."
+      title="Sign in to view My Municipality"
+      description="Your municipality snapshot — plans, budget and priorities — is available after you sign in and confirm your municipality. Reporting an issue does not require an account."
     >
       <MunicipalityAuthenticatedView />
     </AuthGate>

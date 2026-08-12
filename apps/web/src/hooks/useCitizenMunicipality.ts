@@ -8,7 +8,7 @@ import {
 } from '@/lib/municipality/resolveCitizenMunicipality'
 
 /**
- * Shared citizen municipality context for Our Municipality, updates, ideas, etc.
+ * Shared citizen municipality context for My Municipality, updates, ideas, etc.
  * Precedence: JWT claims → persisted profile → null (never invents JHB).
  */
 export function useCitizenMunicipality(): CitizenMunicipalityResolution & {

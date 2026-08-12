@@ -11,6 +11,7 @@ import {
   MUNICIPAL_PROJECT_STATUS_LABEL,
   PLAN_DOCUMENT_KIND_LABEL,
   PLANNING_EMPTY_COPY,
+  selectMajorMunicipalProjects,
 } from '../src'
 
 describe('municipal planning contract', () => {
@@ -103,5 +104,22 @@ describe('municipal planning contract', () => {
   it('exposes honest empty-state copy', () => {
     expect(PLANNING_EMPTY_COPY.notPublished).toMatch(/Not published/i)
     expect(PLANNING_EMPTY_COPY.awaitingVerification).toMatch(/verification/i)
+    expect(PLANNING_EMPTY_COPY.municipalitySnapshotComingSoon).toMatch(
+      /coming soon/i
+    )
+  })
+
+  it('selects major projects deterministically without inventing ward focus', () => {
+    const selected = selectMajorMunicipalProjects(
+      [
+        { id: 'w', scope: 'ward_specific', status: 'planned', sortOrder: 0 },
+        { id: 'm', scope: 'municipality_wide', status: 'in_progress', sortOrder: 5 },
+        { id: 'r', scope: 'regional', status: 'planned', sortOrder: 1 },
+        { id: 'c', scope: 'municipality_wide', status: 'cancelled', sortOrder: 0 },
+      ],
+      3
+    )
+    expect(selected.map((p) => p.id)).toEqual(['m', 'r', 'w'])
+    expect(MUNICIPAL_PROJECT_STATUS_LABEL.in_progress).toMatch(/implementation/i)
   })
 })

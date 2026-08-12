@@ -8,7 +8,7 @@ test.describe('municipal planning @planning', () => {
   test('anonymous municipality route requires sign-in', async ({ page }) => {
     await page.goto('/municipality.html')
     await expect(
-      page.getByRole('heading', { name: /Sign in to view Our Municipality/i })
+      page.getByRole('heading', { name: /Sign in to view My Municipality/i })
     ).toBeVisible({ timeout: 20_000 })
     await expect(page.getByRole('link', { name: /Sign in/i }).first()).toBeVisible()
     await expect(page.getByText(/\bJHB\b/)).toHaveCount(0)

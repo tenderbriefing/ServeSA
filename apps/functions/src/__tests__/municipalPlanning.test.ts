@@ -50,6 +50,11 @@ describe('planning lifecycle', () => {
   })
 
   it('keeps honest empty copy constants', () => {
-    expect(PLANNING_EMPTY_COPY.noWardMapping).toMatch(/Ward-level/i)
+    expect(PLANNING_EMPTY_COPY.municipalitySnapshotComingSoon).toMatch(
+      /coming soon/i
+    )
+    expect(PLANNING_EMPTY_COPY.municipalitySnapshotComingSoonBody).toMatch(
+      /identified your municipality/i
+    )
   })
 })

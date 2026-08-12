@@ -17,6 +17,9 @@ import {
   assertPlanPublicationTransition,
   MUNICIPAL_PLANNING_CONTRACT_VERSION,
   PLANNING_EMPTY_COPY,
+  MUNICIPALITY_SNAPSHOT_PRIORITY_LIMIT,
+  MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT,
+  selectMajorMunicipalProjects,
   type PlanPublicationStatus,
 } from '@servesa/case-contract'
 import {
@@ -472,7 +475,8 @@ export async function listPlanningEntitiesOps(raw: unknown, ctx: AuthCtx) {
 export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx) {
   const parsed = GetMunicipalPlanningSummaryInputSchema.parse(raw || {})
   const municipalityCode = parsed.municipalityCode.trim()
-  const wardId = parsed.wardId?.trim() || null
+  // wardId accepted for backwards compatibility but must NOT shape the snapshot
+  const wardIdIgnored = parsed.wardId?.trim() || null
 
   const [prioritiesSnap, projectsSnap, budgetSnap, docsSnap] = await Promise.all([
     db
@@ -504,9 +508,18 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
   const priorities = prioritiesSnap.docs
     .map((d) => serializeTimestamps(d.data() as Record<string, unknown>))
     .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+    .slice(0, MUNICIPALITY_SNAPSHOT_PRIORITY_LIMIT)
 
-  const projects = projectsSnap.docs.map((d) =>
+  const allProjects = projectsSnap.docs.map((d) =>
     serializeTimestamps(d.data() as Record<string, unknown>)
+  )
+  const projects = selectMajorMunicipalProjects(
+    allProjects as Array<{
+      scope?: string
+      status?: string
+      sortOrder?: number
+    }>,
+    MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT
   )
   const budgetLines = budgetSnap.docs
     .map((d) => serializeTimestamps(d.data() as Record<string, unknown>))
@@ -515,18 +528,11 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     serializeTimestamps(d.data() as Record<string, unknown>)
   )
 
-  const anyWardMapping = projects.some((p) => Boolean(p.wardMappingAvailable))
-  const wardProjects =
-    wardId && anyWardMapping
-      ? projects.filter((p) => {
-          const wards = (p.wardIds as string[]) || []
-          return Boolean(p.wardMappingAvailable) && wards.includes(wardId)
-        })
-      : []
-
-  const publishedProjectCount = projects.length
-  const completedCount = projects.filter((p) => p.status === 'completed').length
-  const inProgressCount = projects.filter((p) => p.status === 'in_progress').length
+  const publishedProjectCount = allProjects.length
+  const completedCount = allProjects.filter((p) => p.status === 'completed').length
+  const inProgressCount = allProjects.filter(
+    (p) => p.status === 'in_progress'
+  ).length
   const budgetTotalZar = budgetLines.reduce((sum, line) => {
     const amount = line.amount as { amountZar?: number } | null
     return sum + (typeof amount?.amountZar === 'number' ? amount.amountZar : 0)
@@ -536,7 +542,7 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
   const kpis = [
     {
       id: 'priorities',
-      label: 'Published priorities',
+      label: 'Key priorities',
       value: priorities.length,
       unit: 'count' as const,
       confidence: priorities.length
@@ -545,8 +551,8 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     },
     {
       id: 'projects',
-      label: 'Published projects',
-      value: publishedProjectCount,
+      label: 'Major plans & projects',
+      value: projects.length,
       unit: 'count' as const,
       confidence: publishedProjectCount
         ? ('verified_official' as const)
@@ -554,7 +560,7 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
     },
     {
       id: 'in_progress',
-      label: 'In progress',
+      label: 'In implementation',
       value: inProgressCount,
       unit: 'count' as const,
       confidence: publishedProjectCount
@@ -583,35 +589,35 @@ export async function getMunicipalPlanningSummaryOps(raw: unknown, _ctx: AuthCtx
 
   logCaseTelemetry('municipal_planning_summary_viewed', {
     municipalityCode,
-    hasWard: Boolean(wardId),
+    hasWard: Boolean(wardIdIgnored),
     priorityCount: priorities.length,
-    projectCount: publishedProjectCount,
+    projectCount: projects.length,
+    snapshotMode: 'municipality',
   })
 
   return {
     success: true,
     municipalityCode,
-    wardId,
+    /** Always null on citizen snapshot — ward must not shape this surface */
+    wardId: null,
     kpis,
     priorities,
     projects,
     budgetLines,
     documents,
+    /** Ward community section removed from My Municipality product */
     community: {
-      wardId,
-      wardMappingAvailable: anyWardMapping,
-      wardProjects,
-      emptyCopy: !anyWardMapping
-        ? PLANNING_EMPTY_COPY.noWardMapping
-        : wardProjects.length === 0
-          ? PLANNING_EMPTY_COPY.notPublished
-          : null,
+      wardId: null,
+      wardMappingAvailable: false,
+      wardProjects: [],
+      emptyCopy: null,
     },
     empty:
       priorities.length === 0 &&
       projects.length === 0 &&
       budgetLines.length === 0,
-    emptyCopy: PLANNING_EMPTY_COPY.notPublished,
+    emptyCopy: PLANNING_EMPTY_COPY.municipalitySnapshotComingSoon,
+    emptyBody: PLANNING_EMPTY_COPY.municipalitySnapshotComingSoonBody,
     contractVersion: MUNICIPAL_PLANNING_CONTRACT_VERSION,
   }
 }

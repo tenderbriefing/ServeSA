@@ -1,9 +1,10 @@
 /**
- * Municipal Planning (Visual IDP Summary) — shared typed contract.
+ * Municipal Planning (Municipality Snapshot) — shared typed contract.
  *
- * Source of truth for budgets, dates, %, status, ward, and expenditure is
+ * Source of truth for budgets, dates, %, status, and expenditure is
  * verified municipal documents — never AI. AI may assist summarisation only
  * and must be labelled as ServeSA plain-language summary.
+ * Citizen My Municipality is municipality-level; ward must not shape the snapshot.
  */
 import { z } from 'zod';
 export declare const MUNICIPAL_PLANNING_CONTRACT_VERSION = "1.0.0";
@@ -869,7 +870,10 @@ export declare const TransitionPlanningStatusInputSchema: z.ZodObject<{
 export type TransitionPlanningStatusInput = z.infer<typeof TransitionPlanningStatusInputSchema>;
 export declare const GetMunicipalPlanningSummaryInputSchema: z.ZodObject<{
     municipalityCode: z.ZodString;
-    /** Optional ward for YOUR COMMUNITY section — never invent if absent */
+    /**
+     * Deprecated for My Municipality snapshot — ward is not used to construct
+     * the citizen planning view. Accepted for backwards compatibility only.
+     */
     wardId: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     fiscalYear: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
@@ -918,6 +922,21 @@ export type ListPlanningEntitiesInput = z.infer<typeof ListPlanningEntitiesInput
 export declare const PLANNING_EMPTY_COPY: {
     readonly notPublished: "Not published yet";
     readonly awaitingVerification: "Data awaiting verification";
+    /** @deprecated Ward planning is not part of My Municipality snapshot */
     readonly noWardMapping: "Ward-level project mapping is not available for this municipality yet.";
-    readonly resolutionUnavailable: "We could not confirm your municipality yet. Confirm where you live to see local planning information.";
+    readonly resolutionUnavailable: "We could not confirm your municipality yet. Confirm where you live to see local municipal information.";
+    readonly municipalitySnapshotComingSoon: "Municipal information coming soon";
+    readonly municipalitySnapshotComingSoonBody: "We have identified your municipality. Verified planning and budget information has not yet been published on Serve SA.";
 };
+/** Deterministic major-project selection for citizen Municipality Snapshot */
+export declare const MUNICIPALITY_SNAPSHOT_PRIORITY_LIMIT = 6;
+export declare const MUNICIPALITY_SNAPSHOT_PROJECT_LIMIT = 8;
+/**
+ * Select a small, reviewable set of major published projects.
+ * Prefers municipality-wide/regional over ward-specific; never invents data.
+ */
+export declare function selectMajorMunicipalProjects<T extends {
+    scope?: string;
+    status?: string;
+    sortOrder?: number;
+}>(projects: T[], limit?: number): T[];

@@ -25,3 +25,12 @@ test('allow-list gates municipality when flag ON', () => {
   assert.equal(isEnabled(true, ['JHB'], 'CPT'), false)
   assert.equal(isEnabled(true, ['JHB'], null), false)
 })
+
+test('Gauteng allow-list includes metros and excludes CPT', () => {
+  const gauteng = ['JHB', 'TSH', 'EKU', 'WTS', 'SED', 'MTS']
+  for (const code of gauteng) {
+    assert.equal(isEnabled(true, gauteng, code), true, code)
+  }
+  assert.equal(isEnabled(true, gauteng, 'CPT'), false)
+  assert.equal(isEnabled(true, gauteng, 'DBN'), false)
+})
