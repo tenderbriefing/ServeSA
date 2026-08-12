@@ -238,10 +238,25 @@ module.exports = {
           '0%': { strokeDashoffset: '120' },
           '100%': { strokeDashoffset: '0' },
         },
+        'landing-pulse': {
+          '0%, 100%': { opacity: '0.9', transform: 'scale(1)' },
+          '50%': { opacity: '0.45', transform: 'scale(1.35)' },
+        },
+        'landing-route': {
+          '0%': { strokeDashoffset: '40' },
+          '100%': { strokeDashoffset: '0' },
+        },
+        'landing-travel': {
+          '0%, 100%': { transform: 'translateX(-6px)', opacity: '0.85' },
+          '50%': { transform: 'translateX(6px)', opacity: '1' },
+        },
       },
       animation: {
         'civic-fade-up': 'civic-fade-up 420ms var(--motion-ease) both',
         'civic-draw': 'civic-draw 900ms var(--motion-ease) both',
+        'landing-pulse': 'landing-pulse 2.8s var(--motion-ease) infinite',
+        'landing-route': 'landing-route 2.4s var(--motion-ease) infinite',
+        'landing-travel': 'landing-travel 2.6s var(--motion-ease) infinite',
       },
     },
   },

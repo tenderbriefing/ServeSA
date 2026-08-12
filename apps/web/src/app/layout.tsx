@@ -25,11 +25,11 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Serve SA — Building Better Communities Together',
+    default: 'Serve SA | Citizens and Municipalities, Connected',
     template: '%s | Serve SA',
   },
   description:
-    'Built for South Africa. Built for every community. Report local service issues and track progress with your municipality.',
+    'Report municipal service-delivery issues, track progress, receive local updates and stay connected to your municipality with Serve SA.',
   keywords: [
     'South Africa',
     'service delivery',
@@ -55,16 +55,16 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_ZA',
     url: 'https://servesa.co.za',
-    title: 'Serve SA — Building Better Communities Together',
+    title: 'Serve SA | Citizens and Municipalities, Connected',
     description:
-      'Built for South Africa. Built for every community. Report local service issues and track progress.',
+      'Report municipal service-delivery issues, track progress, receive local updates and stay connected to your municipality with Serve SA.',
     siteName: 'Serve SA',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Serve SA — Building Better Communities Together',
+    title: 'Serve SA | Citizens and Municipalities, Connected',
     description:
-      'Built for South Africa. Built for every community. Report local service issues and track progress.',
+      'Report municipal service-delivery issues, track progress, receive local updates and stay connected to your municipality with Serve SA.',
   },
   manifest: '/manifest.json',
   icons: {
